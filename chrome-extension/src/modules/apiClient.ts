@@ -18,6 +18,33 @@ type RequestOptions = {
   query?: Record<string, string | number | boolean | undefined>;
 };
 
+const DEBUG = false;
+
+export function normalizeArrayResponse<T>(response: unknown, possibleKeys = ['data', 'devices', 'commands', 'snapshots', 'bookmarks', 'history', 'items']): T[] {
+  if (!response) return [];
+  if (Array.isArray(response)) return response;
+  if (typeof response !== 'object') return [];
+
+  for (const key of possibleKeys) {
+    if (key in response && Array.isArray((response as any)[key])) {
+      return (response as any)[key];
+    }
+  }
+
+  if (DEBUG) {
+    console.warn('[BrowserBridge] Could not extract array from response:', response);
+  }
+
+  return [];
+}
+
+export function unwrapData<T>(response: unknown): T {
+  if (response && typeof response === 'object' && 'data' in response) {
+    return (response as any).data;
+  }
+  return response as T;
+}
+
 function normalizeApiUrl(apiUrl: string): string {
   return apiUrl.replace(/\/+$/, '');
 }
@@ -52,7 +79,13 @@ async function request<T>(config: ExtensionConfig, path: string, options: Reques
     throw new Error(errorPayload.message || fallbackMessage);
   }
 
-  return await response.json() as T;
+  const responseJson = await response.json();
+
+  if (DEBUG) {
+    console.log(`[BrowserBridge] API response for ${path}:`, responseJson);
+  }
+
+  return responseJson as T;
 }
 
 export async function registerDevice(config: ExtensionConfig): Promise<DeviceResource> {
@@ -113,6 +146,10 @@ export async function searchBookmarks(config: ExtensionConfig, query = ''): Prom
 }
 
 export async function uploadBookmarkSnapshot(config: ExtensionConfig, items: BookmarkSnapshotItem[]): Promise<void> {
+  if (DEBUG) {
+    console.log(`[BrowserBridge] Uploading bookmark snapshot with ${items.length} items.`);
+  }
+
   await request(config, '/api/bookmarks/snapshot', {
     method: 'POST',
     body: {
@@ -123,6 +160,10 @@ export async function uploadBookmarkSnapshot(config: ExtensionConfig, items: Boo
 }
 
 export async function uploadTabSnapshot(config: ExtensionConfig, tabs: TabSnapshotItem[]): Promise<void> {
+  if (DEBUG) {
+    console.log(`[BrowserBridge] Uploading tab snapshot with ${tabs.length} tabs.`);
+  }
+
   await request(config, '/api/tabs/snapshot', {
     method: 'POST',
     body: {
@@ -135,6 +176,10 @@ export async function uploadTabSnapshot(config: ExtensionConfig, tabs: TabSnapsh
 export async function uploadHistoryBatch(config: ExtensionConfig, items: HistoryBatchItem[]): Promise<void> {
   if (items.length === 0) {
     return;
+  }
+
+  if (DEBUG) {
+    console.log(`[BrowserBridge] Uploading history batch with ${items.length} items.`);
   }
 
   await request(config, '/api/history/batch', {
@@ -162,7 +207,7 @@ export async function sendTabCommand(
     },
   });
 
-  return response.data;
+  return unwrapData(response);
 }
 
 export async function fetchIncomingTabCommands(config: ExtensionConfig): Promise<TabCommandResource[]> {
@@ -172,7 +217,7 @@ export async function fetchIncomingTabCommands(config: ExtensionConfig): Promise
     },
   });
 
-  return response.data;
+  return normalizeArrayResponse(response);
 }
 
 export async function searchHistory(config: ExtensionConfig, query = ''): Promise<HistoryItemResource[]> {
@@ -184,7 +229,7 @@ export async function searchHistory(config: ExtensionConfig, query = ''): Promis
     },
   });
 
-  return response.data;
+  return normalizeArrayResponse(response);
 }
 
 export async function deleteSyncedHistory(config: ExtensionConfig): Promise<void> {
@@ -204,7 +249,7 @@ export async function markTabCommandOpened(config: ExtensionConfig, commandId: n
     },
   });
 
-  return response.data;
+  return unwrapData(response);
 }
 
 export async function markTabCommandDismissed(config: ExtensionConfig, commandId: number): Promise<TabCommandResource> {
@@ -215,5 +260,5 @@ export async function markTabCommandDismissed(config: ExtensionConfig, commandId
     },
   });
 
-  return response.data;
+  return unwrapData(response);
 }

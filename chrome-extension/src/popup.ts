@@ -10,6 +10,7 @@ import type {
   NormalizedBookmarkResource,
   TabCommandResource,
   TabSnapshotItem,
+  SyncSummary,
 } from './modules/types';
 
 type PopupStatus = {
@@ -20,6 +21,7 @@ type PopupStatus = {
   currentTab: TabSnapshotItem | null;
   bookmarks?: NormalizedBookmarkResource[];
   historyItems?: HistoryItemResource[];
+  summary?: SyncSummary;
 };
 
 type RuntimeResponse<T> = {
@@ -334,6 +336,30 @@ function render(status: PopupStatus): void {
   renderCommands(status);
 }
 
+function renderSyncSummary(summary?: SyncSummary): void {
+  if (!summary) return;
+
+  const parts = [];
+
+  if (summary.bookmarks) {
+    parts.push(summary.bookmarks.success ? `Bookmarks: ${summary.bookmarks.count}` : 'Bookmarks: Failed');
+  }
+
+  if (summary.tabs) {
+    parts.push(summary.tabs.success ? `Tabs: ${summary.tabs.count}` : 'Tabs: Failed');
+  }
+
+  if (summary.history) {
+    parts.push(summary.history.success ? `History: ${summary.history.count}` : 'History: Failed');
+  }
+
+  if (parts.length > 0) {
+    setError(`Sync finished. ${parts.join(' | ')}`);
+  } else {
+    setError('Sync finished but no categories were enabled.');
+  }
+}
+
 async function refresh(): Promise<void> {
   const status = await sendMessage<PopupStatus>({ type: 'browserbridge.getStatus' });
   render(status);
@@ -402,17 +428,26 @@ async function deleteBrowserBridgeHistory(): Promise<void> {
 
 requireElement(elements.syncNow).addEventListener('click', () => {
   void sendMessage<PopupStatus>({ type: 'browserbridge.syncNow' })
-    .then(render)
-    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to sync.'));
+    .then((status) => {
+      render(status);
+      renderSyncSummary(status.summary);
+    })
+    .catch((error: unknown) => {
+      console.error(error);
+      setError('Sync failed. Check extension console for details.');
+    });
 });
 
 requireElement(elements.syncBookmarksNow).addEventListener('click', () => {
   void sendMessage<PopupStatus>({ type: 'browserbridge.syncBookmarksNow' })
     .then((status) => {
       render(status);
-      setError('Bookmarks synced.');
+      renderSyncSummary(status.summary);
     })
-    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to sync bookmarks.'));
+    .catch((error: unknown) => {
+      console.error(error);
+      setError('Bookmark sync failed. Check extension console for details.');
+    });
 });
 
 requireElement(elements.openOptions).addEventListener('click', () => {

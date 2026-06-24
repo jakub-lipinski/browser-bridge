@@ -107,3 +107,15 @@ export type ApiCollection<T> = {
 export type ApiItem<T> = {
   data: T;
 };
+
+export type SyncCategoryResult = {
+  success: boolean;
+  count: number;
+  error?: string;
+};
+
+export type SyncSummary = {
+  bookmarks?: SyncCategoryResult;
+  tabs?: SyncCategoryResult;
+  history?: SyncCategoryResult;
+};

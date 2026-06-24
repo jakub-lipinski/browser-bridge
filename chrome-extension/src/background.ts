@@ -11,7 +11,7 @@ import {
   openIncomingCommand,
   sendCurrentTabToDevice,
 } from './modules/tabCommands';
-import type { ExtensionConfig, TabCommandResource } from './modules/types';
+import type { ExtensionConfig, SyncSummary, TabCommandResource } from './modules/types';
 
 const SYNC_ALARM_NAME = 'browserbridge.sync';
 const SYNC_INTERVAL_MINUTES = 1;
@@ -36,32 +36,64 @@ async function ensureRegistered(config: ExtensionConfig): Promise<ExtensionConfi
   return connectDevice(config);
 }
 
-async function syncOnce(): Promise<void> {
+async function syncOnce(): Promise<SyncSummary> {
   let config = await getConfig();
 
   if (!config.apiUrl || !config.apiToken) {
-    return;
+    return {};
   }
 
   config = await ensureRegistered(config);
 
+  const summary: SyncSummary = {};
+  let globalError: string | null = null;
+
   if (config.sync.bookmarks) {
-    await syncBookmarks(config);
+    try {
+      const count = await syncBookmarks(config);
+      summary.bookmarks = { success: true, count };
+    } catch (error) {
+      summary.bookmarks = { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
+      globalError = summary.bookmarks.error || globalError;
+      console.warn('[BrowserBridge] Bookmark sync failed:', error);
+    }
   }
 
   if (config.sync.tabs) {
-    await syncOpenTabs(config);
+    try {
+      const count = await syncOpenTabs(config);
+      summary.tabs = { success: true, count };
+    } catch (error) {
+      summary.tabs = { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
+      globalError = summary.tabs.error || globalError;
+      console.warn('[BrowserBridge] Tab sync failed:', error);
+    }
   }
 
   if (config.sync.history) {
-    await syncHistory(config);
+    try {
+      const count = await syncHistory(config);
+      summary.history = { success: true, count };
+    } catch (error) {
+      summary.history = { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
+      globalError = summary.history.error || globalError;
+      console.warn('[BrowserBridge] History sync failed:', error);
+    }
   }
 
-  await getIncomingCommands(config);
+  try {
+    await getIncomingCommands(config);
+  } catch (error) {
+    globalError = error instanceof Error ? error.message : 'Unknown error';
+    console.warn('[BrowserBridge] Incoming commands sync failed:', error);
+  }
+
   await updateConfig({
     lastSyncAt: new Date().toISOString(),
-    lastError: null,
+    lastError: globalError,
   });
+
+  return summary;
 }
 
 async function captureError(error: unknown): Promise<void> {
@@ -122,17 +154,27 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResponse) => {
   const respond = async (): Promise<unknown> => {
     if (message.type === 'browserbridge.syncNow') {
-      await syncOnce();
+      const summary = await syncOnce();
+      const status = await getStatus();
 
-      return getStatus();
+      return { ...status, summary };
     }
 
     if (message.type === 'browserbridge.syncBookmarksNow') {
       const config = await ensureRegistered(await getConfig());
+      const summary: SyncSummary = {};
 
-      await syncBookmarks(config);
+      try {
+        const count = await syncBookmarks(config);
+        summary.bookmarks = { success: true, count };
+      } catch (error) {
+        summary.bookmarks = { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
+        throw error; // Let the popup catch it
+      }
 
-      return getStatus();
+      const status = await getStatus();
+
+      return { ...status, summary };
     }
 
     if (message.type === 'browserbridge.getStatus') {

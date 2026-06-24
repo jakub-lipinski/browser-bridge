@@ -35,6 +35,10 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
   async getAllTabs(): Promise<TabSnapshotItem[]> {
     const tabs = await chrome.tabs.query({});
 
+    if (!Array.isArray(tabs)) {
+      return [];
+    }
+
     return tabs
       .filter((tab) => !tab.incognito)
       .map((tab) => this.mapTab(tab))
@@ -45,8 +49,15 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
     const tree = await chrome.bookmarks.getTree();
     const items: BookmarkSnapshotItem[] = [];
 
+    if (!Array.isArray(tree)) {
+      return items;
+    }
+
     const visit = (node: chrome.bookmarks.BookmarkTreeNode, path: string[] = []): void => {
-      const nextPath = node.title ? [...path, node.title] : path;
+      if (!node) return;
+
+      const safeTitle = typeof node.title === 'string' && node.title.trim() !== '' ? node.title : (node.url ? 'Untitled bookmark' : 'Untitled folder');
+      const nextPath = node.id !== '0' ? [...path, safeTitle] : path;
 
       if (node.url) {
         if (!isSyncableUrl(node.url)) {
@@ -57,7 +68,7 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
           external_id: node.id,
           parent_external_id: node.parentId,
           type: 'bookmark',
-          title: node.title,
+          title: safeTitle,
           url: node.url,
           path,
           date_added: node.dateAdded ? new Date(node.dateAdded).toISOString() : null,
@@ -67,17 +78,19 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
           external_id: node.id,
           parent_external_id: node.parentId,
           type: 'folder',
-          title: node.title,
+          title: safeTitle,
           url: null,
           path: nextPath,
           date_added: node.dateAdded ? new Date(node.dateAdded).toISOString() : null,
         });
       }
 
-      node.children?.forEach((child) => visit(child, nextPath));
+      if (Array.isArray(node.children)) {
+        node.children.forEach((child) => visit(child, nextPath));
+      }
     };
 
-    tree.forEach(visit);
+    tree.forEach((node) => visit(node, []));
 
     return items;
   }
