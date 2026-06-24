@@ -37,7 +37,7 @@ class BookmarkSnapshotRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $this->rejectOversizedJson($validator, 'items');
+                $this->rejectOversizedJson($validator, 'items', (int) config('browserbridge.max_bookmark_snapshot_payload_bytes'));
                 $this->rejectInvalidProvidedUrls($validator, 'items');
             },
         ];

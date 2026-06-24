@@ -20,6 +20,11 @@ Set a private API token in `.env`:
 
 ```dotenv
 BROWSERBRIDGE_API_TOKEN=replace-with-a-long-random-token
+BROWSERBRIDGE_MAX_DEVICES=10
+BROWSERBRIDGE_MAX_BOOKMARK_SNAPSHOT_PAYLOAD_BYTES=1048576
+BROWSERBRIDGE_MAX_TAB_SNAPSHOT_PAYLOAD_BYTES=524288
+BROWSERBRIDGE_MAX_HISTORY_BATCH_SIZE=500
+BROWSERBRIDGE_MAX_PENDING_TAB_COMMANDS_PER_TARGET=100
 ```
 
 Laravel Herd serves this project at:
@@ -44,7 +49,7 @@ php artisan migrate --force
 
 ## API Examples
 
-The API accepts either `Authorization: Bearer <token>` or `X-BrowserBridge-Token: <token>`.
+The API accepts only `Authorization: Bearer <token>`.
 
 ```bash
 export BASE="https://browserbridge.test"
@@ -125,6 +130,7 @@ curl -k -X POST "$BASE/api/history/batch" \
   -H "Content-Type: application/json" \
   -d '{
     "device_uuid": "11111111-1111-4111-8111-111111111111",
+    "history_sync_enabled": true,
     "items": [
       {
         "url": "https://example.com/article",

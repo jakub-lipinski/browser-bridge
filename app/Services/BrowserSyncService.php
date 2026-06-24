@@ -11,16 +11,27 @@ use App\Models\TabSnapshot;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class BrowserSyncService
 {
-    public function __construct(private BrowserDataSanitizer $sanitizer) {}
+    public function __construct(private UrlSanitizer $urlSanitizer) {}
 
     /**
      * @param  array{name: string, browser: string, platform: string}  $attributes
      */
-    public function registerDevice(string $uuid, array $attributes): Device
+    public function registerDevice(?string $uuid, array $attributes): Device
     {
+        $uuid ??= (string) Str::uuid();
+        $isNewDevice = ! Device::query()->where('uuid', $uuid)->exists();
+
+        if ($isNewDevice && Device::query()->count() >= (int) config('browserbridge.max_devices')) {
+            throw ValidationException::withMessages([
+                'device_uuid' => 'The maximum number of registered devices has been reached.',
+            ]);
+        }
+
         return Device::query()->updateOrCreate(
             ['uuid' => $uuid],
             [
@@ -37,7 +48,7 @@ class BrowserSyncService
      */
     public function storeBookmarkSnapshot(Device $device, array $payload): BookmarkSnapshot
     {
-        $items = $this->sanitizer->filterSyncableItems($payload['items'] ?? []);
+        $items = $this->urlSanitizer->filterSyncableItems($payload['items'] ?? []);
 
         return $device->bookmarkSnapshots()->create([
             'payload_json' => ['items' => $items],
@@ -51,7 +62,7 @@ class BrowserSyncService
      */
     public function storeTabSnapshot(Device $device, array $payload): TabSnapshot
     {
-        $tabs = $this->sanitizer->filterSyncableItems($payload['tabs'] ?? []);
+        $tabs = $this->urlSanitizer->filterSyncableItems($payload['tabs'] ?? []);
 
         return $device->tabSnapshots()->create([
             'payload_json' => ['tabs' => $tabs],
@@ -69,13 +80,21 @@ class BrowserSyncService
         return DB::transaction(function () use ($device, $items): EloquentCollection {
             $historyItems = new EloquentCollection;
 
-            foreach ($this->sanitizer->filterSyncableItems($items) as $item) {
-                $historyItems->push($device->historyItems()->create([
-                    'url' => $item['url'],
-                    'title' => $item['title'] ?? null,
-                    'visited_at' => Carbon::parse($item['visited_at']),
-                    'encrypted_payload' => null,
-                ]));
+            foreach ($this->urlSanitizer->filterSyncableItems($items) as $item) {
+                $historyItem = $device->historyItems()->firstOrCreate(
+                    [
+                        'url' => $item['url'],
+                        'visited_at' => Carbon::parse($item['visited_at']),
+                    ],
+                    [
+                        'title' => $item['title'] ?? null,
+                        'encrypted_payload' => null,
+                    ],
+                );
+
+                if ($historyItem->wasRecentlyCreated) {
+                    $historyItems->push($historyItem);
+                }
             }
 
             return $historyItems;
@@ -84,6 +103,16 @@ class BrowserSyncService
 
     public function sendTabCommand(Device $sourceDevice, Device $targetDevice, string $url, ?string $title): TabCommand
     {
+        $pendingCommandCount = $targetDevice->incomingTabCommands()
+            ->where('status', TabCommandStatus::Pending)
+            ->count();
+
+        if ($pendingCommandCount >= (int) config('browserbridge.max_pending_tab_commands_per_target')) {
+            throw ValidationException::withMessages([
+                'target_device_uuid' => 'The target device has too many pending tab commands.',
+            ]);
+        }
+
         return TabCommand::query()->create([
             'source_device_id' => $sourceDevice->id,
             'target_device_id' => $targetDevice->id,

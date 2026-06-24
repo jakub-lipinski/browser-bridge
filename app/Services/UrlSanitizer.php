@@ -5,26 +5,44 @@ namespace App\Services;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-class BrowserDataSanitizer
+class UrlSanitizer
 {
     /**
      * @var array<int, string>
      */
-    private const INTERNAL_SCHEMES = ['about', 'chrome', 'edge', 'file'];
+    private const BLOCKED_SCHEMES = [
+        'about',
+        'brave',
+        'chrome',
+        'devtools',
+        'edge',
+        'file',
+        'javascript',
+        'view-source',
+    ];
 
-    public function isInternalUrl(?string $url): bool
+    /**
+     * @var array<int, string>
+     */
+    private const ALLOWED_SCHEMES = ['http', 'https'];
+
+    public function isBlockedInternalUrl(?string $url): bool
     {
         if (! is_string($url) || $url === '') {
             return false;
         }
 
+        $normalizedUrl = Str::lower($url);
         $scheme = parse_url($url, PHP_URL_SCHEME);
 
-        if (is_string($scheme) && in_array(Str::lower($scheme), self::INTERNAL_SCHEMES, true)) {
+        if (is_string($scheme) && in_array(Str::lower($scheme), self::BLOCKED_SCHEMES, true)) {
             return true;
         }
 
-        return Str::startsWith(Str::lower($url), ['about:']);
+        return Str::startsWith($normalizedUrl, array_map(
+            fn (string $scheme): string => $scheme.':',
+            self::BLOCKED_SCHEMES,
+        ));
     }
 
     public function isValidWebUrl(?string $url): bool
@@ -33,13 +51,16 @@ class BrowserDataSanitizer
             return false;
         }
 
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
         return filter_var($url, FILTER_VALIDATE_URL) !== false
-            && in_array(Str::lower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true);
+            && is_string($scheme)
+            && in_array(Str::lower($scheme), self::ALLOWED_SCHEMES, true);
     }
 
     public function isSyncableUrl(?string $url): bool
     {
-        return $this->isValidWebUrl($url) && ! $this->isInternalUrl($url);
+        return $this->isValidWebUrl($url) && ! $this->isBlockedInternalUrl($url);
     }
 
     /**

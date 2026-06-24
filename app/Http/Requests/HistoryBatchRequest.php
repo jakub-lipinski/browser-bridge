@@ -25,6 +25,7 @@ class HistoryBatchRequest extends FormRequest
 
         return [
             'device_uuid' => ['required', 'uuid'],
+            'history_sync_enabled' => ['required', 'accepted'],
             'items' => ['required', 'array', 'max:'.$maxBatchSize],
             'items.*.url' => ['required', 'string', 'max:2048'],
             'items.*.title' => ['nullable', 'string', 'max:512'],
@@ -39,7 +40,6 @@ class HistoryBatchRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $this->rejectOversizedJson($validator, 'items');
                 $this->rejectInvalidProvidedUrls($validator, 'items');
             },
         ];

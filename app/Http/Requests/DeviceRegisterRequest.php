@@ -18,7 +18,7 @@ class DeviceRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'device_uuid' => ['required', 'uuid'],
+            'device_uuid' => ['nullable', 'uuid'],
             'name' => ['required', 'string', 'max:120'],
             'browser' => ['required', 'string', 'max:64'],
             'platform' => ['required', 'string', 'max:64'],

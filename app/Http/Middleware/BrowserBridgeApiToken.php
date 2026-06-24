@@ -16,7 +16,7 @@ class BrowserBridgeApiToken
     public function handle(Request $request, Closure $next): Response
     {
         $configuredToken = config('browserbridge.api_token');
-        $providedToken = $request->bearerToken() ?: $request->header('X-BrowserBridge-Token');
+        $providedToken = $request->bearerToken();
 
         if (! is_string($configuredToken) || $configuredToken === '') {
             return response()->json([

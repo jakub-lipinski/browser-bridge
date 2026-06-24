@@ -37,7 +37,7 @@ class TabSnapshotRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $this->rejectOversizedJson($validator, 'tabs');
+                $this->rejectOversizedJson($validator, 'tabs', (int) config('browserbridge.max_tab_snapshot_payload_bytes'));
                 $this->rejectInvalidProvidedUrls($validator, 'tabs');
             },
         ];

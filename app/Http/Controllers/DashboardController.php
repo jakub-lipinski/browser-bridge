@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TabCommandStatus;
+use App\Models\BookmarkSnapshot;
 use App\Models\Device;
+use App\Models\HistoryItem;
+use App\Models\TabCommand;
+use App\Models\TabSnapshot;
 use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
@@ -22,8 +26,24 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'devices' => $devices,
-            'pendingCommandCount' => $devices->sum('pending_tab_commands_count'),
-            'historyItemCount' => $devices->sum('history_items_count'),
+            'storageCounts' => [
+                'devices' => Device::query()->count(),
+                'bookmarkSnapshots' => BookmarkSnapshot::query()->count(),
+                'tabSnapshots' => TabSnapshot::query()->count(),
+                'historyItems' => HistoryItem::query()->count(),
+                'tabCommands' => TabCommand::query()->count(),
+            ],
+            'latestHistoryItems' => HistoryItem::query()
+                ->with('device')
+                ->latest('visited_at')
+                ->limit(10)
+                ->get(),
+            'pendingTabCommands' => TabCommand::query()
+                ->with(['sourceDevice', 'targetDevice'])
+                ->where('status', TabCommandStatus::Pending)
+                ->latest()
+                ->limit(10)
+                ->get(),
         ]);
     }
 }

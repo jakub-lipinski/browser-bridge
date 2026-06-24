@@ -9,7 +9,7 @@
     </head>
     <body class="bg-zinc-50 font-sans text-zinc-950 antialiased">
         <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
-            <header class="flex flex-col gap-4 border-b border-zinc-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <header class="flex flex-col gap-4 border-b border-zinc-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                     <p class="text-sm font-medium text-teal-700">BrowserBridge local cloud</p>
                     <h1 class="mt-2 text-3xl font-semibold text-zinc-950">Sync dashboard</h1>
@@ -18,22 +18,30 @@
                     </p>
                 </div>
                 <div class="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-                    History sync is opt-in only. Browsing history can reveal sensitive private information.
+                    Local/private build. Do not expose publicly until authentication, encryption, privacy policy and rate limiting are complete.
                 </div>
             </header>
 
-            <section class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 <div class="rounded-lg border border-zinc-200 bg-white p-5">
                     <p class="text-sm text-zinc-500">Devices</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $devices->count() }}</p>
+                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['devices'] }}</p>
+                </div>
+                <div class="rounded-lg border border-zinc-200 bg-white p-5">
+                    <p class="text-sm text-zinc-500">Bookmark snapshots</p>
+                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['bookmarkSnapshots'] }}</p>
+                </div>
+                <div class="rounded-lg border border-zinc-200 bg-white p-5">
+                    <p class="text-sm text-zinc-500">Tab snapshots</p>
+                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['tabSnapshots'] }}</p>
                 </div>
                 <div class="rounded-lg border border-zinc-200 bg-white p-5">
                     <p class="text-sm text-zinc-500">History items</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $historyItemCount }}</p>
+                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['historyItems'] }}</p>
                 </div>
                 <div class="rounded-lg border border-zinc-200 bg-white p-5">
-                    <p class="text-sm text-zinc-500">Pending tab commands</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $pendingCommandCount }}</p>
+                    <p class="text-sm text-zinc-500">Tab commands</p>
+                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['tabCommands'] }}</p>
                 </div>
             </section>
 
@@ -88,6 +96,59 @@
                     </div>
                 @endif
             </section>
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <section class="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+                    <div class="border-b border-zinc-200 px-5 py-4">
+                        <h2 class="text-base font-semibold">Latest history items</h2>
+                    </div>
+
+                    @if ($latestHistoryItems->isEmpty())
+                        <div class="px-5 py-8 text-sm text-zinc-500">
+                            No history items stored.
+                        </div>
+                    @else
+                        <div class="divide-y divide-zinc-100">
+                            @foreach ($latestHistoryItems as $historyItem)
+                                <div class="px-5 py-4">
+                                    <div class="truncate text-sm font-medium text-zinc-950">{{ $historyItem->title ?: $historyItem->url }}</div>
+                                    <div class="mt-1 truncate text-xs text-zinc-500">{{ $historyItem->url }}</div>
+                                    <div class="mt-2 text-xs text-zinc-500">
+                                        {{ $historyItem->device?->name ?? 'Unknown device' }} - {{ $historyItem->visited_at?->diffForHumans() }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </section>
+
+                <section class="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+                    <div class="border-b border-zinc-200 px-5 py-4">
+                        <h2 class="text-base font-semibold">Pending tab commands</h2>
+                    </div>
+
+                    @if ($pendingTabCommands->isEmpty())
+                        <div class="px-5 py-8 text-sm text-zinc-500">
+                            No pending tab commands.
+                        </div>
+                    @else
+                        <div class="divide-y divide-zinc-100">
+                            @foreach ($pendingTabCommands as $tabCommand)
+                                <div class="px-5 py-4">
+                                    <div class="truncate text-sm font-medium text-zinc-950">{{ $tabCommand->title ?: $tabCommand->url }}</div>
+                                    <div class="mt-1 truncate text-xs text-zinc-500">{{ $tabCommand->url }}</div>
+                                    <div class="mt-2 text-xs text-zinc-500">
+                                        {{ $tabCommand->sourceDevice?->name ?? 'Unknown source' }}
+                                        to
+                                        {{ $tabCommand->targetDevice?->name ?? 'Unknown target' }}
+                                        - {{ $tabCommand->created_at?->diffForHumans() }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </section>
+            </div>
         </main>
     </body>
 </html>

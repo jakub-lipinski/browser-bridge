@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\Concerns;
 
-use App\Services\BrowserDataSanitizer;
+use App\Services\UrlSanitizer;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Validator;
 use JsonException;
 
 trait ValidatesBrowserBridgePayloads
 {
-    public function rejectOversizedJson(Validator $validator, string $key): void
+    public function rejectOversizedJson(Validator $validator, string $key, int $maxBytes): void
     {
         try {
             $encodedPayload = json_encode($this->input($key), JSON_THROW_ON_ERROR);
@@ -19,14 +19,14 @@ trait ValidatesBrowserBridgePayloads
             return;
         }
 
-        if (strlen($encodedPayload) > (int) config('browserbridge.max_snapshot_payload_bytes')) {
-            $validator->errors()->add($key, 'The payload is too large.');
+        if (strlen($encodedPayload) > $maxBytes) {
+            $validator->errors()->add($key, "The payload is too large. Maximum size is {$maxBytes} bytes.");
         }
     }
 
     public function rejectInvalidProvidedUrls(Validator $validator, string $itemsKey): void
     {
-        $sanitizer = app(BrowserDataSanitizer::class);
+        $sanitizer = app(UrlSanitizer::class);
         $items = $this->input($itemsKey, []);
 
         if (! is_array($items)) {
@@ -40,7 +40,7 @@ trait ValidatesBrowserBridgePayloads
 
             $url = Arr::get($item, 'url');
 
-            if ($url === null || $url === '' || $sanitizer->isInternalUrl($url)) {
+            if ($url === null || $url === '' || $sanitizer->isBlockedInternalUrl($url)) {
                 continue;
             }
 
@@ -53,7 +53,7 @@ trait ValidatesBrowserBridgePayloads
     public function rejectUnsyncableUrl(Validator $validator, string $key): void
     {
         $url = $this->input($key);
-        $sanitizer = app(BrowserDataSanitizer::class);
+        $sanitizer = app(UrlSanitizer::class);
 
         if (! is_string($url) || ! $sanitizer->isSyncableUrl($url)) {
             $validator->errors()->add($key, 'The URL must be a syncable http or https URL.');
