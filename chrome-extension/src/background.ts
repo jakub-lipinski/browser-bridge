@@ -213,12 +213,30 @@ async function getStatus(updateBadge = true) {
   }
 
   const [devices, incomingCommands, currentTab, bookmarks, historyItems, tabSnapshots] = await Promise.all([
-    fetchDevices(config),
-    getIncomingCommands(config),
-    getCurrentTab(),
-    fetchBookmarks(config),
-    searchHistory(config),
-    fetchTabSnapshots(config),
+    fetchDevices(config).catch((error) => {
+      console.warn('[BrowserBridge] Could not load devices:', error);
+      return [];
+    }),
+    getIncomingCommands(config).catch((error) => {
+      console.warn('[BrowserBridge] Could not load incoming commands:', error);
+      return [];
+    }),
+    getCurrentTab().catch((error) => {
+      console.warn('[BrowserBridge] Could not load current tab:', error);
+      return null;
+    }),
+    fetchBookmarks(config).catch((error) => {
+      console.warn('[BrowserBridge] Could not load bookmarks:', error);
+      return [];
+    }),
+    searchHistory(config).catch((error) => {
+      console.warn('[BrowserBridge] Could not load history:', error);
+      return [];
+    }),
+    fetchTabSnapshots(config).catch((error) => {
+      console.warn('[BrowserBridge] Could not load tab snapshots:', error);
+      return [];
+    }),
   ]);
 
   if (updateBadge) {

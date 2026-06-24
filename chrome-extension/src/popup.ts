@@ -536,8 +536,8 @@ function scheduleBookmarkSearch(): void {
         bookmarkState.results = bookmarks;
         bookmarkState.error = null;
       })
-      .catch(() => {
-        bookmarkState.error = 'Could not load bookmarks.';
+      .catch((error: unknown) => {
+        bookmarkState.error = error instanceof Error ? error.message : 'Could not load bookmarks.';
       })
       .finally(() => {
         if (requestId === bookmarkState.requestId) {
@@ -577,8 +577,8 @@ function scheduleHistorySearch(): void {
         historyState.results = historyItems;
         historyState.error = null;
       })
-      .catch(() => {
-        historyState.error = 'Could not load history.';
+      .catch((error: unknown) => {
+        historyState.error = error instanceof Error ? error.message : 'Could not load history.';
       })
       .finally(() => {
         if (requestId === historyState.requestId) {

@@ -67,6 +67,26 @@ function makeUrl(config: ExtensionConfig, path: string, query: RequestOptions['q
   return url.toString();
 }
 
+export class ApiError extends Error {
+  status: number;
+  technicalMessage: string;
+  isServerError: boolean;
+  isMigrationError: boolean;
+
+  constructor(status: number, message: string, technicalMessage: string = '') {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.technicalMessage = technicalMessage;
+    this.isServerError = status >= 500;
+    this.isMigrationError = 
+      technicalMessage.includes('no such column') || 
+      technicalMessage.includes('capabilities_json') || 
+      message.includes('no such column') || 
+      message.includes('capabilities_json');
+  }
+}
+
 async function request<T>(config: ExtensionConfig, path: string, options: RequestOptions = {}): Promise<T> {
   const response = await fetch(makeUrl(config, path, options.query), {
     method: options.method ?? 'GET',
@@ -80,9 +100,45 @@ async function request<T>(config: ExtensionConfig, path: string, options: Reques
 
   if (!response.ok) {
     const fallbackMessage = `BrowserBridge API request failed with status ${response.status}.`;
-    const errorPayload = await response.json().catch(() => ({ message: fallbackMessage })) as { message?: string };
+    let responseText = '';
+    try {
+      responseText = await response.text();
+    } catch (e) {
+      // ignore
+    }
 
-    throw new Error(errorPayload.message || fallbackMessage);
+    let errorPayload: { message?: string } = {};
+    let isJson = false;
+
+    try {
+      if (responseText) {
+        errorPayload = JSON.parse(responseText);
+        isJson = true;
+      }
+    } catch (e) {
+      // not json
+    }
+
+    let message = fallbackMessage;
+    let technicalMessage = responseText || fallbackMessage;
+
+    if (isJson && errorPayload.message) {
+      technicalMessage = errorPayload.message;
+      message = errorPayload.message;
+    } else if (!isJson && responseText.includes('<html')) {
+      // Don't show HTML to user
+      message = fallbackMessage;
+    }
+
+    const apiError = new ApiError(response.status, message, technicalMessage);
+
+    if (apiError.isMigrationError) {
+      apiError.message = 'Database schema is outdated. Run: php artisan migrate';
+    } else if (apiError.isServerError) {
+      apiError.message = 'BrowserBridge server error. Check Laravel logs and run migrations.';
+    }
+
+    throw apiError;
   }
 
   const responseJson = await response.json();

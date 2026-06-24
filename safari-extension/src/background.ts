@@ -112,7 +112,7 @@ async function loadSection<T>(
     return await loader();
   } catch (error) {
     console.warn(`[BrowserBridge Safari] ${friendlyLoadError(key)}:`, error);
-    loadErrors[key] = friendlyLoadError(key);
+    loadErrors[key] = error instanceof Error ? error.message : friendlyLoadError(key);
 
     return [];
   }
@@ -120,7 +120,17 @@ async function loadSection<T>(
 
 async function refreshOnce(): Promise<SafariStatus> {
   let config = await getConfig();
-  const capabilityAudit = await getBrowserAdapter().getCapabilityAudit();
+  const capabilityAudit = await getBrowserAdapter().getCapabilityAudit().catch(() => ({
+    canReadNativeBookmarks: false,
+    canWriteNativeBookmarks: false,
+    canReadNativeHistory: false,
+    canReadCurrentTab: false,
+    canReadAllTabs: false,
+    canOpenTab: false,
+    canUseBackgroundPolling: false,
+    historyMode: 'unavailable',
+    probes: [{ name: 'Audit Failed', api: 'capability', success: false, error: 'Safari blocked the capability audit' }],
+  } as BrowserCapabilityAudit));
 
   if (!config.apiUrl || !config.apiToken) {
     return {
@@ -251,7 +261,17 @@ async function captureError(error: unknown): Promise<void> {
 
 async function getStatus() {
   const config = await getConfig();
-  const capabilityAudit = await getBrowserAdapter().getCapabilityAudit();
+  const capabilityAudit = await getBrowserAdapter().getCapabilityAudit().catch(() => ({
+    canReadNativeBookmarks: false,
+    canWriteNativeBookmarks: false,
+    canReadNativeHistory: false,
+    canReadCurrentTab: false,
+    canReadAllTabs: false,
+    canOpenTab: false,
+    canUseBackgroundPolling: false,
+    historyMode: 'unavailable',
+    probes: [{ name: 'Audit Failed', api: 'capability', success: false, error: 'Safari blocked the capability audit' }],
+  } as BrowserCapabilityAudit));
 
   if (!isConfigured(config)) {
     return {
