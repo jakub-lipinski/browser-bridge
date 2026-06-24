@@ -19,6 +19,7 @@ const SYNC_INTERVAL_MINUTES = 1;
 type RuntimeMessage =
   | { type: 'browserbridge.syncNow' }
   | { type: 'browserbridge.syncBookmarksNow' }
+  | { type: 'browserbridge.resyncHistoryNow' }
   | { type: 'browserbridge.getStatus' }
   | { type: 'browserbridge.openCommand'; command: TabCommandResource }
   | { type: 'browserbridge.dismissCommand'; commandId: number }
@@ -169,6 +170,23 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
         summary.bookmarks = { success: true, count };
       } catch (error) {
         summary.bookmarks = { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
+        throw error; // Let the popup catch it
+      }
+
+      const status = await getStatus();
+
+      return { ...status, summary };
+    }
+
+    if (message.type === 'browserbridge.resyncHistoryNow') {
+      const config = await ensureRegistered(await getConfig());
+      const summary: SyncSummary = {};
+
+      try {
+        const result = await syncHistory(config, true);
+        summary.history = { success: true, count: result.count, skipped: result.skipped };
+      } catch (error) {
+        summary.history = { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
         throw error; // Let the popup catch it
       }
 

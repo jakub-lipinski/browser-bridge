@@ -11,6 +11,7 @@ import type {
   TabCommandResource,
   TabSnapshotItem,
   SyncSummary,
+  HistorySyncRange,
 } from './modules/types';
 
 type PopupStatus = {
@@ -53,6 +54,10 @@ const elements = {
   historyConfirmationModal: document.querySelector<HTMLDivElement>('#history-confirmation-modal'),
   cancelHistoryEnable: document.querySelector<HTMLButtonElement>('#cancel-history-enable'),
   confirmHistoryEnable: document.querySelector<HTMLButtonElement>('#confirm-history-enable'),
+  historySettingsContainer: document.querySelector<HTMLDivElement>('#history-settings-container'),
+  historySyncRange: document.querySelector<HTMLSelectElement>('#history-sync-range'),
+  historyRangeWarning: document.querySelector<HTMLDivElement>('#history-range-warning'),
+  resyncHistory: document.querySelector<HTMLButtonElement>('#resync-history'),
 };
 
 function requireElement<T>(element: T | null): T {
@@ -324,7 +329,12 @@ function render(status: PopupStatus): void {
 
   requireElement(elements.toggleBookmarks).checked = status.config.sync.bookmarks;
   requireElement(elements.toggleTabs).checked = status.config.sync.tabs;
-  requireElement(elements.toggleHistory).checked = status.config.sync.history;
+  
+  const historyEnabled = status.config.sync.history;
+  requireElement(elements.toggleHistory).checked = historyEnabled;
+  requireElement(elements.historySettingsContainer).hidden = !historyEnabled;
+  requireElement(elements.historySyncRange).value = status.config.historySyncRange || '24h';
+  requireElement(elements.historyRangeWarning).hidden = status.config.historySyncRange !== 'all';
 
   requireElement(elements.currentTabTitle).textContent = status.currentTab?.title || 'No syncable current tab.';
   requireElement(elements.currentTabUrl).textContent = status.currentTab?.url || '';
@@ -351,10 +361,11 @@ function renderSyncSummary(summary?: SyncSummary): void {
 
   if (summary.history) {
     if (summary.history.success) {
-      const skippedText = summary.history.skipped && summary.history.skipped > 0
-        ? `, ${summary.history.skipped} skipped`
-        : '';
-      parts.push(`History: ${summary.history.count} synced${skippedText}`);
+      const stored = summary.history.count;
+      const skipped = summary.history.skipped || 0;
+      const fetched = stored + skipped;
+      
+      parts.push(`History: fetched ${fetched}, stored ${stored}, skipped ${skipped}`);
     } else {
       parts.push('History: Failed');
     }
@@ -533,6 +544,28 @@ requireElement(elements.toggleHistory).addEventListener('change', () => {
   void handleHistoryToggle().catch((error: unknown) => {
     setError(error instanceof Error ? error.message : 'Unable to update history sync.');
   });
+});
+
+requireElement(elements.historySyncRange).addEventListener('change', (e) => {
+  const select = e.target as HTMLSelectElement;
+  const val = select.value as HistorySyncRange;
+  requireElement(elements.historyRangeWarning).hidden = val !== 'all';
+
+  void getConfig().then(config => saveConfig({ ...config, historySyncRange: val })).catch((error: unknown) => {
+    setError(error instanceof Error ? error.message : 'Unable to update history sync range.');
+  });
+});
+
+requireElement(elements.resyncHistory).addEventListener('click', () => {
+  void sendMessage<PopupStatus>({ type: 'browserbridge.resyncHistoryNow' })
+    .then((status) => {
+      render(status);
+      renderSyncSummary(status.summary);
+    })
+    .catch((error: unknown) => {
+      console.error(error);
+      setError('Resync failed. Check extension console for details.');
+    });
 });
 
 void refresh().catch((error: unknown) => {

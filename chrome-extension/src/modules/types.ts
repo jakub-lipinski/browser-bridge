@@ -4,6 +4,8 @@ export type SyncToggles = {
   history: boolean;
 };
 
+export type HistorySyncRange = '24h' | '7d' | '30d' | 'all';
+
 export type ExtensionConfig = {
   apiUrl: string;
   apiToken: string;
@@ -13,6 +15,7 @@ export type ExtensionConfig = {
   platform: string;
   sync: SyncToggles;
   syncHistory: boolean;
+  historySyncRange: HistorySyncRange;
   lastSyncAt: string | null;
   lastBookmarkSyncAt: string | null;
   lastHistorySyncAt: string | null;

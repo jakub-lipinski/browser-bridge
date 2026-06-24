@@ -42,6 +42,24 @@
           <span>Sync browsing history</span>
           <input id="toggle-history" type="checkbox" />
         </label>
+        
+        <div id="history-settings-container" hidden>
+          <label class="row" style="margin-top: 12px;">
+            <span>History sync range</span>
+            <select id="history-sync-range">
+              <option value="24h">Last 24 hours</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="all">All available history</option>
+            </select>
+          </label>
+          <div id="history-range-warning" class="warning" hidden style="margin-top: 8px;">
+            This may sync thousands of browsing history entries and may include sensitive private data.
+          </div>
+          <div class="row" style="margin-top: 12px; justify-content: flex-end;">
+            <button id="resync-history" type="button" class="secondary" style="width: 100%;">Resync selected range</button>
+          </div>
+        </div>
         <div class="warning">
           Browsing history can contain sensitive private information such as medical, financial, work-related,
           personal or adult websites. BrowserBridge never syncs passwords, cookies, login sessions or form data.
@@ -76,6 +94,7 @@
           <span class="muted">Shared view</span>
         </div>
         <p class="muted">BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.</p>
+        <p class="muted" style="margin-top: 8px;"><strong>Note:</strong> BrowserBridge sync count may be lower than your Chrome history count due to: range limits, URL filtering (e.g. max URL length), deduplication, and internal/local URLs being ignored.</p>
         <div class="row">
           <input id="history-query" type="text" placeholder="Search BrowserBridge History" />
           <button id="delete-history" type="button" class="danger">Delete</button>

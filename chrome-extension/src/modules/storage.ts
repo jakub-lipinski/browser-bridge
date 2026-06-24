@@ -16,6 +16,7 @@ export const defaultConfig: ExtensionConfig = {
     history: false,
   },
   syncHistory: false,
+  historySyncRange: '24h',
   lastSyncAt: null,
   lastBookmarkSyncAt: null,
   lastHistorySyncAt: null,
@@ -29,6 +30,7 @@ export async function getConfig(): Promise<ExtensionConfig> {
   return {
     ...defaultConfig,
     ...config,
+    historySyncRange: config?.historySyncRange ?? defaultConfig.historySyncRange,
     syncHistory: config?.syncHistory ?? config?.sync?.history ?? defaultConfig.syncHistory,
     sync: {
       ...defaultConfig.sync,
@@ -47,6 +49,7 @@ export async function updateConfig(patch: Partial<ExtensionConfig>): Promise<Ext
   const nextConfig: ExtensionConfig = {
     ...config,
     ...patch,
+    historySyncRange: patch.historySyncRange ?? config.historySyncRange,
     syncHistory: patch.syncHistory ?? patch.sync?.history ?? config.syncHistory,
     sync: {
       ...config.sync,
