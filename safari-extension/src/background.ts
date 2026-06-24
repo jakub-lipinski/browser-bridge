@@ -1,17 +1,20 @@
-import './modules/initChromiumAdapter';
-import { fetchBookmarkSnapshots, fetchDevices, searchHistory } from './modules/apiClient';
-import { syncBookmarks } from './modules/bookmarksSync';
-import { connectDevice } from './modules/device';
-import { syncHistory } from './modules/historySync';
-import { getConfig, isConfigured, updateConfig } from './modules/storage';
-import { getCurrentTab, syncOpenTabs } from './modules/tabsSync';
+import './modules/initSafariAdapter';
+import {
+  fetchBookmarkSnapshots,
+  fetchDevices,
+  searchHistory,
+} from '../../chrome-extension/src/modules/apiClient';
+import { connectDevice } from '../../chrome-extension/src/modules/device';
+import { syncHistory } from '../../chrome-extension/src/modules/historySync';
+import { getConfig, isConfigured, updateConfig } from '../../chrome-extension/src/modules/storage';
+import { getCurrentTab, syncOpenTabs } from '../../chrome-extension/src/modules/tabsSync';
 import {
   dismissIncomingCommand,
   getIncomingCommands,
   openIncomingCommand,
   sendCurrentTabToDevice,
-} from './modules/tabCommands';
-import type { ExtensionConfig, TabCommandResource } from './modules/types';
+} from '../../chrome-extension/src/modules/tabCommands';
+import type { ExtensionConfig, TabCommandResource } from '../../chrome-extension/src/modules/types';
 
 const SYNC_ALARM_NAME = 'browserbridge.sync';
 const SYNC_INTERVAL_MINUTES = 1;
@@ -44,10 +47,6 @@ async function syncOnce(): Promise<void> {
 
   config = await ensureRegistered(config);
 
-  if (config.sync.bookmarks) {
-    await syncBookmarks(config);
-  }
-
   if (config.sync.tabs) {
     await syncOpenTabs(config);
   }
@@ -79,6 +78,8 @@ async function getStatus() {
       devices: [],
       incomingCommands: [],
       currentTab: await getCurrentTab(),
+      bookmarkSnapshots: [],
+      historyItems: [],
     };
   }
 
@@ -101,18 +102,24 @@ async function getStatus() {
   };
 }
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.alarms.create(SYNC_ALARM_NAME, {
-    delayInMinutes: 0.1,
-    periodInMinutes: SYNC_INTERVAL_MINUTES,
-  });
-});
+function installAlarm(): void {
+  try {
+    chrome.alarms?.create(SYNC_ALARM_NAME, {
+      delayInMinutes: 0.1,
+      periodInMinutes: SYNC_INTERVAL_MINUTES,
+    });
+  } catch {
+    void captureError(new Error('Safari background polling is unavailable. Open the popup to sync manually.'));
+  }
+}
 
-chrome.runtime.onStartup.addListener(() => {
+chrome.runtime.onInstalled.addListener(installAlarm);
+
+chrome.runtime.onStartup?.addListener(() => {
   void syncOnce().catch(captureError);
 });
 
-chrome.alarms.onAlarm.addListener((alarm) => {
+chrome.alarms?.onAlarm.addListener((alarm) => {
   if (alarm.name === SYNC_ALARM_NAME) {
     void syncOnce().catch(captureError);
   }
@@ -148,7 +155,7 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
       const currentTab = await getCurrentTab();
 
       if (!currentTab) {
-        throw new Error('The current tab cannot be sent.');
+        throw new Error('Safari could not read the current active tab.');
       }
 
       await sendCurrentTabToDevice(config, message.targetDeviceUuid, currentTab);

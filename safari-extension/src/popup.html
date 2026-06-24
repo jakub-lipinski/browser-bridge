@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BrowserBridge</title>
+    <title>BrowserBridge Safari</title>
     <script type="module" src="/popup.ts"></script>
   </head>
   <body>
@@ -11,7 +11,7 @@
       <header class="header">
         <div>
           <p class="eyebrow">BrowserBridge</p>
-          <h1>Sync</h1>
+          <h1>Safari Sync</h1>
           <p id="device-summary" class="muted"></p>
         </div>
         <span id="connection-status" class="status bad">Disconnected</span>
@@ -29,24 +29,9 @@
       </section>
 
       <section class="panel">
-        <h2>Sync toggles</h2>
-        <label class="row">
-          <span>Sync bookmarks</span>
-          <input id="toggle-bookmarks" type="checkbox" />
-        </label>
-        <label class="row">
-          <span>Sync open tabs</span>
-          <input id="toggle-tabs" type="checkbox" />
-        </label>
-        <label class="row">
-          <span>Sync browsing history</span>
-          <input id="toggle-history" type="checkbox" />
-        </label>
-        <div class="warning">
-          Browsing history can contain sensitive private information such as medical, financial, work-related,
-          personal or adult websites. BrowserBridge never syncs passwords, cookies, login sessions or form data.
-          Enable this only if you understand what browsing history sync means.
-        </div>
+        <h2>Safari capabilities</h2>
+        <p class="muted">Safari can send and receive tabs in this milestone.</p>
+        <p class="muted">Native Safari bookmark/history upload and native bookmark writing are disabled for now.</p>
       </section>
 
       <section class="panel">

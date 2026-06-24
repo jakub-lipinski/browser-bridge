@@ -31,3 +31,30 @@ Thumbs.db
 AGENTS.md
 CLAUDE.md
 boost.json
+# BrowserBridge extensions
+/chrome-extension/node_modules/
+/chrome-extension/dist/
+/chrome-extension/build/
+/chrome-extension/.env
+/chrome-extension/.env.local
+/chrome-extension/.env.*.local
+/chrome-extension/.DS_Store
+
+/safari-extension/node_modules/
+/safari-extension/dist/
+/safari-extension/build/
+/safari-extension/.env
+/safari-extension/.env.local
+/safari-extension/.env.*.local
+/safari-extension/.DS_Store
+
+# Safari / Xcode generated files
+/safari-extension/**/DerivedData/
+/safari-extension/**/xcuserdata/
+/safari-extension/**/*.xcuserstate
+/safari-extension/**/*.xcworkspace/xcuserdata/
+/safari-extension/**/*.xcodeproj/xcuserdata/
+/safari-extension/**/*.xcodeproj/project.xcworkspace/xcuserdata/
+/safari-extension/**/.build/
+/safari-extension/**/Build/
+/safari-extension/**/Products/

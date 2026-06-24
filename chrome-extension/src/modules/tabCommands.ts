@@ -4,6 +4,7 @@ import {
   markTabCommandOpened,
   sendTabCommand,
 } from './apiClient';
+import { getBrowserAdapter } from './browserAdapter';
 import type { ExtensionConfig, TabCommandResource, TabSnapshotItem } from './types';
 import { isSyncableUrl } from './urlFilter';
 
@@ -18,7 +19,7 @@ export async function openIncomingCommand(config: ExtensionConfig, command: TabC
     return;
   }
 
-  await chrome.tabs.create({ url: command.url });
+  await getBrowserAdapter().openTab(command.url);
   await markTabCommandOpened(config, command.id);
 }
 

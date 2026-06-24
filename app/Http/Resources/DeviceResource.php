@@ -18,6 +18,7 @@ class DeviceResource extends JsonResource
             'name' => $this->name,
             'browser' => $this->browser,
             'platform' => $this->platform,
+            'capabilities' => $this->capabilities(),
             'last_seen_at' => $this->last_seen_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

@@ -1,8 +1,8 @@
-import './modules/initChromiumAdapter';
-import './styles.css';
-import { connectDevice, defaultDeviceName, detectPlatform } from './modules/device';
-import { getConfig, saveConfig } from './modules/storage';
-import type { ExtensionConfig } from './modules/types';
+import './modules/initSafariAdapter';
+import '../../chrome-extension/src/styles.css';
+import { connectDevice, defaultDeviceName, detectPlatform } from '../../chrome-extension/src/modules/device';
+import { getConfig, saveConfig } from '../../chrome-extension/src/modules/storage';
+import type { ExtensionConfig } from '../../chrome-extension/src/modules/types';
 
 const form = document.querySelector<HTMLFormElement>('#options-form');
 const apiUrlInput = document.querySelector<HTMLInputElement>('#api-url');
@@ -15,7 +15,7 @@ const statusElement = document.querySelector<HTMLDivElement>('#status');
 
 function requireElement<T>(element: T | null): T {
   if (!element) {
-    throw new Error('BrowserBridge options page did not initialize.');
+    throw new Error('BrowserBridge Safari options page did not initialize.');
   }
 
   return element;
@@ -33,8 +33,13 @@ async function readFormConfig(): Promise<ExtensionConfig> {
     apiUrl: requireElement(apiUrlInput).value.trim(),
     apiToken: requireElement(apiTokenInput).value.trim(),
     deviceName: requireElement(deviceNameInput).value.trim() || defaultDeviceName(),
-    browserName: requireElement(browserNameInput).value.trim() || 'Chrome',
-    platform: requireElement(platformInput).value.trim() || detectPlatform(),
+    browserName: 'safari',
+    platform: detectPlatform(),
+    sync: {
+      ...currentConfig.sync,
+      bookmarks: false,
+      history: false,
+    },
   };
 }
 
@@ -52,8 +57,8 @@ async function initialize(): Promise<void> {
   requireElement(apiUrlInput).value = config.apiUrl;
   requireElement(apiTokenInput).value = config.apiToken;
   requireElement(deviceNameInput).value = config.deviceName || defaultDeviceName();
-  requireElement(browserNameInput).value = config.browserName || 'Chrome';
-  requireElement(platformInput).value = config.platform || detectPlatform();
+  requireElement(browserNameInput).value = 'safari';
+  requireElement(platformInput).value = detectPlatform();
 }
 
 requireElement(form).addEventListener('submit', (event) => {

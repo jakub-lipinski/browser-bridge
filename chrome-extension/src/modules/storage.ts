@@ -1,4 +1,5 @@
 import type { ExtensionConfig } from './types';
+import { getBrowserAdapter } from './browserAdapter';
 
 const STORAGE_KEY = 'browserbridge.config';
 
@@ -20,8 +21,7 @@ export const defaultConfig: ExtensionConfig = {
 };
 
 export async function getConfig(): Promise<ExtensionConfig> {
-  const stored = await chrome.storage.local.get(STORAGE_KEY);
-  const config = stored[STORAGE_KEY] as Partial<ExtensionConfig> | undefined;
+  const config = await getBrowserAdapter().getStorage<Partial<ExtensionConfig>>(STORAGE_KEY);
 
   return {
     ...defaultConfig,
@@ -34,7 +34,7 @@ export async function getConfig(): Promise<ExtensionConfig> {
 }
 
 export async function saveConfig(config: ExtensionConfig): Promise<void> {
-  await chrome.storage.local.set({ [STORAGE_KEY]: config });
+  await getBrowserAdapter().setStorage(STORAGE_KEY, config);
 }
 
 export async function updateConfig(patch: Partial<ExtensionConfig>): Promise<ExtensionConfig> {

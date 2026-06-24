@@ -2,9 +2,11 @@ import type {
   ApiCollection,
   ApiItem,
   BookmarkSnapshotItem,
+  BookmarkSnapshotResource,
   DeviceResource,
   ExtensionConfig,
   HistoryBatchItem,
+  HistoryItemResource,
   TabCommandResource,
   TabSnapshotItem,
 } from './types';
@@ -67,7 +69,21 @@ export async function registerDevice(config: ExtensionConfig): Promise<DeviceRes
 }
 
 export async function fetchDevices(config: ExtensionConfig): Promise<DeviceResource[]> {
-  const response = await request<ApiCollection<DeviceResource>>(config, '/api/devices');
+  const response = await request<ApiCollection<DeviceResource>>(config, '/api/devices', {
+    query: {
+      device_uuid: config.deviceUuid,
+    },
+  });
+
+  return response.data;
+}
+
+export async function fetchBookmarkSnapshots(config: ExtensionConfig): Promise<BookmarkSnapshotResource[]> {
+  const response = await request<ApiCollection<BookmarkSnapshotResource>>(config, '/api/bookmarks/snapshots', {
+    query: {
+      device_uuid: config.deviceUuid,
+    },
+  });
 
   return response.data;
 }
@@ -129,6 +145,18 @@ export async function fetchIncomingTabCommands(config: ExtensionConfig): Promise
   const response = await request<ApiCollection<TabCommandResource>>(config, '/api/tabs/incoming', {
     query: {
       device_uuid: config.deviceUuid,
+    },
+  });
+
+  return response.data;
+}
+
+export async function searchHistory(config: ExtensionConfig, query = ''): Promise<HistoryItemResource[]> {
+  const response = await request<ApiCollection<HistoryItemResource>>(config, '/api/history/search', {
+    query: {
+      device_uuid: config.deviceUuid,
+      query,
+      limit: 50,
     },
   });
 

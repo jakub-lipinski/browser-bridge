@@ -20,7 +20,7 @@ class DeviceFactory extends Factory
         return [
             'uuid' => fake()->uuid(),
             'name' => fake()->words(2, true),
-            'browser' => fake()->randomElement(['chrome', 'edge', 'safari']),
+            'browser' => fake()->randomElement(['chrome', 'safari']),
             'platform' => fake()->randomElement(['macos', 'windows', 'ios']),
             'last_seen_at' => now(),
         ];

@@ -15,6 +15,7 @@ class BookmarkSnapshotResource extends JsonResource
         return [
             'id' => $this->id,
             'device_id' => $this->device_id,
+            'device' => new DeviceResource($this->whenLoaded('device')),
             'item_count' => $this->item_count,
             'payload_json' => $this->payload_json,
             'created_at' => $this->created_at?->toIso8601String(),

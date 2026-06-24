@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DeviceRegisterRequest extends FormRequest
 {
@@ -20,8 +21,8 @@ class DeviceRegisterRequest extends FormRequest
         return [
             'device_uuid' => ['nullable', 'uuid'],
             'name' => ['required', 'string', 'max:120'],
-            'browser' => ['required', 'string', 'max:64'],
-            'platform' => ['required', 'string', 'max:64'],
+            'browser' => ['required', 'string', Rule::in(['chrome', 'safari'])],
+            'platform' => ['required', 'string', Rule::in(['windows', 'macos', 'ios'])],
         ];
     }
 }

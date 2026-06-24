@@ -1,8 +1,8 @@
 # BrowserBridge
 
-BrowserBridge is a production-oriented browser sync cloud built with Laravel. The first client target is a Chromium Manifest V3 extension, with Safari Web Extension support planned later.
+BrowserBridge is a production-oriented browser sync cloud built with Laravel. This milestone targets Chrome <-> Safari on macOS through a Laravel backend, with Chrome as the first full browser-data source and Safari as the first real cross-browser target.
 
-The backend currently supports device registration, bookmark snapshots, tab snapshots, optional history upload, history search, and sending the current tab to a selected device.
+The backend currently supports device registration, bookmark snapshots, tab snapshots, optional history upload, shared BrowserBridge history search, and sending the current tab to a selected device.
 
 BrowserBridge never syncs passwords, cookies, login sessions, localStorage, sessionStorage, or form data.
 
@@ -31,6 +31,13 @@ Laravel Herd serves this project at:
 
 ```text
 https://browserbridge.test/dashboard
+```
+
+The local API URL for extensions is usually one of:
+
+```text
+http://browserbridge.test
+https://browserbridge.test
 ```
 
 ## Migration Command
@@ -77,7 +84,15 @@ curl -k -X POST "$BASE/api/device/register" \
 List devices:
 
 ```bash
-curl -k "$BASE/api/devices" \
+curl -k "$BASE/api/devices?device_uuid=$SOURCE_DEVICE_UUID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json"
+```
+
+List bookmark snapshots:
+
+```bash
+curl -k "$BASE/api/bookmarks/snapshots?device_uuid=$TARGET_DEVICE_UUID" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Accept: application/json"
 ```
@@ -141,7 +156,7 @@ curl -k -X POST "$BASE/api/history/batch" \
   }'
 ```
 
-Search history:
+Search shared BrowserBridge history:
 
 ```bash
 curl -k "$BASE/api/history/search?device_uuid=$SOURCE_DEVICE_UUID&query=example&limit=10" \
@@ -206,7 +221,7 @@ curl -k -X POST "$BASE/api/tabs/$TAB_COMMAND_ID/dismissed" \
 - Encrypt browser data at rest and migrate reads/writes to `encrypted_payload`.
 - Add per-user ownership to every sync table and dashboard query.
 - Add rate limiting, request signing or token rotation, CORS policy, abuse monitoring, and audit logging.
-- Build the Chromium extension and Safari Web Extension with explicit privacy permissions.
+- Build and review the Chromium extension and Safari Web Extension with explicit privacy permissions.
 - Add history retention controls, deletion/export flows, and clearer consent UX.
 - Add conflict resolution and deduplication for bookmark sync.
 - Add production deployment configuration, backups, monitoring, and incident-response docs.
@@ -216,6 +231,23 @@ curl -k -X POST "$BASE/api/tabs/$TAB_COMMAND_ID/dismissed" \
 ```bash
 php artisan test --compact
 ```
+
+## Chrome <-> Safari Manual Test Path
+
+This milestone intentionally targets Chrome <-> Safari, not Chrome <-> Chrome. A second Chromium profile can still be useful for troubleshooting, but it is not the product flow.
+
+1. Run the Laravel backend locally through Herd at `http://browserbridge.test` or `https://browserbridge.test`.
+2. Run `php artisan migrate`.
+3. Build the Chromium extension.
+4. Load `/Users/jakub/Webdev/projekty-prywatne/browser-bridge/chrome-extension/dist` in Chrome through `chrome://extensions` -> Load unpacked.
+5. Build the Safari Web Extension bundle.
+6. Convert/run it in Xcode and enable it in Safari.
+7. Connect Chrome as `Chrome PC` or `Chrome Mac`.
+8. Connect Safari as `Safari Mac`.
+9. Send the current tab from Chrome to Safari, then open it in Safari.
+10. Send the current tab from Safari to Chrome, then open it in Chrome.
+11. Enable history sync in Chrome, visit a few pages, then search BrowserBridge History in Safari.
+12. Add bookmarks in Chrome, run sync, then view BrowserBridge Bookmarks in Safari.
 
 ## Chromium Extension
 
@@ -253,13 +285,52 @@ Connect it to Laravel:
 4. Enter the same API token from `.env`.
 5. Set a device name and click Save and register device.
 
-Test with two Chrome profiles:
+Chrome capabilities in this milestone:
 
-1. Build and load the same `chrome-extension/dist` folder in both profiles.
-2. Register each profile with a different device name.
-3. Keep bookmarks/tabs sync enabled.
-4. Leave browsing history disabled unless you explicitly want to test it.
-5. Open the popup in profile A and send the current tab to profile B.
-6. Open the popup in profile B, then open or dismiss the incoming tab command.
+- Register as a BrowserBridge device.
+- Send the current tab to Safari.
+- Receive and open tabs sent by Safari.
+- Upload open-tab snapshots.
+- Upload bookmark snapshots.
+- Upload browsing history only after explicit opt-in.
+- Display BrowserBridge Bookmarks and BrowserBridge History from the backend.
 
-History sync warning: browsing history can contain sensitive private information such as medical, financial, work-related, personal or adult websites. BrowserBridge never syncs passwords, cookies, login sessions or form data. Enable this only if you understand what browsing history sync means.
+## Safari Web Extension
+
+The macOS Safari Web Extension bundle lives in `safari-extension`.
+
+Install extension dependencies:
+
+```bash
+cd safari-extension
+npm install
+```
+
+Build the web extension bundle:
+
+```bash
+npm run build
+```
+
+Prepared bundle path:
+
+```text
+/Users/jakub/Webdev/projekty-prywatne/browser-bridge/safari-extension/dist
+```
+
+Safari capabilities in this milestone:
+
+- Register as a BrowserBridge device with browser `safari` and platform `macos`.
+- Send the current active tab to Chrome when Safari exposes the tab URL/title.
+- Receive and open tab commands from Chrome.
+- Display BrowserBridge Bookmarks uploaded by Chrome.
+- Display and search BrowserBridge History uploaded by Chrome.
+- Show disabled/limited states for native Safari bookmark/history sync.
+
+See [docs/safari-local-development.md](/Users/jakub/Webdev/projekty-prywatne/browser-bridge/docs/safari-local-development.md) for Xcode and Safari setup.
+
+## BrowserBridge-Only Views
+
+BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.
+
+BrowserBridge Bookmarks are shown inside the extension. Native Safari bookmark writing may be added later.

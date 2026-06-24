@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BrowserBridge Safari Options</title>
+    <script type="module" src="/options.ts"></script>
+  </head>
+  <body>
+    <main class="options-shell">
+      <section class="panel">
+        <div>
+          <p class="eyebrow">BrowserBridge</p>
+          <h1>Safari extension options</h1>
+          <p class="muted">Connect Safari on macOS to your local Laravel BrowserBridge API.</p>
+        </div>
+
+        <form id="options-form" class="form">
+          <label>
+            API URL
+            <input id="api-url" type="url" placeholder="http://browserbridge.test" autocomplete="off" />
+          </label>
+
+          <label>
+            API token
+            <input id="api-token" type="password" autocomplete="off" />
+          </label>
+
+          <label>
+            Device name
+            <input id="device-name" type="text" autocomplete="off" />
+          </label>
+
+          <label>
+            Browser name
+            <input id="browser-name" type="text" autocomplete="off" readonly />
+          </label>
+
+          <label>
+            Platform
+            <input id="platform" type="text" autocomplete="off" readonly />
+          </label>
+
+          <div class="warning">
+            BrowserBridge Safari can receive and send tabs and display BrowserBridge Bookmarks and History. Native
+            Safari bookmark/history writing is not implemented in this milestone.
+          </div>
+
+          <div class="warning">
+            Browsing history can contain sensitive private information such as medical, financial, work-related,
+            personal or adult websites. BrowserBridge never syncs passwords, cookies, login sessions or form data.
+            Enable this only if you understand what browsing history sync means.
+          </div>
+
+          <div class="actions">
+            <button id="save-button" type="submit">Save settings</button>
+            <button id="connect-button" type="button" class="secondary">Save and register device</button>
+          </div>
+        </form>
+
+        <div id="status" class="muted"></div>
+      </section>
+    </main>
+  </body>
+</html>

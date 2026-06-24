@@ -23,6 +23,7 @@ export type DeviceResource = {
   name: string;
   browser: string;
   platform: string;
+  capabilities?: Record<string, boolean>;
   last_seen_at: string | null;
 };
 
@@ -44,6 +45,17 @@ export type BookmarkSnapshotItem = {
   url: string;
 };
 
+export type BookmarkSnapshotResource = {
+  id: number;
+  device_id: number;
+  device?: DeviceResource;
+  item_count: number;
+  payload_json: {
+    items?: BookmarkSnapshotItem[];
+  } | null;
+  created_at: string | null;
+};
+
 export type TabSnapshotItem = {
   id?: number;
   title?: string;
@@ -56,6 +68,13 @@ export type HistoryBatchItem = {
   url: string;
   title?: string;
   visited_at: string;
+};
+
+export type HistoryItemResource = HistoryBatchItem & {
+  id: number;
+  device_id: number;
+  device?: DeviceResource;
+  created_at?: string | null;
 };
 
 export type ApiCollection<T> = {

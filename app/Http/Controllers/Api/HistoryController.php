@@ -26,13 +26,13 @@ class HistoryController extends Controller
 
     public function search(HistorySearchRequest $request, DeviceResolver $deviceResolver): AnonymousResourceCollection
     {
-        $device = $deviceResolver->required($request->string('device_uuid')->toString());
+        $deviceResolver->required($request->string('device_uuid')->toString());
         $query = $request->string('query')->trim()->toString();
         $limit = (int) ($request->validated('limit') ?? config('browserbridge.history_search_limit'));
 
         return HistoryItemResource::collection(
             HistoryItem::query()
-                ->whereBelongsTo($device)
+                ->with('device')
                 ->when($query !== '', function ($historyQuery) use ($query): void {
                     $historyQuery->where(function ($innerQuery) use ($query): void {
                         $innerQuery

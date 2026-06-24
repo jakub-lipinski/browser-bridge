@@ -59,11 +59,23 @@ it('registers devices with provided or generated UUIDs', function (): void {
     ], browserBridgeHeaders())
         ->assertSuccessful()
         ->assertJsonPath('data.name', 'Safari iPhone')
+        ->assertJsonPath('data.browser', 'safari')
+        ->assertJsonPath('data.platform', 'ios')
+        ->assertJsonPath('data.capabilities.tab_commands', true)
+        ->assertJsonPath('data.capabilities.bookmarks_read', false)
+        ->assertJsonPath('data.capabilities.history_read', false)
         ->assertJsonStructure(['data' => ['uuid']]);
 
-    $this->getJson('/api/devices', browserBridgeHeaders())
+    $this->getJson('/api/devices?device_uuid='.$deviceUuid, browserBridgeHeaders())
         ->assertSuccessful()
-        ->assertJsonCount(2, 'data');
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.capabilities.tab_commands', true);
+});
+
+it('requires a registered device UUID when listing devices', function (): void {
+    $this->getJson('/api/devices', browserBridgeHeaders())
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('device_uuid');
 });
 
 it('enforces the registered device limit', function (): void {
@@ -97,6 +109,33 @@ it('uploads bookmark snapshots and filters internal browser URLs', function (): 
         ->assertSuccessful()
         ->assertJsonPath('data.item_count', 1)
         ->assertJsonPath('data.payload_json.items.0.url', 'https://laravel.com/docs');
+});
+
+it('exposes BrowserBridge bookmark snapshots across Chrome and Safari devices', function (): void {
+    $chrome = Device::factory()->create([
+        'name' => 'Chrome Mac',
+        'browser' => 'chrome',
+        'platform' => 'macos',
+    ]);
+
+    $safari = Device::factory()->create([
+        'name' => 'Safari Mac',
+        'browser' => 'safari',
+        'platform' => 'macos',
+    ]);
+
+    $this->postJson('/api/bookmarks/snapshot', [
+        'device_uuid' => $chrome->uuid,
+        'items' => [
+            ['title' => 'BrowserBridge', 'url' => 'https://example.com/browserbridge'],
+        ],
+    ], browserBridgeHeaders())->assertSuccessful();
+
+    $this->getJson('/api/bookmarks/snapshots?device_uuid='.$safari->uuid, browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.device.name', 'Chrome Mac')
+        ->assertJsonPath('data.0.payload_json.items.0.url', 'https://example.com/browserbridge');
 });
 
 it('uploads tab snapshots and rejects invalid URLs', function (): void {
@@ -149,6 +188,38 @@ it('requires history opt in and deduplicates history items', function (): void {
         ->assertJsonPath('data.0.url', 'https://example.com/a');
 
     expect(HistoryItem::query()->count())->toBe(1);
+});
+
+it('exposes BrowserBridge history across Chrome and Safari devices', function (): void {
+    $chrome = Device::factory()->create([
+        'name' => 'Chrome Mac',
+        'browser' => 'chrome',
+        'platform' => 'macos',
+    ]);
+
+    $safari = Device::factory()->create([
+        'name' => 'Safari Mac',
+        'browser' => 'safari',
+        'platform' => 'macos',
+    ]);
+
+    $this->postJson('/api/history/batch', [
+        'device_uuid' => $chrome->uuid,
+        'history_sync_enabled' => true,
+        'items' => [
+            [
+                'url' => 'https://example.com/shared-history',
+                'title' => 'Shared History',
+                'visited_at' => now()->toIso8601String(),
+            ],
+        ],
+    ], browserBridgeHeaders())->assertSuccessful();
+
+    $this->getJson('/api/history/search?device_uuid='.$safari->uuid.'&query=shared&limit=10', browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.device.name', 'Chrome Mac')
+        ->assertJsonPath('data.0.url', 'https://example.com/shared-history');
 });
 
 it('limits history batch size', function (): void {

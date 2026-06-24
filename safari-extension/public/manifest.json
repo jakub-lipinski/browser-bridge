@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "BrowserBridge Safari",
+  "description": "Sync selected browser data with BrowserBridge.",
+  "version": "0.1.0",
+  "permissions": ["alarms", "storage", "tabs"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "BrowserBridge"
+  },
+  "options_page": "options.html"
+}

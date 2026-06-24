@@ -51,6 +51,39 @@ class Device extends Model
     }
 
     /**
+     * @return array<string, bool>
+     */
+    public function capabilities(): array
+    {
+        return match ($this->browser) {
+            'chrome' => [
+                'bookmarks_read' => true,
+                'history_read' => true,
+                'tabs_read' => true,
+                'tab_commands' => true,
+                'native_bookmark_write' => false,
+                'reliable_background_sync' => true,
+            ],
+            'safari' => [
+                'bookmarks_read' => false,
+                'history_read' => false,
+                'tabs_read' => true,
+                'tab_commands' => true,
+                'native_bookmark_write' => false,
+                'reliable_background_sync' => false,
+            ],
+            default => [
+                'bookmarks_read' => false,
+                'history_read' => false,
+                'tabs_read' => false,
+                'tab_commands' => false,
+                'native_bookmark_write' => false,
+                'reliable_background_sync' => false,
+            ],
+        };
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

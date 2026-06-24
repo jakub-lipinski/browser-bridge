@@ -27,6 +27,18 @@ Load unpacked extension path:
    - Browser name, defaults to Chrome
    - Platform, auto-filled when possible
 
+This extension is the first full BrowserBridge data source. It is meant to pair with the Safari Web Extension for the current milestone, not to define a Chrome-to-Chrome product flow.
+
+## Chrome Capabilities
+
+- Register as a BrowserBridge device.
+- Send the current tab to Safari.
+- Receive and open tabs sent by Safari.
+- Upload bookmark snapshots.
+- Upload open-tab snapshots.
+- Upload browsing history only after explicit opt-in.
+- Display BrowserBridge Bookmarks and BrowserBridge History from the backend.
+
 ## Privacy
 
 History sync is off by default. The extension does not request cookies or password/session/form-data permissions.

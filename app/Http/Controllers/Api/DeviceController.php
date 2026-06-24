@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeviceRegisterRequest;
+use App\Http\Requests\IncomingTabCommandsRequest;
 use App\Http\Resources\DeviceResource;
 use App\Models\Device;
 use App\Services\BrowserSyncService;
+use App\Services\DeviceResolver;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class DeviceController extends Controller
@@ -21,8 +23,10 @@ class DeviceController extends Controller
         return new DeviceResource($device);
     }
 
-    public function index(): AnonymousResourceCollection
+    public function index(IncomingTabCommandsRequest $request, DeviceResolver $deviceResolver): AnonymousResourceCollection
     {
+        $deviceResolver->required($request->string('device_uuid')->toString());
+
         return DeviceResource::collection(
             Device::query()
                 ->latest('last_seen_at')

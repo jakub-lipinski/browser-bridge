@@ -15,6 +15,7 @@ class HistoryItemResource extends JsonResource
         return [
             'id' => $this->id,
             'device_id' => $this->device_id,
+            'device' => new DeviceResource($this->whenLoaded('device')),
             'url' => $this->url,
             'title' => $this->title,
             'visited_at' => $this->visited_at?->toIso8601String(),

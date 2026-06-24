@@ -1,7 +1,7 @@
-import './modules/initChromiumAdapter';
-import './styles.css';
-import { getConfig, saveConfig } from './modules/storage';
-import { searchHistory } from './modules/apiClient';
+import './modules/initSafariAdapter';
+import '../../chrome-extension/src/styles.css';
+import { searchHistory } from '../../chrome-extension/src/modules/apiClient';
+import { getConfig } from '../../chrome-extension/src/modules/storage';
 import type {
   BookmarkSnapshotResource,
   DeviceResource,
@@ -9,7 +9,7 @@ import type {
   HistoryItemResource,
   TabCommandResource,
   TabSnapshotItem,
-} from './modules/types';
+} from '../../chrome-extension/src/modules/types';
 
 type PopupStatus = {
   config: ExtensionConfig;
@@ -33,9 +33,6 @@ const elements = {
   lastSync: document.querySelector<HTMLParagraphElement>('#last-sync'),
   errorMessage: document.querySelector<HTMLParagraphElement>('#error-message'),
   syncNow: document.querySelector<HTMLButtonElement>('#sync-now'),
-  toggleBookmarks: document.querySelector<HTMLInputElement>('#toggle-bookmarks'),
-  toggleTabs: document.querySelector<HTMLInputElement>('#toggle-tabs'),
-  toggleHistory: document.querySelector<HTMLInputElement>('#toggle-history'),
   currentTabTitle: document.querySelector<HTMLParagraphElement>('#current-tab-title'),
   currentTabUrl: document.querySelector<HTMLParagraphElement>('#current-tab-url'),
   devicesList: document.querySelector<HTMLDivElement>('#devices-list'),
@@ -48,7 +45,7 @@ const elements = {
 
 function requireElement<T>(element: T | null): T {
   if (!element) {
-    throw new Error('BrowserBridge popup did not initialize.');
+    throw new Error('BrowserBridge Safari popup did not initialize.');
   }
 
   return element;
@@ -75,7 +72,7 @@ function renderDevices(status: PopupStatus): void {
   const otherDevices = status.devices.filter((device) => device.uuid !== status.config.deviceUuid);
 
   if (otherDevices.length === 0) {
-    devicesList.innerHTML = '<p class="muted">No other devices connected yet.</p>';
+    devicesList.innerHTML = '<p class="muted">No Chrome device connected yet.</p>';
 
     return;
   }
@@ -178,7 +175,7 @@ function renderBookmarks(status: PopupStatus): void {
   }).slice(0, 20);
 
   if (bookmarks.length === 0) {
-    bookmarksList.innerHTML = '<p class="muted">No BrowserBridge bookmarks available yet.</p>';
+    bookmarksList.innerHTML = '<p class="muted">No BrowserBridge bookmarks available yet. Upload bookmarks from Chrome first.</p>';
 
     return;
   }
@@ -205,7 +202,7 @@ function renderHistoryItems(historyItems: HistoryItemResource[] = []): void {
   historyList.textContent = '';
 
   if (historyItems.length === 0) {
-    historyList.innerHTML = '<p class="muted">No BrowserBridge history available yet.</p>';
+    historyList.innerHTML = '<p class="muted">No BrowserBridge history available yet. Enable history sync in Chrome first.</p>';
 
     return;
   }
@@ -232,14 +229,10 @@ function render(status: PopupStatus): void {
   connectionStatus.textContent = status.configured ? 'Connected' : 'Disconnected';
   connectionStatus.className = `status ${status.configured ? 'ok' : 'bad'}`;
 
-  requireElement(elements.deviceSummary).textContent = status.config.deviceName || 'No device configured';
+  requireElement(elements.deviceSummary).textContent = status.config.deviceName || 'No Safari device configured';
   requireElement(elements.lastSync).textContent = status.config.lastSyncAt
     ? new Date(status.config.lastSyncAt).toLocaleString()
     : 'Never';
-
-  requireElement(elements.toggleBookmarks).checked = status.config.sync.bookmarks;
-  requireElement(elements.toggleTabs).checked = status.config.sync.tabs;
-  requireElement(elements.toggleHistory).checked = status.config.sync.history;
 
   requireElement(elements.currentTabTitle).textContent = status.currentTab?.title || 'No syncable current tab.';
   requireElement(elements.currentTabUrl).textContent = status.currentTab?.url || '';
@@ -254,21 +247,6 @@ function render(status: PopupStatus): void {
 async function refresh(): Promise<void> {
   const status = await sendMessage<PopupStatus>({ type: 'browserbridge.getStatus' });
   render(status);
-}
-
-async function updateToggles(): Promise<void> {
-  const config = await getConfig();
-
-  await saveConfig({
-    ...config,
-    sync: {
-      bookmarks: requireElement(elements.toggleBookmarks).checked,
-      tabs: requireElement(elements.toggleTabs).checked,
-      history: requireElement(elements.toggleHistory).checked,
-    },
-  });
-
-  await refresh();
 }
 
 async function searchBrowserBridgeHistory(): Promise<void> {
@@ -294,18 +272,6 @@ requireElement(elements.historyQuery).addEventListener('input', () => {
   });
 });
 
-[
-  requireElement(elements.toggleBookmarks),
-  requireElement(elements.toggleTabs),
-  requireElement(elements.toggleHistory),
-].forEach((toggle) => {
-  toggle.addEventListener('change', () => {
-    void updateToggles().catch((error: unknown) => {
-      setError(error instanceof Error ? error.message : 'Unable to update sync toggles.');
-    });
-  });
-});
-
 void refresh().catch((error: unknown) => {
-  setError(error instanceof Error ? error.message : 'Unable to load BrowserBridge status.');
+  setError(error instanceof Error ? error.message : 'Unable to load BrowserBridge Safari status.');
 });
