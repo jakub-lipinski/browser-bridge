@@ -35,6 +35,21 @@ class Device extends Model
         return $this->hasMany(HistoryItem::class);
     }
 
+    public function bookmarkSyncProfilesAsSource(): HasMany
+    {
+        return $this->hasMany(BookmarkSyncProfile::class, 'source_device_id');
+    }
+
+    public function bookmarkSyncProfilesAsTarget(): HasMany
+    {
+        return $this->hasMany(BookmarkSyncProfile::class, 'target_device_id');
+    }
+
+    public function bookmarkBackups(): HasMany
+    {
+        return $this->hasMany(BookmarkBackup::class);
+    }
+
     public function latestBookmarkSnapshot(): HasOne
     {
         return $this->hasOne(BookmarkSnapshot::class)->latestOfMany();
@@ -66,7 +81,7 @@ class Device extends Model
                 'history_read' => true,
                 'tabs_read' => true,
                 'tab_commands' => true,
-                'native_bookmark_write' => false,
+                'native_bookmark_write' => true,
                 'reliable_background_sync' => true,
             ],
             'safari' => [

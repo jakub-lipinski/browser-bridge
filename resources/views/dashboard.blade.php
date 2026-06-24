@@ -132,6 +132,113 @@
             <section class="bb-card">
                 <div class="bb-section-head">
                     <div>
+                        <h2 class="bb-section-title">Bookmark Sync</h2>
+                        <p class="bb-section-copy">Profiles for Safe Folder Import, Merge, and guarded Mirror runs.</p>
+                    </div>
+                    <span class="bb-badge bb-badge-accent">{{ $storageCounts['bookmarkSyncProfiles'] }} profiles</span>
+                </div>
+
+                @if ($bookmarkSyncProfiles->isEmpty())
+                    <div class="bb-empty">
+                        No bookmark sync profiles yet. Create one from the Chrome extension options to preview and run imports.
+                    </div>
+                @else
+                    <div class="bb-table-wrap">
+                        <table class="bb-table">
+                            <thead>
+                                <tr>
+                                    <th>Profile</th>
+                                    <th>Source</th>
+                                    <th>Target</th>
+                                    <th>Mode</th>
+                                    <th>Scope</th>
+                                    <th>Auto sync</th>
+                                    <th>Last run</th>
+                                    <th>Next run</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($bookmarkSyncProfiles as $profile)
+                                    <tr>
+                                        <td>
+                                            <div class="bb-item-title">{{ $profile->name }}</div>
+                                            <div class="bb-item-meta">{{ $profile->is_active ? 'Active' : 'Paused' }}</div>
+                                        </td>
+                                        <td>{{ $profile->sourceDevice?->name ?? 'Unknown source' }}</td>
+                                        <td>{{ $profile->targetDevice?->name ?? 'Unknown target' }}</td>
+                                        <td>
+                                            <span class="bb-badge {{ $profile->mode === \App\Enums\BookmarkSyncMode::Mirror ? 'bb-badge-warning' : '' }}">
+                                                {{ str($profile->mode->value)->replace('_', ' ')->title() }}
+                                            </span>
+                                        </td>
+                                        <td>{{ str($profile->target_scope->value)->replace('_', ' ')->title() }}</td>
+                                        <td>
+                                            @if ($profile->auto_sync_enabled)
+                                                Every {{ $profile->auto_sync_interval_minutes }} min
+                                            @else
+                                                Manual only
+                                            @endif
+                                        </td>
+                                        <td>{{ $profile->last_run_at?->diffForHumans() ?? 'Never' }}</td>
+                                        <td>{{ $profile->next_run_at?->diffForHumans() ?? 'Not scheduled' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+
+                <div class="bb-section-head bb-card-pad">
+                    <div>
+                        <h3 class="bb-section-title">Recent bookmark sync runs</h3>
+                        <p class="bb-section-copy">Run history keeps previews, counts, errors, and operation logs auditable.</p>
+                    </div>
+                    <span class="bb-badge">{{ $storageCounts['bookmarkSyncRuns'] }} total</span>
+                </div>
+
+                @if ($bookmarkSyncRuns->isEmpty())
+                    <div class="bb-empty">No bookmark sync runs recorded yet.</div>
+                @else
+                    <div class="bb-table-wrap">
+                        <table class="bb-table">
+                            <thead>
+                                <tr>
+                                    <th>Run</th>
+                                    <th>Status</th>
+                                    <th>Mode</th>
+                                    <th>Source</th>
+                                    <th>Target</th>
+                                    <th>Changes</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($bookmarkSyncRuns as $run)
+                                    <tr>
+                                        <td>{{ $run->profile?->name ?? 'Deleted profile' }}</td>
+                                        <td><span class="bb-badge">{{ $run->status->value }}</span></td>
+                                        <td>{{ str($run->mode->value)->replace('_', ' ')->title() }}</td>
+                                        <td>{{ $run->sourceDevice?->name ?? 'Unknown source' }}</td>
+                                        <td>{{ $run->targetDevice?->name ?? 'Unknown target' }}</td>
+                                        <td>
+                                            +{{ $run->added_count }}
+                                            / ~{{ $run->updated_count }}
+                                            / &rarr;{{ $run->moved_count }}
+                                            / -{{ $run->deleted_count }}
+                                            / skipped {{ $run->skipped_count }}
+                                        </td>
+                                        <td>{{ $run->created_at?->diffForHumans() }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </section>
+
+            <section class="bb-card">
+                <div class="bb-section-head">
+                    <div>
                         <h2 class="bb-section-title">Pending and recent tab commands</h2>
                         <p class="bb-section-copy">Tab handoff is the main BrowserBridge workflow, so command status stays visible.</p>
                     </div>

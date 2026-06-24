@@ -23,7 +23,8 @@ class BookmarkSearchRequest extends FormRequest
             'device_uuid' => ['required', 'uuid'],
             'query' => ['nullable', 'string', 'max:200'],
             'q' => ['nullable', 'string', 'max:200'],
-            'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'device_id' => ['nullable', 'integer', 'exists:devices,id'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:1000'],
         ];
     }
 

@@ -60,6 +60,97 @@
 
         <div id="status" class="muted" role="status"></div>
       </section>
+
+      <section class="panel">
+        <div class="brand-row">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          <div>
+            <p class="eyebrow">Bookmark Sync</p>
+            <h1>Import modes</h1>
+            <p class="muted">Safe Folder Import is recommended. Mirror is scoped and always requires preview, confirmation, and backup.</p>
+          </div>
+        </div>
+
+        <div class="form">
+          <label>
+            Profile
+            <select id="bookmark-sync-profile"></select>
+          </label>
+
+          <div class="row wrap">
+            <label>
+              Source device
+              <select id="bookmark-sync-source"></select>
+            </label>
+            <label>
+              Target device
+              <select id="bookmark-sync-target"></select>
+            </label>
+          </div>
+
+          <div class="row wrap">
+            <label>
+              Mode
+              <select id="bookmark-sync-mode">
+                <option value="safe_folder">Safe Folder Import — Recommended</option>
+                <option value="merge">Merge — Advanced</option>
+                <option value="mirror">Mirror — Dangerous</option>
+              </select>
+            </label>
+            <label>
+              Direction
+              <select id="bookmark-sync-direction">
+                <option value="source_to_target">Source → target</option>
+                <option value="target_to_source">Target → source</option>
+                <option value="two_way" disabled>Two-way (experimental)</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row wrap">
+            <label>
+              Target scope
+              <select id="bookmark-sync-scope">
+                <option value="browserbridge_folder">BrowserBridge managed folder</option>
+                <option value="selected_folder">Selected folder ID</option>
+                <option value="entire_bookmarks_root" disabled>Entire root (disabled)</option>
+              </select>
+            </label>
+            <label>
+              Selected folder ID
+              <input id="bookmark-sync-selected-folder" type="text" placeholder="Optional folder id" autocomplete="off" />
+            </label>
+          </div>
+
+          <div class="row wrap">
+            <label>
+              Auto sync
+              <select id="bookmark-sync-auto">
+                <option value="">Manual only</option>
+                <option value="5">Every 5 minutes</option>
+                <option value="15">Every 15 minutes</option>
+                <option value="30">Every 30 minutes</option>
+                <option value="60">Hourly</option>
+                <option value="1440">Daily</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="warning">
+            Mirror may delete or move bookmarks in the selected destination scope. BrowserBridge creates a backup first and never runs full-root Mirror in this build.
+          </div>
+
+          <div class="actions">
+            <button id="bookmark-sync-save" type="button">Save profile</button>
+            <button id="bookmark-sync-preview" type="button" class="secondary">Preview</button>
+            <button id="bookmark-sync-run" type="button" class="secondary">Run now</button>
+          </div>
+
+          <div id="bookmark-sync-status" class="muted" role="status">Register this device, then create a bookmark sync profile.</div>
+        </div>
+      </section>
     </main>
   </body>
 </html>

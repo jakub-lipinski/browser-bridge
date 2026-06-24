@@ -1,7 +1,13 @@
 <?php
 
+use App\Enums\BookmarkSyncDirection;
+use App\Enums\BookmarkSyncMode;
+use App\Enums\BookmarkSyncTargetScope;
 use App\Enums\TabCommandStatus;
+use App\Models\BookmarkBackup;
 use App\Models\BookmarkSnapshot;
+use App\Models\BookmarkSyncProfile;
+use App\Models\BookmarkSyncRun;
 use App\Models\Device;
 use App\Models\HistoryItem;
 use App\Models\NormalizedBookmark;
@@ -742,6 +748,199 @@ it('rejects oversized bookmark and tab snapshot payloads', function (): void {
     ], browserBridgeHeaders())
         ->assertUnprocessable()
         ->assertJsonValidationErrors('tabs');
+});
+
+it('creates bookmark sync profiles', function (): void {
+    $source = Device::factory()->create(['name' => 'Chrome on macOS', 'browser' => 'chrome']);
+    $target = Device::factory()->create(['name' => 'Chrome on Windows', 'browser' => 'chrome']);
+
+    $this->postJson('/api/bookmark-sync/profiles', [
+        'device_uuid' => $target->uuid,
+        'name' => 'Chrome import',
+        'source_device_id' => $source->id,
+        'target_device_id' => $target->id,
+        'mode' => BookmarkSyncMode::SafeFolder->value,
+        'direction' => BookmarkSyncDirection::SourceToTarget->value,
+        'target_scope' => BookmarkSyncTargetScope::BrowserBridgeFolder->value,
+        'auto_sync_enabled' => true,
+        'auto_sync_interval_minutes' => 15,
+        'is_active' => true,
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.name', 'Chrome import')
+        ->assertJsonPath('data.mode', BookmarkSyncMode::SafeFolder->value)
+        ->assertJsonPath('data.auto_sync_interval_minutes', 15);
+
+    expect(BookmarkSyncProfile::query()->count())->toBe(1)
+        ->and(BookmarkSyncProfile::query()->first()?->next_run_at)->not->toBeNull();
+});
+
+it('previews safe folder bookmark sync without destructive changes', function (): void {
+    $source = Device::factory()->create(['name' => 'Chrome on macOS', 'browser' => 'chrome']);
+    $target = Device::factory()->create(['name' => 'Chrome on Windows', 'browser' => 'chrome']);
+    $profile = BookmarkSyncProfile::factory()->create([
+        'source_device_id' => $source->id,
+        'target_device_id' => $target->id,
+        'mode' => BookmarkSyncMode::SafeFolder,
+    ]);
+
+    NormalizedBookmark::factory()->create([
+        'device_id' => $source->id,
+        'title' => 'Laravel',
+        'url' => 'https://laravel.com',
+    ]);
+    NormalizedBookmark::factory()->create([
+        'device_id' => $source->id,
+        'title' => 'Laravel duplicate',
+        'url' => 'https://laravel.com/',
+    ]);
+    NormalizedBookmark::factory()->create([
+        'device_id' => $source->id,
+        'title' => 'BrowserBridge',
+        'url' => 'https://example.com/browserbridge',
+    ]);
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/preview", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('data.mode', BookmarkSyncMode::SafeFolder->value)
+        ->assertJsonPath('data.add_count', 2)
+        ->assertJsonPath('data.delete_count', 0)
+        ->assertJsonPath('data.duplicate_count', 1)
+        ->assertJsonStructure(['data' => ['warnings', 'sample_changes', 'run_id']]);
+
+    expect(BookmarkSyncRun::query()->where('status', 'preview')->count())->toBe(1);
+});
+
+it('previews merge bookmark sync as non destructive', function (): void {
+    $source = Device::factory()->create(['browser' => 'chrome']);
+    $target = Device::factory()->create(['browser' => 'chrome']);
+    $profile = BookmarkSyncProfile::factory()->create([
+        'source_device_id' => $source->id,
+        'target_device_id' => $target->id,
+        'mode' => BookmarkSyncMode::Merge,
+    ]);
+
+    NormalizedBookmark::factory()->count(3)->create(['device_id' => $source->id]);
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/preview", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.mode', BookmarkSyncMode::Merge->value)
+        ->assertJsonPath('data.add_count', 3)
+        ->assertJsonPath('data.delete_count', 0);
+});
+
+it('previews mirror bookmark sync and warns about destructive scope', function (): void {
+    $source = Device::factory()->create(['browser' => 'chrome']);
+    $target = Device::factory()->create(['browser' => 'chrome']);
+    $profile = BookmarkSyncProfile::factory()->create([
+        'source_device_id' => $source->id,
+        'target_device_id' => $target->id,
+        'mode' => BookmarkSyncMode::Mirror,
+        'target_scope' => BookmarkSyncTargetScope::BrowserBridgeFolder,
+    ]);
+
+    NormalizedBookmark::factory()->create(['device_id' => $source->id]);
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/preview", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.mode', BookmarkSyncMode::Mirror->value)
+        ->assertJsonPath('data.add_count', 1)
+        ->assertJsonPath('data.delete_count', 0)
+        ->assertJsonFragment([
+            'Mirror may delete or move bookmarks in the selected destination scope. BrowserBridge requires confirmation and a backup first.',
+        ]);
+});
+
+it('requires explicit confirmation before running mirror bookmark sync', function (): void {
+    $source = Device::factory()->create(['browser' => 'chrome']);
+    $target = Device::factory()->create(['browser' => 'chrome']);
+    $profile = BookmarkSyncProfile::factory()->create([
+        'source_device_id' => $source->id,
+        'target_device_id' => $target->id,
+        'mode' => BookmarkSyncMode::Mirror,
+    ]);
+
+    NormalizedBookmark::factory()->create(['device_id' => $source->id]);
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/preview", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())->assertSuccessful();
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/run", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('confirm_mirror');
+});
+
+it('creates a backup and saves run logs before completing mirror bookmark sync', function (): void {
+    $source = Device::factory()->create(['browser' => 'chrome']);
+    $target = Device::factory()->create(['browser' => 'chrome']);
+    $profile = BookmarkSyncProfile::factory()->create([
+        'source_device_id' => $source->id,
+        'target_device_id' => $target->id,
+        'mode' => BookmarkSyncMode::Mirror,
+    ]);
+
+    NormalizedBookmark::factory()->create(['device_id' => $source->id]);
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/preview", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())->assertSuccessful();
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/run", [
+        'device_uuid' => $target->uuid,
+        'confirm_mirror' => true,
+        'backup_payload' => [
+            'items' => [
+                ['title' => 'Existing native bookmark', 'url' => 'https://example.com/native'],
+            ],
+        ],
+        'operation_log' => [
+            ['action' => 'backup_created'],
+            ['action' => 'mirror_applied'],
+        ],
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.status', 'completed')
+        ->assertJsonPath('data.added_count', 1)
+        ->assertJsonPath('data.result.operation_log.0.action', 'backup_created');
+
+    expect(BookmarkBackup::query()->count())->toBe(1)
+        ->and(BookmarkSyncRun::query()->where('status', 'completed')->count())->toBe(1)
+        ->and($profile->fresh()?->last_run_at)->not->toBeNull();
+});
+
+it('rejects full root mirror runs in this build', function (): void {
+    $source = Device::factory()->create(['browser' => 'chrome']);
+    $target = Device::factory()->create(['browser' => 'chrome']);
+    $profile = BookmarkSyncProfile::factory()->create([
+        'source_device_id' => $source->id,
+        'target_device_id' => $target->id,
+        'mode' => BookmarkSyncMode::Mirror,
+        'target_scope' => BookmarkSyncTargetScope::EntireBookmarksRoot,
+    ]);
+
+    NormalizedBookmark::factory()->create(['device_id' => $source->id]);
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/preview", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())->assertSuccessful();
+
+    $this->postJson("/api/bookmark-sync/profiles/{$profile->id}/run", [
+        'device_uuid' => $target->uuid,
+        'confirm_mirror' => true,
+        'backup_payload' => ['items' => []],
+    ], browserBridgeHeaders())
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('target_scope');
 });
 
 it('cleans up expired history items and tab commands', function (): void {

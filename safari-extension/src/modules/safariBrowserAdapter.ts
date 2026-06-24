@@ -1,7 +1,6 @@
-import type { BrowserAdapter } from '../../../chrome-extension/src/modules/browserAdapter';
+import type { BrowserAdapter, HistoryBatchResult } from '../../../chrome-extension/src/modules/browserAdapter';
 import type {
   BookmarkSnapshotItem,
-  HistoryBatchItem,
   TabSnapshotItem,
 } from '../../../chrome-extension/src/modules/types';
 import { isSyncableUrl } from '../../../chrome-extension/src/modules/urlFilter';
@@ -60,8 +59,40 @@ export class SafariBrowserAdapter implements BrowserAdapter {
     return [];
   }
 
-  async getHistorySince(_timestamp: number): Promise<HistoryBatchItem[]> {
-    return [];
+  async getNativeBookmarkTree(): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async findNativeFolderByPath(_path: string[]): Promise<chrome.bookmarks.BookmarkTreeNode | null> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async findOrCreateNativeFolderPath(_path: string[]): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async createNativeFolder(_parentId: string, _title: string, _index?: number): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async createNativeBookmark(_parentId: string, _title: string, _url: string, _index?: number): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async updateNativeBookmark(_id: string, _changes: { title?: string; url?: string }): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async moveNativeBookmark(_id: string, _destination: { parentId: string; index?: number }): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async removeNativeBookmarkTree(_id: string): Promise<void> {
+    throw new Error('Native Safari bookmark writing is not available in this Safari version.');
+  }
+
+  async getHistorySince(_timestamp: number): Promise<HistoryBatchResult> {
+    return { items: [], skipped: 0, skippedReasons: {} };
   }
 
   async getStorage<T>(key: string): Promise<T | undefined> {

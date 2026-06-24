@@ -95,6 +95,88 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
     return items;
   }
 
+  async getNativeBookmarkTree(): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
+    return chrome.bookmarks.getTree();
+  }
+
+  async findNativeFolderByPath(path: string[]): Promise<chrome.bookmarks.BookmarkTreeNode | null> {
+    const cleanPath = path.map((segment) => segment.trim()).filter(Boolean);
+
+    if (cleanPath.length === 0) {
+      return null;
+    }
+
+    const tree = await this.getNativeBookmarkTree();
+    const root = tree[0];
+
+    if (!root?.children) {
+      return null;
+    }
+
+    return this.findFolderPathFromChildren(root.children, cleanPath);
+  }
+
+  async findOrCreateNativeFolderPath(path: string[]): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    const cleanPath = path.map((segment) => segment.trim()).filter(Boolean);
+
+    if (cleanPath.length === 0) {
+      throw new Error('Bookmark folder path cannot be empty.');
+    }
+
+    const tree = await this.getNativeBookmarkTree();
+    const root = tree[0];
+
+    if (!root?.children?.length) {
+      throw new Error('Chrome bookmark roots are unavailable.');
+    }
+
+    let parentId = this.defaultWritableRootId(root);
+    let parentChildren = root.children;
+    let current: chrome.bookmarks.BookmarkTreeNode | null = null;
+
+    for (const segment of cleanPath) {
+      current = this.findDirectFolder(parentChildren, segment);
+
+      if (!current) {
+        current = await chrome.bookmarks.create({ parentId, title: segment });
+      }
+
+      parentId = current.id;
+      parentChildren = current.children || [];
+    }
+
+    return current;
+  }
+
+  async createNativeFolder(parentId: string, title: string, index?: number): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    return chrome.bookmarks.create({
+      parentId,
+      title,
+      ...(typeof index === 'number' ? { index } : {}),
+    });
+  }
+
+  async createNativeBookmark(parentId: string, title: string, url: string, index?: number): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    return chrome.bookmarks.create({
+      parentId,
+      title: title || url,
+      url,
+      ...(typeof index === 'number' ? { index } : {}),
+    });
+  }
+
+  async updateNativeBookmark(id: string, changes: { title?: string; url?: string }): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    return chrome.bookmarks.update(id, changes);
+  }
+
+  async moveNativeBookmark(id: string, destination: { parentId: string; index?: number }): Promise<chrome.bookmarks.BookmarkTreeNode> {
+    return chrome.bookmarks.move(id, destination);
+  }
+
+  async removeNativeBookmarkTree(id: string): Promise<void> {
+    await chrome.bookmarks.removeTree(id);
+  }
+
   async getHistorySince(timestamp: number): Promise<HistoryBatchResult> {
     const historyItems = await chrome.history.search({
       text: '',
@@ -161,7 +243,7 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
   }
 
   supportsNativeBookmarkWrite(): boolean {
-    return false;
+    return true;
   }
 
   supportsReliableBackgroundSync(): boolean {
@@ -180,5 +262,34 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
       active: tab.active,
       windowId: tab.windowId,
     };
+  }
+
+  private defaultWritableRootId(root: chrome.bookmarks.BookmarkTreeNode): string {
+    const bookmarksBar = root.children?.find((child) => child.id === '1') || root.children?.[0];
+
+    if (!bookmarksBar) {
+      throw new Error('Chrome bookmark root is unavailable.');
+    }
+
+    return bookmarksBar.id;
+  }
+
+  private findFolderPathFromChildren(children: chrome.bookmarks.BookmarkTreeNode[], path: string[]): chrome.bookmarks.BookmarkTreeNode | null {
+    const [segment, ...rest] = path;
+    const folder = this.findDirectFolder(children, segment);
+
+    if (!folder) {
+      return null;
+    }
+
+    if (rest.length === 0) {
+      return folder;
+    }
+
+    return this.findFolderPathFromChildren(folder.children || [], rest);
+  }
+
+  private findDirectFolder(children: chrome.bookmarks.BookmarkTreeNode[], title: string): chrome.bookmarks.BookmarkTreeNode | null {
+    return children.find((child) => !child.url && child.title === title) || null;
   }
 }

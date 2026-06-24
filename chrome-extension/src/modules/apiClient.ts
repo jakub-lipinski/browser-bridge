@@ -1,8 +1,13 @@
 import type {
   ApiCollection,
   ApiItem,
+  BookmarkBackupResource,
   BookmarkSnapshotItem,
   BookmarkSnapshotResource,
+  BookmarkSyncPreviewData,
+  BookmarkSyncProfilePayload,
+  BookmarkSyncProfileResource,
+  BookmarkSyncRunResource,
   DeviceResource,
   ExtensionConfig,
   HistoryBatchItem,
@@ -14,7 +19,7 @@ import type {
 } from './types';
 
 type RequestOptions = {
-  method?: 'DELETE' | 'GET' | 'POST';
+  method?: 'DELETE' | 'GET' | 'POST' | 'PUT';
   body?: unknown;
   query?: Record<string, string | number | boolean | undefined>;
 };
@@ -123,11 +128,22 @@ export async function fetchBookmarkSnapshots(config: ExtensionConfig): Promise<B
   return normalizeArrayResponse(response);
 }
 
-export async function fetchBookmarks(config: ExtensionConfig): Promise<NormalizedBookmarkResource[]> {
+export async function fetchBookmarks(config: ExtensionConfig, deviceId?: number): Promise<NormalizedBookmarkResource[]> {
   const response = await request<ApiCollection<NormalizedBookmarkResource>>(config, '/api/bookmarks', {
     query: {
       device_uuid: config.deviceUuid,
-      limit: 100,
+      device_id: deviceId,
+      limit: 1000,
+    },
+  });
+
+  return normalizeArrayResponse(response);
+}
+
+export async function exportBookmarks(config: ExtensionConfig): Promise<NormalizedBookmarkResource[]> {
+  const response = await request<ApiCollection<NormalizedBookmarkResource>>(config, '/api/bookmarks/export', {
+    query: {
+      device_uuid: config.deviceUuid,
     },
   });
 
@@ -143,7 +159,7 @@ export async function searchBookmarks(config: ExtensionConfig, query = ''): Prom
     },
   });
 
-  return response.data;
+  return normalizeArrayResponse(response);
 }
 
 export async function uploadBookmarkSnapshot(config: ExtensionConfig, items: BookmarkSnapshotItem[]): Promise<void> {
@@ -158,6 +174,100 @@ export async function uploadBookmarkSnapshot(config: ExtensionConfig, items: Boo
       items,
     },
   });
+}
+
+export async function fetchBookmarkSyncProfiles(config: ExtensionConfig): Promise<BookmarkSyncProfileResource[]> {
+  const response = await request<ApiCollection<BookmarkSyncProfileResource>>(config, '/api/bookmark-sync/profiles', {
+    query: {
+      device_uuid: config.deviceUuid,
+    },
+  });
+
+  return normalizeArrayResponse(response);
+}
+
+export async function createBookmarkSyncProfile(
+  config: ExtensionConfig,
+  payload: BookmarkSyncProfilePayload,
+): Promise<BookmarkSyncProfileResource> {
+  const response = await request<ApiItem<BookmarkSyncProfileResource>>(config, '/api/bookmark-sync/profiles', {
+    method: 'POST',
+    body: {
+      device_uuid: config.deviceUuid,
+      ...payload,
+    },
+  });
+
+  return unwrapData(response);
+}
+
+export async function updateBookmarkSyncProfile(
+  config: ExtensionConfig,
+  profileId: number,
+  payload: BookmarkSyncProfilePayload,
+): Promise<BookmarkSyncProfileResource> {
+  const response = await request<ApiItem<BookmarkSyncProfileResource>>(config, `/api/bookmark-sync/profiles/${profileId}`, {
+    method: 'PUT',
+    body: {
+      device_uuid: config.deviceUuid,
+      ...payload,
+    },
+  });
+
+  return unwrapData(response);
+}
+
+export async function previewBookmarkSyncProfile(
+  config: ExtensionConfig,
+  profileId: number,
+): Promise<BookmarkSyncPreviewData> {
+  const response = await request<{ success: boolean; data: BookmarkSyncPreviewData }>(config, `/api/bookmark-sync/profiles/${profileId}/preview`, {
+    method: 'POST',
+    body: {
+      device_uuid: config.deviceUuid,
+    },
+  });
+
+  return response.data;
+}
+
+export async function runBookmarkSyncProfile(
+  config: ExtensionConfig,
+  profileId: number,
+  payload: {
+    confirm_mirror?: boolean;
+    backup_created?: boolean;
+    backup_payload?: unknown;
+    operation_log?: unknown[];
+    result?: Record<string, unknown>;
+  } = {},
+): Promise<BookmarkSyncRunResource> {
+  const response = await request<ApiItem<BookmarkSyncRunResource>>(config, `/api/bookmark-sync/profiles/${profileId}/run`, {
+    method: 'POST',
+    body: {
+      device_uuid: config.deviceUuid,
+      ...payload,
+    },
+  });
+
+  return unwrapData(response);
+}
+
+export async function createBookmarkBackup(
+  config: ExtensionConfig,
+  payload: unknown,
+  syncRunId?: number,
+): Promise<BookmarkBackupResource> {
+  const response = await request<ApiItem<BookmarkBackupResource>>(config, '/api/bookmarks/backup', {
+    method: 'POST',
+    body: {
+      device_uuid: config.deviceUuid,
+      sync_run_id: syncRunId,
+      payload,
+    },
+  });
+
+  return unwrapData(response);
 }
 
 export async function uploadTabSnapshot(config: ExtensionConfig, tabs: TabSnapshotItem[]): Promise<void> {

@@ -46,11 +46,13 @@ class BookmarkSnapshotController extends Controller
     {
         $deviceResolver->required($request->string('device_uuid')->toString());
         $limit = (int) ($request->validated('limit') ?? 100);
+        $deviceId = $request->validated('device_id');
 
         return NormalizedBookmarkResource::collection(
             NormalizedBookmark::query()
                 ->with('device')
                 ->where('type', 'bookmark')
+                ->when($deviceId, fn ($query) => $query->where('device_id', $deviceId))
                 ->latest('updated_at')
                 ->limit($limit)
                 ->get(),
@@ -62,11 +64,13 @@ class BookmarkSnapshotController extends Controller
         $deviceResolver->required($request->string('device_uuid')->toString());
         $query = $request->string('query')->trim()->toString();
         $limit = (int) ($request->validated('limit') ?? 100);
+        $deviceId = $request->validated('device_id');
 
         return NormalizedBookmarkResource::collection(
             NormalizedBookmark::query()
                 ->with('device')
                 ->where('type', 'bookmark')
+                ->when($deviceId, fn ($bookmarkQuery) => $bookmarkQuery->where('device_id', $deviceId))
                 ->when($query !== '', function ($bookmarkQuery) use ($query): void {
                     $bookmarkQuery->where(function ($innerQuery) use ($query): void {
                         $innerQuery

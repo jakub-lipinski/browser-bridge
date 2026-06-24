@@ -6,6 +6,8 @@ use App\Enums\TabCommandStatus;
 use App\Http\Resources\HistoryItemResource;
 use App\Http\Resources\NormalizedBookmarkResource;
 use App\Models\BookmarkSnapshot;
+use App\Models\BookmarkSyncProfile;
+use App\Models\BookmarkSyncRun;
 use App\Models\Device;
 use App\Models\HistoryItem;
 use App\Models\NormalizedBookmark;
@@ -46,6 +48,8 @@ class DashboardController extends Controller
                 'tabSnapshots' => TabSnapshot::query()->count(),
                 'historyItems' => HistoryItem::query()->count(),
                 'tabCommands' => TabCommand::query()->count(),
+                'bookmarkSyncProfiles' => BookmarkSyncProfile::query()->count(),
+                'bookmarkSyncRuns' => BookmarkSyncRun::query()->count(),
             ],
             'bookmarkQuery' => $bookmarkQuery,
             'browserBridgeBookmarks' => $this->bookmarkQuery($bookmarkQuery)
@@ -69,6 +73,16 @@ class DashboardController extends Controller
                 ->with(['sourceDevice', 'targetDevice'])
                 ->latest()
                 ->limit(12)
+                ->get(),
+            'bookmarkSyncProfiles' => BookmarkSyncProfile::query()
+                ->with(['sourceDevice', 'targetDevice', 'latestRun'])
+                ->latest()
+                ->limit(8)
+                ->get(),
+            'bookmarkSyncRuns' => BookmarkSyncRun::query()
+                ->with(['profile', 'sourceDevice', 'targetDevice'])
+                ->latest()
+                ->limit(8)
                 ->get(),
         ]);
     }

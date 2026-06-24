@@ -1,7 +1,17 @@
 import './modules/initChromiumAdapter';
-import { fetchBookmarks, fetchDevices, fetchTabSnapshots, searchHistory } from './modules/apiClient';
+import {
+  fetchBookmarks,
+  fetchBookmarkSyncProfiles,
+  fetchDevices,
+  fetchTabSnapshots,
+  previewBookmarkSyncProfile,
+  runBookmarkSyncProfile,
+  searchHistory,
+} from './modules/apiClient';
+import { applyNativeBookmarkSync } from './modules/bookmarkSyncModes';
 import { syncBookmarks } from './modules/bookmarksSync';
 import { connectDevice } from './modules/device';
+import { getBrowserAdapter } from './modules/browserAdapter';
 import { syncHistory } from './modules/historySync';
 import { getConfig, isConfigured, updateConfig } from './modules/storage';
 import { getCurrentTab, syncOpenTabs } from './modules/tabsSync';
@@ -121,6 +131,13 @@ async function syncOnce(): Promise<SyncSummary> {
   }
 
   try {
+    await runDueBookmarkSyncProfiles(config);
+  } catch (error) {
+    globalError = error instanceof Error ? error.message : 'Unknown bookmark sync profile error';
+    console.warn('[BrowserBridge] Bookmark sync profiles failed:', error);
+  }
+
+  try {
     const incomingCommands = await getIncomingCommands(config);
     await setActionBadgeCount(incomingCommands.length);
   } catch (error) {
@@ -134,6 +151,42 @@ async function syncOnce(): Promise<SyncSummary> {
   });
 
   return summary;
+}
+
+async function runDueBookmarkSyncProfiles(config: ExtensionConfig): Promise<void> {
+  if (!getBrowserAdapter().supportsNativeBookmarkWrite()) {
+    return;
+  }
+
+  const profiles = await fetchBookmarkSyncProfiles(config);
+  const now = Date.now();
+
+  for (const profile of profiles) {
+    const isCurrentTarget = profile.target_device?.uuid === config.deviceUuid;
+    const isDue = profile.auto_sync_enabled && profile.next_run_at && new Date(profile.next_run_at).getTime() <= now;
+
+    if (!profile.is_active || !isCurrentTarget || !isDue) {
+      continue;
+    }
+
+    if (profile.mode === 'mirror') {
+      console.warn('[BrowserBridge] Skipping automatic Mirror bookmark sync; run Mirror manually from options.');
+      continue;
+    }
+
+    await previewBookmarkSyncProfile(config, profile.id);
+
+    const sourceBookmarks = await fetchBookmarks(config, profile.source_device_id);
+    const result = await applyNativeBookmarkSync(profile, sourceBookmarks);
+
+    await runBookmarkSyncProfile(config, profile.id, {
+      operation_log: result.operationLog,
+      result: {
+        native_preview: result.preview,
+        auto_sync: true,
+      },
+    });
+  }
 }
 
 async function captureError(error: unknown): Promise<void> {
