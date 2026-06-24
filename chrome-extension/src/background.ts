@@ -1,5 +1,5 @@
 import './modules/initChromiumAdapter';
-import { fetchBookmarks, fetchDevices, searchHistory } from './modules/apiClient';
+import { fetchBookmarks, fetchDevices, fetchTabSnapshots, searchHistory } from './modules/apiClient';
 import { syncBookmarks } from './modules/bookmarksSync';
 import { connectDevice } from './modules/device';
 import { syncHistory } from './modules/historySync';
@@ -116,12 +116,13 @@ async function getStatus() {
     };
   }
 
-  const [devices, incomingCommands, currentTab, bookmarks, historyItems] = await Promise.all([
+  const [devices, incomingCommands, currentTab, bookmarks, historyItems, tabSnapshots] = await Promise.all([
     fetchDevices(config),
     getIncomingCommands(config),
     getCurrentTab(),
     fetchBookmarks(config),
     searchHistory(config),
+    fetchTabSnapshots(config),
   ]);
 
   return {
@@ -132,6 +133,7 @@ async function getStatus() {
     currentTab,
     bookmarks,
     historyItems,
+    tabSnapshots,
   };
 }
 

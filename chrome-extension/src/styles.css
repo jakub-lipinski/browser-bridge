@@ -13,7 +13,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -43,7 +44,9 @@ button:disabled {
 
 input[type="text"],
 input[type="password"],
-input[type="url"] {
+input[type="url"],
+input[type="search"],
+select {
   border: 1px solid #d4d4d8;
   border-radius: 6px;
   padding: 8px 10px;
@@ -62,6 +65,7 @@ label {
   gap: 16px;
   min-width: 360px;
   padding: 16px;
+  width: 390px;
 }
 
 .options-shell {
@@ -146,9 +150,60 @@ h2 {
   justify-content: space-between;
 }
 
+.row.wrap {
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
 .stack {
   display: grid;
   gap: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stat {
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 18px;
+}
+
+.tabs {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.tab-button {
+  background: #e4e4e7;
+  color: #27272a;
+  font-size: 12px;
+  padding: 7px 6px;
+}
+
+.tab-button.active {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.send-status {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 650;
+  min-height: 16px;
 }
 
 .list {

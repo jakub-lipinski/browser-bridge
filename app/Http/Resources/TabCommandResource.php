@@ -18,6 +18,7 @@ class TabCommandResource extends JsonResource
             'source_device_id' => $this->source_device_id,
             'target_device_id' => $this->target_device_id,
             'source_device' => new DeviceResource($this->whenLoaded('sourceDevice')),
+            'target_device' => new DeviceResource($this->whenLoaded('targetDevice')),
             'url' => $this->url,
             'title' => $this->title,
             'status' => $this->status instanceof TabCommandStatus ? $this->status->value : $this->status,

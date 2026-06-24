@@ -11,25 +11,97 @@
       <header class="header">
         <div>
           <p class="eyebrow">BrowserBridge</p>
-          <h1>Sync</h1>
+          <h1>Tab handoff</h1>
           <p id="device-summary" class="muted"></p>
+          <p class="muted">Last sync: <span id="last-sync">Never</span></p>
         </div>
         <span id="connection-status" class="status bad">Disconnected</span>
       </header>
 
-      <section class="panel">
+      <section id="send-card" class="panel">
         <div class="row">
-          <div>
-            <h2>Last sync</h2>
-            <p id="last-sync" class="muted">Never</p>
-          </div>
-          <button id="sync-now" type="button">Sync now</button>
+          <h2>Send current tab</h2>
+          <button id="sync-now" type="button" class="secondary">Sync</button>
         </div>
+        <p id="current-tab-title" class="truncate">No syncable current tab.</p>
+        <p id="current-tab-url" class="muted truncate"></p>
+        <div class="row wrap">
+          <select id="send-target" aria-label="Target device"></select>
+          <button id="send-current-tab" type="button">Send to Safari</button>
+        </div>
+        <p id="send-status" class="send-status"></p>
         <p id="error-message" class="muted"></p>
       </section>
 
+      <section id="incoming-panel" class="panel tab-panel">
+        <div class="row">
+          <h2>Incoming tabs</h2>
+          <span id="incoming-count" class="muted">0</span>
+        </div>
+        <div id="commands-list" class="list"></div>
+      </section>
+
       <section class="panel">
-        <h2>Sync toggles</h2>
+        <h2>Connected devices</h2>
+        <div id="devices-list" class="list"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Quick stats</h2>
+        <div class="stats-grid">
+          <div class="stat">
+            <strong id="bookmarks-stat">0</strong>
+            <span class="muted">Bookmarks</span>
+          </div>
+          <div class="stat">
+            <strong id="history-stat">0</strong>
+            <span class="muted">History</span>
+          </div>
+          <div class="stat">
+            <strong id="tabs-stat">0</strong>
+            <span class="muted">Latest tabs</span>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Popup sections">
+        <button type="button" class="tab-button active" data-tab="send">Send</button>
+        <button type="button" class="tab-button" data-tab="incoming">Incoming</button>
+        <button type="button" class="tab-button" data-tab="bookmarks">Bookmarks</button>
+        <button type="button" class="tab-button" data-tab="history">History</button>
+        <button type="button" class="tab-button" data-tab="settings">Settings</button>
+      </nav>
+
+      <section id="bookmarks-panel" class="panel tab-panel" hidden>
+        <div class="row">
+          <h2>Bookmarks</h2>
+          <button id="sync-bookmarks-now" type="button" class="secondary">Sync now</button>
+        </div>
+        <input id="bookmarks-query" type="text" placeholder="Search bookmarks" />
+        <p id="bookmarks-count" class="muted">0 bookmarks</p>
+        <div id="bookmarks-list" class="list"></div>
+        <div class="actions">
+          <button id="bookmarks-more" type="button" class="secondary">Show more</button>
+          <button id="bookmarks-less" type="button" class="secondary">Show less</button>
+        </div>
+      </section>
+
+      <section id="history-panel" class="panel tab-panel" hidden>
+        <div class="row">
+          <h2>History</h2>
+          <button id="delete-history" type="button" class="danger">Delete</button>
+        </div>
+        <input id="history-query" type="text" placeholder="Search history" />
+        <p id="history-count" class="muted">0 history items</p>
+        <div id="history-list" class="list"></div>
+        <div class="actions">
+          <button id="history-more" type="button" class="secondary">Show more</button>
+          <button id="history-less" type="button" class="secondary">Show less</button>
+        </div>
+      </section>
+
+      <section id="settings-panel" class="panel tab-panel" hidden>
+        <h2>Settings</h2>
         <label class="row">
           <span>Sync bookmarks</span>
           <input id="toggle-bookmarks" type="checkbox" />
@@ -42,10 +114,10 @@
           <span>Sync browsing history</span>
           <input id="toggle-history" type="checkbox" />
         </label>
-        
+
         <div id="history-settings-container" hidden>
-          <label class="row" style="margin-top: 12px;">
-            <span>History sync range</span>
+          <label class="row">
+            <span>History range</span>
             <select id="history-sync-range">
               <option value="24h">Last 24 hours</option>
               <option value="7d">Last 7 days</option>
@@ -53,62 +125,15 @@
               <option value="all">All available history</option>
             </select>
           </label>
-          <div id="history-range-warning" class="warning" hidden style="margin-top: 8px;">
+          <div id="history-range-warning" class="warning" hidden>
             This may sync thousands of browsing history entries and may include sensitive private data.
           </div>
-          <div class="row" style="margin-top: 12px; justify-content: flex-end;">
-            <button id="resync-history" type="button" class="secondary" style="width: 100%;">Resync selected range</button>
-          </div>
+          <button id="resync-history" type="button" class="secondary">Resync selected range</button>
         </div>
+
         <div class="warning">
-          Browsing history can contain sensitive private information such as medical, financial, work-related,
-          personal or adult websites. BrowserBridge never syncs passwords, cookies, login sessions or form data.
-          Enable this only if you understand what browsing history sync means.
+          Browsing history can contain sensitive private information. BrowserBridge never syncs passwords, cookies, login sessions or form data.
         </div>
-      </section>
-
-      <section class="panel">
-        <h2>Current tab</h2>
-        <p id="current-tab-title" class="truncate">No syncable current tab.</p>
-        <p id="current-tab-url" class="muted truncate"></p>
-      </section>
-
-      <section class="panel">
-        <h2>Connected devices</h2>
-        <div id="devices-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <div class="row">
-          <h2>BrowserBridge Bookmarks</h2>
-          <button id="sync-bookmarks-now" type="button">Sync bookmarks now</button>
-        </div>
-        <p class="muted">BrowserBridge Bookmarks are shown inside the extension. Native Safari bookmark writing may be added later.</p>
-        <input id="bookmarks-query" type="text" placeholder="Search BrowserBridge Bookmarks" />
-        <div id="bookmarks-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <div class="row">
-          <h2>BrowserBridge History</h2>
-          <span class="muted">Shared view</span>
-        </div>
-        <p class="muted">BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.</p>
-        <p class="muted" style="margin-top: 8px;"><strong>Note:</strong> BrowserBridge sync count may be lower than your Chrome history count due to: range limits, URL filtering (e.g. max URL length), deduplication, and internal/local URLs being ignored.</p>
-        <div class="row">
-          <input id="history-query" type="text" placeholder="Search BrowserBridge History" />
-          <button id="delete-history" type="button" class="danger">Delete</button>
-        </div>
-        <div id="history-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Incoming tab commands</h2>
-        <p class="muted">Incoming mode: Ask. Auto-open can be added later as an explicit setting.</p>
-        <div id="commands-list" class="list"></div>
-      </section>
-
-      <section class="actions">
         <button id="open-options" type="button" class="secondary">Options</button>
       </section>
     </main>

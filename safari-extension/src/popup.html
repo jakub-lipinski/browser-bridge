@@ -13,22 +13,94 @@
           <p class="eyebrow">BrowserBridge</p>
           <h1>Safari Client</h1>
           <p id="device-summary" class="muted"></p>
+          <p class="muted">Last refresh: <span id="last-sync">Never</span></p>
         </div>
         <span id="connection-status" class="status bad">Disconnected</span>
       </header>
 
-      <section class="panel">
+      <section id="send-card" class="panel">
         <div class="row">
-          <div>
-            <h2>Last refresh</h2>
-            <p id="last-sync" class="muted">Never</p>
-          </div>
-          <button id="sync-now" type="button">Refresh</button>
+          <h2>Send current tab</h2>
+          <button id="sync-now" type="button" class="secondary">Refresh</button>
         </div>
+        <p id="current-tab-title" class="truncate">No syncable current tab.</p>
+        <p id="current-tab-url" class="muted truncate"></p>
+        <div class="row wrap">
+          <select id="send-target" aria-label="Target device"></select>
+          <button id="send-current-tab" type="button">Send to Chrome</button>
+        </div>
+        <p id="send-status" class="send-status"></p>
         <p id="error-message" class="muted"></p>
       </section>
 
+      <section id="incoming-panel" class="panel tab-panel">
+        <div class="row">
+          <h2>Incoming tabs</h2>
+          <span id="incoming-count" class="muted">0</span>
+        </div>
+        <div id="commands-list" class="list"></div>
+      </section>
+
       <section class="panel">
+        <h2>Connected devices</h2>
+        <div id="devices-list" class="list"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Quick stats</h2>
+        <div class="stats-grid">
+          <div class="stat">
+            <strong id="bookmarks-stat">0</strong>
+            <span class="muted">Bookmarks</span>
+          </div>
+          <div class="stat">
+            <strong id="history-stat">0</strong>
+            <span class="muted">History</span>
+          </div>
+          <div class="stat">
+            <strong id="tabs-stat">0</strong>
+            <span class="muted">Latest tabs</span>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Popup sections">
+        <button type="button" class="tab-button active" data-tab="send">Send</button>
+        <button type="button" class="tab-button" data-tab="incoming">Incoming</button>
+        <button type="button" class="tab-button" data-tab="bookmarks">Bookmarks</button>
+        <button type="button" class="tab-button" data-tab="history">History</button>
+        <button type="button" class="tab-button" data-tab="settings">Settings</button>
+      </nav>
+
+      <section id="bookmarks-panel" class="panel tab-panel" hidden>
+        <div class="row">
+          <h2>Bookmarks</h2>
+          <span class="muted">Server view</span>
+        </div>
+        <input id="bookmarks-query" type="text" placeholder="Search bookmarks" />
+        <p id="bookmarks-count" class="muted">0 bookmarks</p>
+        <div id="bookmarks-list" class="list"></div>
+        <div class="actions">
+          <button id="bookmarks-more" type="button" class="secondary">Show more</button>
+          <button id="bookmarks-less" type="button" class="secondary">Show less</button>
+        </div>
+      </section>
+
+      <section id="history-panel" class="panel tab-panel" hidden>
+        <div class="row">
+          <h2>History</h2>
+          <button id="delete-history" type="button" class="danger">Delete</button>
+        </div>
+        <input id="history-query" type="text" placeholder="Search history" />
+        <p id="history-count" class="muted">0 history items</p>
+        <div id="history-list" class="list"></div>
+        <div class="actions">
+          <button id="history-more" type="button" class="secondary">Show more</button>
+          <button id="history-less" type="button" class="secondary">Show less</button>
+        </div>
+      </section>
+
+      <section id="settings-panel" class="panel tab-panel" hidden>
         <h2>Safari capabilities</h2>
         <div class="stack">
           <p class="muted">Send current tab: Available</p>
@@ -39,57 +111,8 @@
           <p class="muted">Upload native Safari history: Not available in this version</p>
         </div>
         <p class="warning">Safari currently displays BrowserBridge data from your server. Native Safari bookmark/history upload is not implemented in this version.</p>
-      </section>
-
-      <section class="panel">
-        <div class="row">
-          <h2>Send current tab</h2>
-          <button id="send-current-tab" type="button">Send to Chrome</button>
-        </div>
-        <p id="current-tab-title" class="truncate">No syncable current tab.</p>
-        <p id="current-tab-url" class="muted truncate"></p>
-      </section>
-
-      <section class="panel">
-        <h2>Incoming tab commands</h2>
-        <p class="muted">Incoming mode: Ask. Opening this popup checks for new tabs even when Safari background polling is delayed.</p>
-        <div id="commands-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Connected devices</h2>
-        <div id="devices-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <div class="row">
-          <h2>BrowserBridge Bookmarks</h2>
-          <span class="muted">Shared view</span>
-        </div>
-        <p class="muted">BrowserBridge Bookmarks are shown inside the extension. Native Safari bookmark writing may be added later.</p>
-        <input id="bookmarks-query" type="text" placeholder="Search BrowserBridge Bookmarks" />
-        <div id="bookmarks-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <div class="row">
-          <h2>BrowserBridge History</h2>
-          <span class="muted">Shared view</span>
-        </div>
-        <p class="muted">BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.</p>
-        <div class="row">
-          <input id="history-query" type="text" placeholder="Search BrowserBridge History" />
-          <button id="delete-history" type="button" class="danger">Delete</button>
-        </div>
-        <div id="history-list" class="list"></div>
-      </section>
-
-      <section class="panel">
         <h2>Refresh status</h2>
         <p id="refresh-summary" class="muted">Refresh BrowserBridge data from your server.</p>
-      </section>
-
-      <section class="actions">
         <button id="open-options" type="button" class="secondary">Options</button>
       </section>
     </main>

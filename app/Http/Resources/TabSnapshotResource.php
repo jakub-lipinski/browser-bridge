@@ -15,6 +15,7 @@ class TabSnapshotResource extends JsonResource
         return [
             'id' => $this->id,
             'device_id' => $this->device_id,
+            'device' => new DeviceResource($this->whenLoaded('device')),
             'tab_count' => $this->tab_count,
             'payload_json' => $this->payload_json,
             'created_at' => $this->created_at?->toIso8601String(),

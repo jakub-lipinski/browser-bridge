@@ -269,6 +269,65 @@ it('shows bookmark counts and searchable bookmarks on the dashboard', function (
         ->assertSee('1');
 });
 
+it('limits dashboard bookmarks by default and exposes searchable JSON slices', function (): void {
+    $device = Device::factory()->create(['name' => 'Chrome Mac']);
+
+    NormalizedBookmark::factory()->create([
+        'device_id' => $device->id,
+        'title' => 'Old Hidden BrowserBridge Bookmark',
+        'url' => 'https://example.com/old-hidden-bookmark',
+        'updated_at' => now()->subDays(2),
+    ]);
+
+    NormalizedBookmark::factory()
+        ->count(12)
+        ->sequence(fn ($sequence) => [
+            'device_id' => $device->id,
+            'title' => 'Visible BrowserBridge Bookmark '.$sequence->index,
+            'url' => 'https://example.com/visible-bookmark-'.$sequence->index,
+            'updated_at' => now()->subMinutes($sequence->index),
+        ])
+        ->create();
+
+    $this->get('/dashboard')
+        ->assertSuccessful()
+        ->assertSee('BrowserBridge Bookmarks')
+        ->assertSee('Visible BrowserBridge Bookmark 0')
+        ->assertDontSee('Old Hidden BrowserBridge Bookmark');
+
+    $this->getJson('/dashboard/bookmarks?query=visible&limit=5')
+        ->assertSuccessful()
+        ->assertJsonCount(5, 'data')
+        ->assertJsonPath('total', 12)
+        ->assertJsonPath('has_more', true);
+});
+
+it('exposes searchable dashboard history slices', function (): void {
+    $device = Device::factory()->create(['name' => 'Chrome Mac']);
+
+    HistoryItem::factory()
+        ->count(3)
+        ->sequence(fn ($sequence) => [
+            'device_id' => $device->id,
+            'title' => 'Dynamic History '.$sequence->index,
+            'url' => 'https://example.com/dynamic-history-'.$sequence->index,
+            'visited_at' => now()->subMinutes($sequence->index),
+        ])
+        ->create();
+
+    HistoryItem::factory()->create([
+        'device_id' => $device->id,
+        'title' => 'Unrelated History',
+        'url' => 'https://example.com/unrelated-history',
+    ]);
+
+    $this->getJson('/dashboard/history?query=dynamic&limit=2')
+        ->assertSuccessful()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('total', 3)
+        ->assertJsonPath('has_more', true);
+});
+
 it('uploads tab snapshots and rejects invalid URLs', function (): void {
     $device = Device::factory()->create();
 
@@ -290,6 +349,33 @@ it('uploads tab snapshots and rejects invalid URLs', function (): void {
     ], browserBridgeHeaders())
         ->assertUnprocessable()
         ->assertJsonValidationErrors('tabs.0.url');
+});
+
+it('exposes recent tab snapshots across devices', function (): void {
+    $chrome = Device::factory()->create([
+        'name' => 'Chrome Mac',
+        'browser' => 'chrome',
+        'platform' => 'macos',
+    ]);
+
+    $safari = Device::factory()->create([
+        'name' => 'Safari Mac',
+        'browser' => 'safari',
+        'platform' => 'macos',
+    ]);
+
+    $this->postJson('/api/tabs/snapshot', [
+        'device_uuid' => $chrome->uuid,
+        'tabs' => [
+            ['title' => 'BrowserBridge', 'url' => 'https://example.com/browserbridge', 'active' => true],
+        ],
+    ], browserBridgeHeaders())->assertSuccessful();
+
+    $this->getJson('/api/tabs/snapshots?device_uuid='.$safari->uuid, browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.device.name', 'Chrome Mac')
+        ->assertJsonPath('data.0.tab_count', 1);
 });
 
 it('requires history opt in and deduplicates history items', function (): void {
@@ -354,7 +440,7 @@ it('skips invalid and internal history URLs gracefully', function (): void {
     $uploadHistoryUrl('devtools://devtools/bundled/inspector.html')->assertSuccessful()->assertJsonPath('data.skipped', 1);
     $uploadHistoryUrl('view-source:https://example.com')->assertSuccessful()->assertJsonPath('data.skipped', 1);
     $uploadHistoryUrl('javascript:alert(1)')->assertSuccessful()->assertJsonPath('data.skipped', 1);
-    $uploadHistoryUrl('https://example.com/' . str_repeat('a', 2049))->assertSuccessful()->assertJsonPath('data.skipped', 1)->assertJsonPath('data.skipped_reasons.url_too_long', 1);
+    $uploadHistoryUrl('https://example.com/'.str_repeat('a', 2049))->assertSuccessful()->assertJsonPath('data.skipped', 1)->assertJsonPath('data.skipped_reasons.url_too_long', 1);
 });
 
 it('exposes BrowserBridge history across Chrome and Safari devices', function (): void {

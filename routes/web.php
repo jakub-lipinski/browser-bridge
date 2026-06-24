@@ -9,4 +9,6 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', DashboardController::class)->name('dashboard');
+Route::get('/dashboard/bookmarks', [DashboardController::class, 'bookmarks'])->name('dashboard.bookmarks');
+Route::get('/dashboard/history', [DashboardController::class, 'history'])->name('dashboard.history');
 Route::delete('/dashboard/history', DashboardHistoryController::class)->name('dashboard.history.destroy');

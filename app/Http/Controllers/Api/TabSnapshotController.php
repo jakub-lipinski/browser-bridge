@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\IncomingTabCommandsRequest;
 use App\Http\Requests\TabSnapshotRequest;
 use App\Http\Resources\TabSnapshotResource;
+use App\Models\TabSnapshot;
 use App\Services\BrowserSyncService;
 use App\Services\DeviceResolver;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -25,10 +26,11 @@ class TabSnapshotController extends Controller
 
     public function index(IncomingTabCommandsRequest $request, DeviceResolver $deviceResolver): AnonymousResourceCollection
     {
-        $device = $deviceResolver->required($request->string('device_uuid')->toString());
+        $deviceResolver->required($request->string('device_uuid')->toString());
 
         return TabSnapshotResource::collection(
-            $device->tabSnapshots()
+            TabSnapshot::query()
+                ->with('device')
                 ->latest()
                 ->limit(20)
                 ->get(),
