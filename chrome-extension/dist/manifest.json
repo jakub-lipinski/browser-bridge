@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "BrowserBridge",
+  "description": "Sync selected browser data with a local BrowserBridge Laravel backend.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "alarms",
+    "bookmarks",
+    "history",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "BrowserBridge",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html"
+}

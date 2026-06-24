@@ -197,7 +197,7 @@ curl -k -X POST "$BASE/api/tabs/$TAB_COMMAND_ID/dismissed" \
 - History sync must be disabled by default in browser clients.
 - History UI must warn that browsing history may contain sensitive private information.
 - Browser extensions must not request permissions for cookies, passwords, sessions, localStorage, sessionStorage, or form data.
-- Internal browser URLs such as `chrome://`, `edge://`, `about:`, and `file://` are ignored for snapshots and history, and rejected for send-tab commands.
+- Internal browser URLs such as `chrome://`, `edge://`, `brave://`, `about:`, `file://`, `view-source:`, `devtools://`, and `javascript:` are ignored for snapshots and history, and rejected for send-tab commands.
 - Payload columns are named `payload_json` and `encrypted_payload` so local JSON storage can later migrate to encrypted payload storage.
 
 ## Before Public Release
@@ -216,3 +216,50 @@ curl -k -X POST "$BASE/api/tabs/$TAB_COMMAND_ID/dismissed" \
 ```bash
 php artisan test --compact
 ```
+
+## Chromium Extension
+
+The first local Chromium extension lives in `chrome-extension`.
+
+Install extension dependencies:
+
+```bash
+cd chrome-extension
+npm install
+```
+
+Build the unpacked extension:
+
+```bash
+npm run build
+```
+
+Load it in Chrome:
+
+1. Open `chrome://extensions`.
+2. Enable Developer mode.
+3. Click Load unpacked.
+4. Select this directory:
+
+```text
+/Users/jakub/Webdev/projekty-prywatne/browser-bridge/chrome-extension/dist
+```
+
+Connect it to Laravel:
+
+1. Make sure the Laravel backend has `BROWSERBRIDGE_API_TOKEN` set and migrations are run.
+2. Open the BrowserBridge extension options page.
+3. Enter the API URL, for example `http://browserbridge.test` or `https://browserbridge.test`.
+4. Enter the same API token from `.env`.
+5. Set a device name and click Save and register device.
+
+Test with two Chrome profiles:
+
+1. Build and load the same `chrome-extension/dist` folder in both profiles.
+2. Register each profile with a different device name.
+3. Keep bookmarks/tabs sync enabled.
+4. Leave browsing history disabled unless you explicitly want to test it.
+5. Open the popup in profile A and send the current tab to profile B.
+6. Open the popup in profile B, then open or dismiss the incoming tab command.
+
+History sync warning: browsing history can contain sensitive private information such as medical, financial, work-related, personal or adult websites. BrowserBridge never syncs passwords, cookies, login sessions or form data. Enable this only if you understand what browsing history sync means.
