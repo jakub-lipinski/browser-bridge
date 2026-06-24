@@ -9,16 +9,21 @@
   <body>
     <main class="options-shell">
       <section class="panel">
-        <div>
-          <p class="eyebrow">BrowserBridge</p>
-          <h1>Safari extension options</h1>
-          <p class="muted">Connect Safari on macOS to your local Laravel BrowserBridge API.</p>
+        <div class="brand-row">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          </span>
+          <div>
+            <p class="eyebrow">BrowserBridge</p>
+            <h1>Safari setup</h1>
+            <p class="muted">Connect Safari to your private BrowserBridge server for tab handoff and shared BrowserBridge views.</p>
+          </div>
         </div>
 
         <form id="options-form" class="form">
           <label>
             API URL
-            <input id="api-url" type="url" placeholder="http://browserbridge.test" autocomplete="off" />
+            <input id="api-url" type="url" placeholder="https://browserbridge.test" autocomplete="off" />
           </label>
 
           <label>
@@ -31,25 +36,23 @@
             <input id="device-name" type="text" autocomplete="off" />
           </label>
 
-          <label>
-            Browser name
-            <input id="browser-name" type="text" autocomplete="off" readonly />
-          </label>
+          <div class="row wrap">
+            <label>
+              Browser
+              <input id="browser-name" type="text" autocomplete="off" readonly />
+            </label>
+            <label>
+              Platform
+              <input id="platform" type="text" autocomplete="off" readonly />
+            </label>
+          </div>
 
-          <label>
-            Platform
-            <input id="platform" type="text" autocomplete="off" readonly />
-          </label>
-
-          <div class="warning">
-            BrowserBridge Safari can receive and send tabs and display BrowserBridge Bookmarks and History. Native
-            Safari bookmark/history writing is not implemented in this milestone.
+          <div class="privacy-note">
+            Safari displays BrowserBridge data from your server. Native Safari bookmark/history upload is not available in this version.
           </div>
 
           <div class="warning">
-            Browsing history can contain sensitive private information such as medical, financial, work-related,
-            personal or adult websites. BrowserBridge never syncs passwords, cookies, login sessions or form data.
-            Enable this only if you understand what browsing history sync means.
+            History sync remains explicit and opt-in. BrowserBridge never syncs passwords, cookies, login sessions or form data.
           </div>
 
           <div class="actions">
@@ -58,7 +61,7 @@
           </div>
         </form>
 
-        <div id="status" class="muted"></div>
+        <div id="status" class="muted" role="status"></div>
       </section>
     </main>
   </body>

@@ -10,17 +10,29 @@
     <main class="shell">
       <header class="header">
         <div>
-          <p class="eyebrow">BrowserBridge</p>
-          <h1>Safari Client</h1>
+          <div class="brand-row">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </span>
+            <div>
+              <p class="eyebrow">BrowserBridge</p>
+              <h1>Safari Client <span id="activity-dot" class="activity-dot" hidden></span></h1>
+            </div>
+          </div>
           <p id="device-summary" class="muted"></p>
           <p class="muted">Last refresh: <span id="last-sync">Never</span></p>
         </div>
         <span id="connection-status" class="status bad">Disconnected</span>
       </header>
 
-      <section id="send-card" class="panel">
+      <section id="send-card" class="panel primary-panel">
         <div class="row">
-          <h2>Send current tab</h2>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </span>
+            Send current tab
+          </h2>
           <button id="sync-now" type="button" class="secondary">Refresh</button>
         </div>
         <p id="current-tab-title" class="truncate">No syncable current tab.</p>
@@ -30,24 +42,40 @@
           <button id="send-current-tab" type="button">Send to Chrome</button>
         </div>
         <p id="send-status" class="send-status"></p>
+        <p id="send-toast" class="toast" hidden></p>
         <p id="error-message" class="muted"></p>
       </section>
 
       <section id="incoming-panel" class="panel tab-panel">
         <div class="row">
-          <h2>Incoming tabs</h2>
-          <span id="incoming-count" class="muted">0</span>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            </span>
+            Incoming tabs
+          </h2>
+          <span id="incoming-count" class="badge">0</span>
         </div>
         <div id="commands-list" class="list"></div>
       </section>
 
       <section class="panel">
-        <h2>Connected devices</h2>
+        <h2>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M10 8h4M10 16h4"/></svg>
+          </span>
+          Connected devices
+        </h2>
         <div id="devices-list" class="list"></div>
       </section>
 
       <section class="panel">
-        <h2>Quick stats</h2>
+        <h2>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M8 17V9"/><path d="M12 19V7"/><path d="M16 15v-4"/><path d="M20 19V5"/></svg>
+          </span>
+          Quick stats
+        </h2>
         <div class="stats-grid">
           <div class="stat">
             <strong id="bookmarks-stat">0</strong>
@@ -66,7 +94,6 @@
 
       <nav class="tabs" aria-label="Popup sections">
         <button type="button" class="tab-button active" data-tab="send">Send</button>
-        <button type="button" class="tab-button" data-tab="incoming">Incoming</button>
         <button type="button" class="tab-button" data-tab="bookmarks">Bookmarks</button>
         <button type="button" class="tab-button" data-tab="history">History</button>
         <button type="button" class="tab-button" data-tab="settings">Settings</button>
@@ -74,8 +101,13 @@
 
       <section id="bookmarks-panel" class="panel tab-panel" hidden>
         <div class="row">
-          <h2>Bookmarks</h2>
-          <span class="muted">Server view</span>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            Bookmarks
+          </h2>
+          <span class="badge">Server view</span>
         </div>
         <input id="bookmarks-query" type="text" placeholder="Search bookmarks" />
         <p id="bookmarks-count" class="muted">0 bookmarks</p>
@@ -88,7 +120,12 @@
 
       <section id="history-panel" class="panel tab-panel" hidden>
         <div class="row">
-          <h2>History</h2>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/><path d="M12 7v5l3 2"/></svg>
+            </span>
+            History
+          </h2>
           <button id="delete-history" type="button" class="danger">Delete</button>
         </div>
         <input id="history-query" type="text" placeholder="Search history" />
@@ -101,7 +138,12 @@
       </section>
 
       <section id="settings-panel" class="panel tab-panel" hidden>
-        <h2>Safari capabilities</h2>
+        <h2>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </span>
+          Safari capabilities
+        </h2>
         <div class="stack">
           <p class="muted">Send current tab: Available</p>
           <p class="muted">Receive tabs: Available</p>
@@ -110,7 +152,7 @@
           <p class="muted">Upload native Safari bookmarks: Not available in this version</p>
           <p class="muted">Upload native Safari history: Not available in this version</p>
         </div>
-        <p class="warning">Safari currently displays BrowserBridge data from your server. Native Safari bookmark/history upload is not implemented in this version.</p>
+        <p class="privacy-note">Safari displays BrowserBridge data from your server. Native Safari bookmark/history upload is not available in this version. Refresh checks incoming tabs and reloads BrowserBridge data.</p>
         <h2>Refresh status</h2>
         <p id="refresh-summary" class="muted">Refresh BrowserBridge data from your server.</p>
         <button id="open-options" type="button" class="secondary">Options</button>

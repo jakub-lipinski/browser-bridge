@@ -15,6 +15,7 @@ import type { ExtensionConfig, SyncSummary, TabCommandResource } from './modules
 
 const SYNC_ALARM_NAME = 'browserbridge.sync';
 const SYNC_INTERVAL_MINUTES = 1;
+const SENT_BADGE_DURATION_MS = 1800;
 
 type RuntimeMessage =
   | { type: 'browserbridge.syncNow' }
@@ -35,6 +36,43 @@ async function ensureRegistered(config: ExtensionConfig): Promise<ExtensionConfi
   }
 
   return connectDevice(config);
+}
+
+async function setActionBadgeCount(count: number): Promise<void> {
+  if (!chrome.action) {
+    return;
+  }
+
+  await chrome.action.setBadgeBackgroundColor({ color: '#0f766e' });
+  await chrome.action.setBadgeText({ text: count > 0 ? String(count) : '' });
+}
+
+async function refreshActionBadge(config?: ExtensionConfig): Promise<void> {
+  config = config ?? await getConfig();
+
+  if (!isConfigured(config)) {
+    await setActionBadgeCount(0);
+
+    return;
+  }
+
+  const incomingCommands = await getIncomingCommands(config);
+  await setActionBadgeCount(incomingCommands.length);
+}
+
+function flashSentBadge(): void {
+  if (!chrome.action) {
+    return;
+  }
+
+  void chrome.action.setBadgeBackgroundColor({ color: '#0f766e' });
+  void chrome.action.setBadgeText({ text: '✓' });
+
+  setTimeout(() => {
+    void refreshActionBadge().catch((error: unknown) => {
+      console.warn('[BrowserBridge] Unable to refresh action badge:', error);
+    });
+  }, SENT_BADGE_DURATION_MS);
 }
 
 async function syncOnce(): Promise<SyncSummary> {
@@ -83,7 +121,8 @@ async function syncOnce(): Promise<SyncSummary> {
   }
 
   try {
-    await getIncomingCommands(config);
+    const incomingCommands = await getIncomingCommands(config);
+    await setActionBadgeCount(incomingCommands.length);
   } catch (error) {
     globalError = error instanceof Error ? error.message : 'Unknown error';
     console.warn('[BrowserBridge] Incoming commands sync failed:', error);
@@ -103,10 +142,14 @@ async function captureError(error: unknown): Promise<void> {
   await updateConfig({ lastError: message });
 }
 
-async function getStatus() {
+async function getStatus(updateBadge = true) {
   const config = await getConfig();
 
   if (!isConfigured(config)) {
+    if (updateBadge) {
+      await setActionBadgeCount(0);
+    }
+
     return {
       config,
       configured: false,
@@ -124,6 +167,10 @@ async function getStatus() {
     searchHistory(config),
     fetchTabSnapshots(config),
   ]);
+
+  if (updateBadge) {
+    await setActionBadgeCount(incomingCommands.length);
+  }
 
   return {
     config,
@@ -223,8 +270,10 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
       }
 
       await sendCurrentTabToDevice(config, message.targetDeviceUuid, currentTab);
+      const status = await getStatus(false);
+      flashSentBadge();
 
-      return getStatus();
+      return status;
     }
 
     throw new Error('Unknown BrowserBridge message.');

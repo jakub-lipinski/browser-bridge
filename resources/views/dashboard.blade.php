@@ -7,91 +7,120 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-zinc-50 font-sans text-zinc-950 antialiased">
-        <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
-            <header class="flex flex-col gap-4 border-b border-zinc-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
+    <body>
+        <main class="bb-shell bb-stack">
+            <header class="bb-header">
                 <div>
-                    <p class="text-sm font-medium text-teal-700">BrowserBridge local cloud</p>
-                    <h1 class="mt-2 text-3xl font-semibold text-zinc-950">Sync dashboard</h1>
-                    <p class="mt-2 max-w-2xl text-sm text-zinc-600">
-                        Local admin view for devices, tab handoff, recent open tabs, and searchable BrowserBridge data.
+                    <p class="bb-kicker">BrowserBridge local cloud</p>
+                    <h1 class="bb-title">Sync dashboard</h1>
+                    <p class="bb-copy">
+                        A private, local view of cross-browser tab handoff, synced bookmarks, shared history, and connected devices.
                     </p>
                 </div>
-                <div class="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-                    Local/private build. Do not expose publicly until authentication, encryption, privacy policy and rate limiting are complete.
-                </div>
+                <span class="bb-badge bb-badge-warning">
+                    <span class="bb-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                    </span>
+                    Local/private build
+                </span>
             </header>
 
             @if (session('status'))
-                <div class="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-950">
+                <div class="bb-warning">
                     {{ session('status') }}
                 </div>
             @endif
 
-            <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                <div class="rounded-lg border border-zinc-200 bg-white p-5">
-                    <p class="text-sm text-zinc-500">Devices</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['devices'] }}</p>
-                </div>
-                <div class="rounded-lg border border-zinc-200 bg-white p-5">
-                    <p class="text-sm text-zinc-500">Bookmarks</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['normalizedBookmarks'] }}</p>
-                    <p class="mt-1 text-xs text-zinc-500">{{ $storageCounts['bookmarkSnapshots'] }} snapshots</p>
-                </div>
-                <div class="rounded-lg border border-zinc-200 bg-white p-5">
-                    <p class="text-sm text-zinc-500">Latest open tabs</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $latestTabSnapshots->sum('tab_count') }}</p>
-                    <p class="mt-1 text-xs text-zinc-500">{{ $storageCounts['tabSnapshots'] }} snapshots</p>
-                </div>
-                <div class="rounded-lg border border-zinc-200 bg-white p-5">
-                    <p class="text-sm text-zinc-500">History items</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['historyItems'] }}</p>
-                </div>
-                <div class="rounded-lg border border-zinc-200 bg-white p-5">
-                    <p class="text-sm text-zinc-500">Pending commands</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $devices->sum('pending_tab_commands_count') }}</p>
-                    <p class="mt-1 text-xs text-zinc-500">{{ $storageCounts['tabCommands'] }} total commands</p>
-                </div>
+            <section class="bb-grid bb-grid-5" aria-label="Storage summary">
+                <article class="bb-stat">
+                    <div class="bb-stat-top">
+                        <span class="bb-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M10 8h4M10 16h4"/></svg>
+                        </span>
+                        <p class="bb-stat-label">Devices</p>
+                    </div>
+                    <p class="bb-stat-value">{{ $storageCounts['devices'] }}</p>
+                </article>
+                <article class="bb-stat">
+                    <div class="bb-stat-top">
+                        <span class="bb-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        </span>
+                        <p class="bb-stat-label">Bookmarks</p>
+                    </div>
+                    <p class="bb-stat-value">{{ $storageCounts['normalizedBookmarks'] }}</p>
+                    <p class="bb-stat-meta">{{ $storageCounts['bookmarkSnapshots'] }} snapshots</p>
+                </article>
+                <article class="bb-stat">
+                    <div class="bb-stat-top">
+                        <span class="bb-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8"/></svg>
+                        </span>
+                        <p class="bb-stat-label">Open tabs</p>
+                    </div>
+                    <p class="bb-stat-value">{{ $latestTabSnapshots->sum('tab_count') }}</p>
+                    <p class="bb-stat-meta">{{ $storageCounts['tabSnapshots'] }} snapshots</p>
+                </article>
+                <article class="bb-stat">
+                    <div class="bb-stat-top">
+                        <span class="bb-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/><path d="M12 7v5l3 2"/></svg>
+                        </span>
+                        <p class="bb-stat-label">History items</p>
+                    </div>
+                    <p class="bb-stat-value">{{ $storageCounts['historyItems'] }}</p>
+                </article>
+                <article class="bb-stat">
+                    <div class="bb-stat-top">
+                        <span class="bb-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                        </span>
+                        <p class="bb-stat-label">Tab commands</p>
+                    </div>
+                    <p class="bb-stat-value">{{ $devices->sum('pending_tab_commands_count') }}</p>
+                    <p class="bb-stat-meta">{{ $storageCounts['tabCommands'] }} total</p>
+                </article>
             </section>
 
-            <section class="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-                <div class="border-b border-zinc-200 px-5 py-4">
-                    <h2 class="text-base font-semibold">Registered devices</h2>
+            <section class="bb-card">
+                <div class="bb-section-head">
+                    <div>
+                        <h2 class="bb-section-title">Registered devices</h2>
+                        <p class="bb-section-copy">Browsers connected to this BrowserBridge server.</p>
+                    </div>
                 </div>
 
                 @if ($devices->isEmpty())
-                    <div class="px-5 py-10 text-sm text-zinc-500">
-                        No devices have registered yet.
-                    </div>
+                    <div class="bb-empty">No devices have registered yet.</div>
                 @else
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-zinc-200 text-left text-sm">
-                            <thead class="bg-zinc-50 text-xs font-semibold uppercase text-zinc-500">
+                    <div class="bb-table-wrap">
+                        <table class="bb-table">
+                            <thead>
                                 <tr>
-                                    <th class="px-5 py-3">Device</th>
-                                    <th class="px-5 py-3">Browser</th>
-                                    <th class="px-5 py-3">Platform</th>
-                                    <th class="px-5 py-3">Last seen</th>
-                                    <th class="px-5 py-3 text-right">Latest tabs</th>
-                                    <th class="px-5 py-3 text-right">Bookmarks</th>
-                                    <th class="px-5 py-3 text-right">History</th>
-                                    <th class="px-5 py-3 text-right">Pending commands</th>
+                                    <th>Device</th>
+                                    <th>Browser</th>
+                                    <th>Platform</th>
+                                    <th>Last seen</th>
+                                    <th>Latest tabs</th>
+                                    <th>Bookmarks</th>
+                                    <th>History</th>
+                                    <th>Pending</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-zinc-100">
+                            <tbody>
                                 @foreach ($devices as $device)
                                     <tr>
-                                        <td class="px-5 py-4">
-                                            <div class="font-medium text-zinc-950">{{ $device->name }}</div>
-                                            <div class="mt-1 font-mono text-xs text-zinc-500">{{ $device->uuid }}</div>
+                                        <td>
+                                            <div class="bb-item-title">{{ $device->name }}</div>
+                                            <div class="bb-mono">{{ $device->uuid }}</div>
                                         </td>
-                                        <td class="px-5 py-4 text-zinc-700">{{ $device->browser }}</td>
-                                        <td class="px-5 py-4 text-zinc-700">{{ $device->platform }}</td>
-                                        <td class="px-5 py-4 text-zinc-700">{{ $device->last_seen_at?->diffForHumans() ?? 'Never' }}</td>
-                                        <td class="px-5 py-4 text-right text-zinc-700">{{ $device->latestTabSnapshot?->tab_count ?? 0 }}</td>
-                                        <td class="px-5 py-4 text-right text-zinc-700">{{ $device->normalized_bookmarks_count }}</td>
-                                        <td class="px-5 py-4 text-right text-zinc-700">{{ $device->history_items_count }}</td>
-                                        <td class="px-5 py-4 text-right text-zinc-700">{{ $device->pending_tab_commands_count }}</td>
+                                        <td><span class="bb-badge">{{ $device->browser }}</span></td>
+                                        <td><span class="bb-badge">{{ $device->platform }}</span></td>
+                                        <td>{{ $device->last_seen_at?->diffForHumans() ?? 'Never' }}</td>
+                                        <td>{{ $device->latestTabSnapshot?->tab_count ?? 0 }}</td>
+                                        <td>{{ $device->normalized_bookmarks_count }}</td>
+                                        <td>{{ $device->history_items_count }}</td>
+                                        <td>{{ $device->pending_tab_commands_count }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -100,52 +129,46 @@
                 @endif
             </section>
 
-            <section class="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-                <div class="border-b border-zinc-200 px-5 py-4">
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <h2 class="text-base font-semibold">Pending and recent tab commands</h2>
-                            <p class="mt-1 text-sm text-zinc-500">Tab handoff is the main BrowserBridge workflow, so command status stays visible here.</p>
-                        </div>
-                        <span class="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800">
-                            {{ $devices->sum('pending_tab_commands_count') }} pending
-                        </span>
+            <section class="bb-card">
+                <div class="bb-section-head">
+                    <div>
+                        <h2 class="bb-section-title">Pending and recent tab commands</h2>
+                        <p class="bb-section-copy">Tab handoff is the main BrowserBridge workflow, so command status stays visible.</p>
                     </div>
+                    <span class="bb-badge bb-badge-accent">{{ $devices->sum('pending_tab_commands_count') }} pending</span>
                 </div>
 
                 @if ($tabCommands->isEmpty())
-                    <div class="px-5 py-8 text-sm text-zinc-500">
-                        No tab commands yet.
-                    </div>
+                    <div class="bb-empty">No tab commands yet.</div>
                 @else
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-zinc-200 text-left text-sm">
-                            <thead class="bg-zinc-50 text-xs font-semibold uppercase text-zinc-500">
+                    <div class="bb-table-wrap">
+                        <table class="bb-table">
+                            <thead>
                                 <tr>
-                                    <th class="px-5 py-3">Tab</th>
-                                    <th class="px-5 py-3">Source</th>
-                                    <th class="px-5 py-3">Target</th>
-                                    <th class="px-5 py-3">Status</th>
-                                    <th class="px-5 py-3">Created</th>
+                                    <th>Tab</th>
+                                    <th>Source</th>
+                                    <th>Target</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-zinc-100">
+                            <tbody>
                                 @foreach ($tabCommands as $tabCommand)
                                     <tr>
-                                        <td class="max-w-md px-5 py-4">
-                                            <a href="{{ $tabCommand->url }}" target="_blank" rel="noreferrer" class="block truncate font-medium text-zinc-950 hover:text-teal-700">
+                                        <td>
+                                            <a href="{{ $tabCommand->url }}" target="_blank" rel="noreferrer" class="bb-item-title">
                                                 {{ $tabCommand->title ?: $tabCommand->url }}
                                             </a>
-                                            <div class="mt-1 truncate text-xs text-zinc-500">{{ $tabCommand->url }}</div>
+                                            <div class="bb-item-meta">{{ $tabCommand->url }}</div>
                                         </td>
-                                        <td class="px-5 py-4 text-zinc-700">{{ $tabCommand->sourceDevice?->name ?? 'Unknown source' }}</td>
-                                        <td class="px-5 py-4 text-zinc-700">{{ $tabCommand->targetDevice?->name ?? 'Unknown target' }}</td>
-                                        <td class="px-5 py-4">
-                                            <span class="rounded-full px-2 py-1 text-xs font-semibold {{ $tabCommand->status === \App\Enums\TabCommandStatus::Pending ? 'bg-amber-100 text-amber-900' : 'bg-zinc-100 text-zinc-700' }}">
+                                        <td>{{ $tabCommand->sourceDevice?->name ?? 'Unknown source' }}</td>
+                                        <td>{{ $tabCommand->targetDevice?->name ?? 'Unknown target' }}</td>
+                                        <td>
+                                            <span class="bb-badge {{ $tabCommand->status === \App\Enums\TabCommandStatus::Pending ? 'bb-badge-warning' : '' }}">
                                                 {{ $tabCommand->status->value }}
                                             </span>
                                         </td>
-                                        <td class="px-5 py-4 text-zinc-700">{{ $tabCommand->created_at?->diffForHumans() }}</td>
+                                        <td>{{ $tabCommand->created_at?->diffForHumans() }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -154,91 +177,90 @@
                 @endif
             </section>
 
-            <section class="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-                <div class="border-b border-zinc-200 px-5 py-4">
-                    <h2 class="text-base font-semibold">Latest open tabs</h2>
-                    <p class="mt-1 text-sm text-zinc-500">Most recent tab snapshot per device, capped to five visible tabs each.</p>
+            <section class="bb-card">
+                <div class="bb-section-head">
+                    <div>
+                        <h2 class="bb-section-title">Latest open tabs</h2>
+                        <p class="bb-section-copy">Most recent tab snapshot per device, capped to five visible tabs each.</p>
+                    </div>
                 </div>
 
                 @if ($latestTabSnapshots->isEmpty())
-                    <div class="px-5 py-8 text-sm text-zinc-500">
-                        No open tab snapshots stored.
-                    </div>
+                    <div class="bb-empty">No open tab snapshots stored.</div>
                 @else
-                    <div class="grid gap-4 p-5 lg:grid-cols-2">
+                    <div class="bb-grid bb-grid-2 bb-card-pad">
                         @foreach ($latestTabSnapshots as $tabSnapshot)
                             @php
                                 $tabs = collect($tabSnapshot->payload_json['tabs'] ?? []);
                                 $visibleTabs = $tabs->take(5);
                                 $hiddenTabs = $tabs->skip(5);
                             @endphp
-                            <article class="rounded-lg border border-zinc-200 p-4">
-                                <div class="flex items-start justify-between gap-3">
+                            <article class="bb-device-panel">
+                                <div class="bb-section-head">
                                     <div>
-                                        <h3 class="text-sm font-semibold text-zinc-950">{{ $tabSnapshot->device?->name ?? 'Unknown device' }}</h3>
-                                        <p class="mt-1 text-xs text-zinc-500">{{ $tabSnapshot->tab_count }} tabs - {{ $tabSnapshot->created_at?->diffForHumans() }}</p>
+                                        <h3 class="bb-section-title">{{ $tabSnapshot->device?->name ?? 'Unknown device' }}</h3>
+                                        <p class="bb-section-copy">{{ $tabSnapshot->tab_count }} tabs - {{ $tabSnapshot->created_at?->diffForHumans() }}</p>
                                     </div>
                                 </div>
-                                <div class="mt-4 grid gap-2">
+                                <div class="bb-list">
                                     @foreach ($visibleTabs as $tab)
-                                        <a href="{{ $tab['url'] ?? '#' }}" target="_blank" rel="noreferrer" class="block rounded-md border border-zinc-100 px-3 py-2 hover:border-teal-600">
-                                            <div class="truncate text-sm font-medium text-zinc-950">{{ $tab['title'] ?? $tab['url'] ?? 'Untitled tab' }}</div>
-                                            <div class="mt-1 truncate text-xs text-zinc-500">{{ $tab['url'] ?? '' }}</div>
+                                        <a href="{{ $tab['url'] ?? '#' }}" target="_blank" rel="noreferrer" class="bb-list-item">
+                                            <div class="bb-item-title">{{ $tab['title'] ?? $tab['url'] ?? 'Untitled tab' }}</div>
+                                            <div class="bb-item-meta">{{ $tab['url'] ?? '' }}</div>
                                         </a>
                                     @endforeach
+                                    @if ($hiddenTabs->isNotEmpty())
+                                        <details>
+                                            <summary class="bb-button bb-button-secondary">Show {{ $hiddenTabs->count() }} more</summary>
+                                            <div class="bb-list">
+                                                @foreach ($hiddenTabs as $tab)
+                                                    <a href="{{ $tab['url'] ?? '#' }}" target="_blank" rel="noreferrer" class="bb-list-item">
+                                                        <div class="bb-item-title">{{ $tab['title'] ?? $tab['url'] ?? 'Untitled tab' }}</div>
+                                                        <div class="bb-item-meta">{{ $tab['url'] ?? '' }}</div>
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </details>
+                                    @endif
                                 </div>
-                                @if ($hiddenTabs->isNotEmpty())
-                                    <details class="mt-3">
-                                        <summary class="cursor-pointer text-sm font-semibold text-teal-700">Show {{ $hiddenTabs->count() }} more</summary>
-                                        <div class="mt-3 grid gap-2">
-                                            @foreach ($hiddenTabs as $tab)
-                                                <a href="{{ $tab['url'] ?? '#' }}" target="_blank" rel="noreferrer" class="block rounded-md border border-zinc-100 px-3 py-2 hover:border-teal-600">
-                                                    <div class="truncate text-sm font-medium text-zinc-950">{{ $tab['title'] ?? $tab['url'] ?? 'Untitled tab' }}</div>
-                                                    <div class="mt-1 truncate text-xs text-zinc-500">{{ $tab['url'] ?? '' }}</div>
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    </details>
-                                @endif
                             </article>
                         @endforeach
                     </div>
                 @endif
             </section>
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="bb-two-column">
                 <section
-                    class="overflow-hidden rounded-lg border border-zinc-200 bg-white"
+                    class="bb-card"
                     data-dashboard-browser
                     data-kind="bookmarks"
                     data-endpoint="{{ route('dashboard.bookmarks') }}"
                     data-limit="12"
                 >
-                    <div class="flex flex-col gap-3 border-b border-zinc-200 px-5 py-4">
-                        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <h2 class="text-base font-semibold">BrowserBridge Bookmarks</h2>
-                                <p class="mt-1 text-sm text-zinc-500">Latest 12 by default. Search updates while typing.</p>
-                            </div>
-                            <span class="text-sm text-zinc-500" data-result-count>{{ $bookmarkTotal }} total</span>
+                    <div class="bb-section-head">
+                        <div>
+                            <h2 class="bb-section-title">BrowserBridge Bookmarks</h2>
+                            <p class="bb-section-copy">Latest 12 by default. Search updates while typing.</p>
                         </div>
-                        <input data-search-input type="search" class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm" placeholder="Search bookmarks">
+                        <span class="bb-badge" data-result-count>{{ $bookmarkTotal }} total</span>
                     </div>
-
-                    <div data-loading class="hidden px-5 py-4 text-sm text-zinc-500">Loading bookmarks...</div>
-                    <div data-error class="hidden px-5 py-4 text-sm text-red-700">Could not load bookmarks.</div>
-                    <div data-empty class="{{ $browserBridgeBookmarks->isEmpty() ? '' : 'hidden' }} px-5 py-8 text-sm text-zinc-500">No BrowserBridge bookmarks found.</div>
-                    <div data-results class="divide-y divide-zinc-100">
+                    <div class="bb-card-pad">
+                        <input data-search-input type="search" class="bb-input" placeholder="Search bookmarks">
+                    </div>
+                    <div data-loading class="bb-empty hidden">Loading bookmarks...</div>
+                    <div data-error class="bb-empty hidden">Could not load bookmarks.</div>
+                    <div data-empty class="{{ $browserBridgeBookmarks->isEmpty() ? '' : 'hidden' }} bb-empty">No BrowserBridge bookmarks found.</div>
+                    <div data-results class="bb-list">
                         @foreach ($browserBridgeBookmarks as $deviceName => $bookmarks)
-                            <div class="px-5 py-4" data-result-group>
-                                <h3 class="text-sm font-semibold text-zinc-950">{{ $deviceName }}</h3>
-                                <div class="mt-3 grid gap-2">
+                            <div data-result-group>
+                                <h3 class="bb-section-title">{{ $deviceName }}</h3>
+                                <div class="bb-list">
                                     @foreach ($bookmarks as $bookmark)
-                                        <a href="{{ $bookmark->url }}" class="rounded-md border border-zinc-100 px-3 py-2 hover:border-teal-600" target="_blank" rel="noreferrer">
-                                            <div class="truncate text-sm font-medium text-zinc-950">{{ $bookmark->title ?: $bookmark->url }}</div>
-                                            <div class="mt-1 truncate text-xs text-zinc-500">{{ $bookmark->url }}</div>
+                                        <a href="{{ $bookmark->url }}" class="bb-list-item" target="_blank" rel="noreferrer">
+                                            <div class="bb-item-title">{{ $bookmark->title ?: $bookmark->url }}</div>
+                                            <div class="bb-item-meta">{{ $bookmark->url }}</div>
                                             @if (! empty($bookmark->path_json))
-                                                <div class="mt-1 truncate text-xs text-zinc-400">{{ implode(' / ', $bookmark->path_json) }}</div>
+                                                <div class="bb-item-meta">{{ implode(' / ', $bookmark->path_json) }}</div>
                                             @endif
                                         </a>
                                     @endforeach
@@ -246,63 +268,62 @@
                             </div>
                         @endforeach
                     </div>
-                    <div class="border-t border-zinc-100 px-5 py-4">
-                        <button data-load-more type="button" class="{{ $bookmarkTotal > 12 ? '' : 'hidden' }} rounded-md bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-700">Show more</button>
+                    <div class="bb-card-pad">
+                        <button data-load-more type="button" class="{{ $bookmarkTotal > 12 ? '' : 'hidden' }} bb-button bb-button-secondary">Show more</button>
                     </div>
                 </section>
 
                 <section
-                    class="overflow-hidden rounded-lg border border-zinc-200 bg-white"
+                    class="bb-card"
                     data-dashboard-browser
                     data-kind="history"
                     data-endpoint="{{ route('dashboard.history') }}"
                     data-limit="10"
                 >
-                    <div class="flex flex-col gap-3 border-b border-zinc-200 px-5 py-4">
-                        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <h2 class="text-base font-semibold">BrowserBridge History</h2>
-                                <p class="mt-1 text-sm text-zinc-500">Recent 10 by default. Search updates while typing.</p>
-                            </div>
-                            <span class="text-sm text-zinc-500" data-result-count>{{ $historyTotal }} total</span>
+                    <div class="bb-section-head">
+                        <div>
+                            <h2 class="bb-section-title">BrowserBridge History</h2>
+                            <p class="bb-section-copy">Recent 10 by default. Search updates while typing.</p>
                         </div>
-                        <input data-search-input type="search" class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm" placeholder="Search history">
+                        <span class="bb-badge" data-result-count>{{ $historyTotal }} total</span>
                     </div>
-
-                    <div data-loading class="hidden px-5 py-4 text-sm text-zinc-500">Loading history...</div>
-                    <div data-error class="hidden px-5 py-4 text-sm text-red-700">Could not load history.</div>
-                    <div data-empty class="{{ $latestHistoryItems->isEmpty() ? '' : 'hidden' }} px-5 py-8 text-sm text-zinc-500">No BrowserBridge history found.</div>
-                    <div data-results class="divide-y divide-zinc-100">
+                    <div class="bb-card-pad">
+                        <input data-search-input type="search" class="bb-input" placeholder="Search history">
+                    </div>
+                    <div data-loading class="bb-empty hidden">Loading history...</div>
+                    <div data-error class="bb-empty hidden">Could not load history.</div>
+                    <div data-empty class="{{ $latestHistoryItems->isEmpty() ? '' : 'hidden' }} bb-empty">No BrowserBridge history found.</div>
+                    <div data-results class="bb-list">
                         @foreach ($latestHistoryItems as $historyItem)
-                            <a href="{{ $historyItem->url }}" target="_blank" rel="noreferrer" class="block px-5 py-4 hover:bg-zinc-50">
-                                <div class="truncate text-sm font-medium text-zinc-950">{{ $historyItem->title ?: $historyItem->url }}</div>
-                                <div class="mt-1 truncate text-xs text-zinc-500">{{ $historyItem->url }}</div>
-                                <div class="mt-2 text-xs text-zinc-500">
+                            <a href="{{ $historyItem->url }}" target="_blank" rel="noreferrer" class="bb-list-item">
+                                <div class="bb-item-title">{{ $historyItem->title ?: $historyItem->url }}</div>
+                                <div class="bb-item-meta">{{ $historyItem->url }}</div>
+                                <div class="bb-item-meta">
                                     {{ $historyItem->device?->name ?? 'Unknown device' }} - {{ $historyItem->visited_at?->diffForHumans() }}
                                 </div>
                             </a>
                         @endforeach
                     </div>
-                    <div class="border-t border-zinc-100 px-5 py-4">
-                        <button data-load-more type="button" class="{{ $historyTotal > 10 ? '' : 'hidden' }} rounded-md bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-700">Show more</button>
+                    <div class="bb-card-pad">
+                        <button data-load-more type="button" class="{{ $historyTotal > 10 ? '' : 'hidden' }} bb-button bb-button-secondary">Show more</button>
                     </div>
                 </section>
             </div>
 
-            <section class="flex flex-col gap-4 rounded-lg border border-red-200 bg-red-50 p-5 text-sm text-red-950 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h2 class="text-base font-semibold">Danger zone</h2>
-                    <p class="mt-1">
-                        Synced history is retained for {{ config('browserbridge.history_retention_days') }} days by default and is only a BrowserBridge shared view.
-                    </p>
+            <section class="bb-card bb-danger-zone">
+                <div class="bb-section-head">
+                    <div>
+                        <h2 class="bb-section-title">Privacy controls</h2>
+                        <p class="bb-section-copy">
+                            Synced history is retained for {{ config('browserbridge.history_retention_days') }} days by default and is only a BrowserBridge shared view.
+                        </p>
+                    </div>
+                    <form method="POST" action="{{ route('dashboard.history.destroy') }}" onsubmit="return confirm('Delete all synced BrowserBridge history?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bb-button bb-button-danger">Delete synced history</button>
+                    </form>
                 </div>
-                <form method="POST" action="{{ route('dashboard.history.destroy') }}" onsubmit="return confirm('Delete all synced BrowserBridge history?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="rounded-md bg-red-700 px-3 py-2 text-sm font-semibold text-white hover:bg-red-800">
-                        Delete synced history
-                    </button>
-                </form>
             </section>
         </main>
     </body>

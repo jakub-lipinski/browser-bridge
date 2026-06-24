@@ -32,10 +32,10 @@ test('Safari popup prioritizes tab handoff before long data lists', () => {
   assert.ok(popup.indexOf('id="send-card"') < popup.indexOf('id="bookmarks-panel"'));
   assert.ok(popup.indexOf('id="incoming-panel"') < popup.indexOf('id="bookmarks-panel"'));
   assert.match(popup, /data-tab="send"/);
-  assert.match(popup, /data-tab="incoming"/);
   assert.match(popup, /data-tab="bookmarks"/);
   assert.match(popup, /data-tab="history"/);
   assert.match(popup, /data-tab="settings"/);
+  assert.doesNotMatch(popup, /data-tab="incoming"/);
 });
 
 test('Safari popup uses bounded result lists and debounced dynamic search', () => {
@@ -46,4 +46,13 @@ test('Safari popup uses bounded result lists and debounced dynamic search', () =
   assert.match(source, /REMOTE_SEARCH_MIN_LENGTH = 2/);
   assert.match(source, /scheduleBookmarkSearch/);
   assert.match(source, /scheduleHistorySearch/);
+});
+
+test('Safari popup shows calm in-popup send feedback without relying on browser badges', () => {
+  const popup = readFileSync(new URL('../src/popup.html', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../src/popup.ts', import.meta.url), 'utf8');
+
+  assert.match(popup, /id="send-toast"/);
+  assert.match(popup, /id="activity-dot"/);
+  assert.match(source, /showSentFeedback/);
 });

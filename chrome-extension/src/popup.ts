@@ -57,6 +57,8 @@ const elements = {
   sendTarget: document.querySelector<HTMLSelectElement>('#send-target'),
   sendCurrentTab: document.querySelector<HTMLButtonElement>('#send-current-tab'),
   sendStatus: document.querySelector<HTMLParagraphElement>('#send-status'),
+  sendToast: document.querySelector<HTMLParagraphElement>('#send-toast'),
+  activityDot: document.querySelector<HTMLSpanElement>('#activity-dot'),
   toggleBookmarks: document.querySelector<HTMLInputElement>('#toggle-bookmarks'),
   toggleTabs: document.querySelector<HTMLInputElement>('#toggle-tabs'),
   toggleHistory: document.querySelector<HTMLInputElement>('#toggle-history'),
@@ -91,6 +93,7 @@ const elements = {
 };
 
 let latestStatus: PopupStatus | null = null;
+let sentFeedbackTimer: number | undefined;
 
 const bookmarkState: SearchState<NormalizedBookmarkResource> = {
   all: [],
@@ -136,6 +139,24 @@ function setError(message: string | null): void {
 
 function setSendStatus(message: string | null): void {
   requireElement(elements.sendStatus).textContent = message || '';
+}
+
+function showSentFeedback(message: string): void {
+  window.clearTimeout(sentFeedbackTimer);
+
+  const toast = requireElement(elements.sendToast);
+  const activityDot = requireElement(elements.activityDot);
+  toast.textContent = message;
+  toast.hidden = false;
+  activityDot.hidden = false;
+  activityDot.classList.add('active');
+  setSendStatus(message);
+
+  sentFeedbackTimer = window.setTimeout(() => {
+    toast.hidden = true;
+    activityDot.hidden = true;
+    activityDot.classList.remove('active');
+  }, 3200);
 }
 
 function crossBrowserTargets(status: PopupStatus): DeviceResource[] {
@@ -234,7 +255,9 @@ function renderDevices(status: PopupStatus): void {
 function renderCommands(status: PopupStatus): void {
   const commandsList = requireElement(elements.commandsList);
   commandsList.textContent = '';
-  requireElement(elements.incomingCount).textContent = `${status.incomingCommands.length} pending`;
+  const incomingCount = requireElement(elements.incomingCount);
+  incomingCount.textContent = `${status.incomingCommands.length} pending`;
+  incomingCount.classList.toggle('accent', status.incomingCommands.length > 0);
 
   if (status.incomingCommands.length === 0) {
     commandsList.innerHTML = '<p class="muted">No incoming tab commands.</p>';
@@ -710,7 +733,7 @@ requireElement(elements.sendCurrentTab).addEventListener('click', () => {
   void sendMessage<PopupStatus>({ type: 'browserbridge.sendCurrentTab', targetDeviceUuid })
     .then((nextStatus) => {
       render(nextStatus);
-      setSendStatus(`Sent current tab to ${targetName}.`);
+      showSentFeedback(`Sent to ${targetName}.`);
     })
     .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to send tab.'));
 });

@@ -32,14 +32,14 @@ function renderBookmarkResults(items) {
     const groups = groupByDevice(items);
 
     return Object.entries(groups).map(([deviceName, bookmarks]) => `
-        <div class="px-5 py-4" data-result-group>
-            <h3 class="text-sm font-semibold text-zinc-950">${escapeHtml(deviceName)}</h3>
-            <div class="mt-3 grid gap-2">
+        <div data-result-group>
+            <h3 class="bb-section-title">${escapeHtml(deviceName)}</h3>
+            <div class="bb-list">
                 ${bookmarks.map((bookmark) => `
-                    <a href="${escapeHtml(bookmark.url)}" class="rounded-md border border-zinc-100 px-3 py-2 hover:border-teal-600" target="_blank" rel="noreferrer">
-                        <div class="truncate text-sm font-medium text-zinc-950">${escapeHtml(bookmark.title || bookmark.url || 'Untitled bookmark')}</div>
-                        <div class="mt-1 truncate text-xs text-zinc-500">${escapeHtml(bookmark.url || '')}</div>
-                        ${(bookmark.path || []).length > 0 ? `<div class="mt-1 truncate text-xs text-zinc-400">${escapeHtml(bookmark.path.join(' / '))}</div>` : ''}
+                    <a href="${escapeHtml(bookmark.url)}" class="bb-list-item" target="_blank" rel="noreferrer">
+                        <div class="bb-item-title">${escapeHtml(bookmark.title || bookmark.url || 'Untitled bookmark')}</div>
+                        <div class="bb-item-meta">${escapeHtml(bookmark.url || '')}</div>
+                        ${(bookmark.path || []).length > 0 ? `<div class="bb-item-meta">${escapeHtml(bookmark.path.join(' / '))}</div>` : ''}
                     </a>
                 `).join('')}
             </div>
@@ -49,10 +49,10 @@ function renderBookmarkResults(items) {
 
 function renderHistoryResults(items) {
     return items.map((historyItem) => `
-        <a href="${escapeHtml(historyItem.url)}" target="_blank" rel="noreferrer" class="block px-5 py-4 hover:bg-zinc-50">
-            <div class="truncate text-sm font-medium text-zinc-950">${escapeHtml(historyItem.title || historyItem.url || 'Untitled history item')}</div>
-            <div class="mt-1 truncate text-xs text-zinc-500">${escapeHtml(historyItem.url || '')}</div>
-            <div class="mt-2 text-xs text-zinc-500">
+        <a href="${escapeHtml(historyItem.url)}" target="_blank" rel="noreferrer" class="bb-list-item">
+            <div class="bb-item-title">${escapeHtml(historyItem.title || historyItem.url || 'Untitled history item')}</div>
+            <div class="bb-item-meta">${escapeHtml(historyItem.url || '')}</div>
+            <div class="bb-item-meta">
                 ${escapeHtml(historyItem.device?.name || 'Unknown device')} - ${escapeHtml(formatDate(historyItem.visited_at))}
             </div>
         </a>

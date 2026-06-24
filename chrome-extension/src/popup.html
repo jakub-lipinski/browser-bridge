@@ -10,17 +10,29 @@
     <main class="shell">
       <header class="header">
         <div>
-          <p class="eyebrow">BrowserBridge</p>
-          <h1>Tab handoff</h1>
+          <div class="brand-row">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </span>
+            <div>
+              <p class="eyebrow">BrowserBridge</p>
+              <h1>Tab handoff <span id="activity-dot" class="activity-dot" hidden></span></h1>
+            </div>
+          </div>
           <p id="device-summary" class="muted"></p>
           <p class="muted">Last sync: <span id="last-sync">Never</span></p>
         </div>
         <span id="connection-status" class="status bad">Disconnected</span>
       </header>
 
-      <section id="send-card" class="panel">
+      <section id="send-card" class="panel primary-panel">
         <div class="row">
-          <h2>Send current tab</h2>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </span>
+            Send current tab
+          </h2>
           <button id="sync-now" type="button" class="secondary">Sync</button>
         </div>
         <p id="current-tab-title" class="truncate">No syncable current tab.</p>
@@ -30,24 +42,40 @@
           <button id="send-current-tab" type="button">Send to Safari</button>
         </div>
         <p id="send-status" class="send-status"></p>
+        <p id="send-toast" class="toast" hidden></p>
         <p id="error-message" class="muted"></p>
       </section>
 
       <section id="incoming-panel" class="panel tab-panel">
         <div class="row">
-          <h2>Incoming tabs</h2>
-          <span id="incoming-count" class="muted">0</span>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            </span>
+            Incoming tabs
+          </h2>
+          <span id="incoming-count" class="badge">0</span>
         </div>
         <div id="commands-list" class="list"></div>
       </section>
 
       <section class="panel">
-        <h2>Connected devices</h2>
+        <h2>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M10 8h4M10 16h4"/></svg>
+          </span>
+          Connected devices
+        </h2>
         <div id="devices-list" class="list"></div>
       </section>
 
       <section class="panel">
-        <h2>Quick stats</h2>
+        <h2>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M8 17V9"/><path d="M12 19V7"/><path d="M16 15v-4"/><path d="M20 19V5"/></svg>
+          </span>
+          Quick stats
+        </h2>
         <div class="stats-grid">
           <div class="stat">
             <strong id="bookmarks-stat">0</strong>
@@ -66,7 +94,6 @@
 
       <nav class="tabs" aria-label="Popup sections">
         <button type="button" class="tab-button active" data-tab="send">Send</button>
-        <button type="button" class="tab-button" data-tab="incoming">Incoming</button>
         <button type="button" class="tab-button" data-tab="bookmarks">Bookmarks</button>
         <button type="button" class="tab-button" data-tab="history">History</button>
         <button type="button" class="tab-button" data-tab="settings">Settings</button>
@@ -74,7 +101,12 @@
 
       <section id="bookmarks-panel" class="panel tab-panel" hidden>
         <div class="row">
-          <h2>Bookmarks</h2>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </span>
+            Bookmarks
+          </h2>
           <button id="sync-bookmarks-now" type="button" class="secondary">Sync now</button>
         </div>
         <input id="bookmarks-query" type="text" placeholder="Search bookmarks" />
@@ -88,7 +120,12 @@
 
       <section id="history-panel" class="panel tab-panel" hidden>
         <div class="row">
-          <h2>History</h2>
+          <h2>
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/><path d="M12 7v5l3 2"/></svg>
+            </span>
+            History
+          </h2>
           <button id="delete-history" type="button" class="danger">Delete</button>
         </div>
         <input id="history-query" type="text" placeholder="Search history" />
@@ -101,7 +138,12 @@
       </section>
 
       <section id="settings-panel" class="panel tab-panel" hidden>
-        <h2>Settings</h2>
+        <h2>
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </span>
+          Settings
+        </h2>
         <label class="row">
           <span>Sync bookmarks</span>
           <input id="toggle-bookmarks" type="checkbox" />
@@ -132,7 +174,8 @@
         </div>
 
         <div class="warning">
-          Browsing history can contain sensitive private information. BrowserBridge never syncs passwords, cookies, login sessions or form data.
+          History sync is off by default. If enabled, BrowserBridge stores a shared searchable history view on your server.
+          BrowserBridge never syncs passwords, cookies, login sessions or form data.
         </div>
         <button id="open-options" type="button" class="secondary">Options</button>
       </section>
