@@ -11,7 +11,7 @@
       <header class="header">
         <div>
           <p class="eyebrow">BrowserBridge</p>
-          <h1>Safari Sync</h1>
+          <h1>Safari Client</h1>
           <p id="device-summary" class="muted"></p>
         </div>
         <span id="connection-status" class="status bad">Disconnected</span>
@@ -20,25 +20,40 @@
       <section class="panel">
         <div class="row">
           <div>
-            <h2>Last sync</h2>
+            <h2>Last refresh</h2>
             <p id="last-sync" class="muted">Never</p>
           </div>
-          <button id="sync-now" type="button">Sync now</button>
+          <button id="sync-now" type="button">Refresh</button>
         </div>
         <p id="error-message" class="muted"></p>
       </section>
 
       <section class="panel">
         <h2>Safari capabilities</h2>
-        <p class="muted">Safari can send and receive tabs in this milestone.</p>
-        <p class="muted">Native Safari history upload is disabled because Safari history access is unsupported or unreliable in this milestone.</p>
-        <p class="muted">Native Safari bookmark upload and native bookmark writing are disabled for now.</p>
+        <div class="stack">
+          <p class="muted">Send current tab: Available</p>
+          <p class="muted">Receive tabs: Available</p>
+          <p class="muted">Display BrowserBridge Bookmarks: Available</p>
+          <p class="muted">Display BrowserBridge History: Available</p>
+          <p class="muted">Upload native Safari bookmarks: Not available in this version</p>
+          <p class="muted">Upload native Safari history: Not available in this version</p>
+        </div>
+        <p class="warning">Safari currently displays BrowserBridge data from your server. Native Safari bookmark/history upload is not implemented in this version.</p>
       </section>
 
       <section class="panel">
-        <h2>Current tab</h2>
+        <div class="row">
+          <h2>Send current tab</h2>
+          <button id="send-current-tab" type="button">Send to Chrome</button>
+        </div>
         <p id="current-tab-title" class="truncate">No syncable current tab.</p>
         <p id="current-tab-url" class="muted truncate"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Incoming tab commands</h2>
+        <p class="muted">Incoming mode: Ask. Opening this popup checks for new tabs even when Safari background polling is delayed.</p>
+        <div id="commands-list" class="list"></div>
       </section>
 
       <section class="panel">
@@ -70,9 +85,8 @@
       </section>
 
       <section class="panel">
-        <h2>Incoming tab commands</h2>
-        <p class="muted">Incoming mode: Ask. Opening this popup checks for new tabs even when Safari background polling is delayed.</p>
-        <div id="commands-list" class="list"></div>
+        <h2>Refresh status</h2>
+        <p id="refresh-summary" class="muted">Refresh BrowserBridge data from your server.</p>
       </section>
 
       <section class="actions">

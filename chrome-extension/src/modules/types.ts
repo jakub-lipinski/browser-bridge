@@ -90,6 +90,17 @@ export type TabSnapshotItem = {
   windowId?: number;
 };
 
+export type TabSnapshotResource = {
+  id: number;
+  device_id: number;
+  device?: DeviceResource;
+  tab_count: number;
+  payload_json: {
+    tabs?: TabSnapshotItem[];
+  } | null;
+  created_at: string | null;
+};
+
 export type HistoryBatchItem = {
   url: string;
   title?: string;

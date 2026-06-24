@@ -10,6 +10,7 @@ import type {
   NormalizedBookmarkResource,
   TabCommandResource,
   TabSnapshotItem,
+  TabSnapshotResource,
 } from './types';
 
 type RequestOptions = {
@@ -109,7 +110,7 @@ export async function fetchDevices(config: ExtensionConfig): Promise<DeviceResou
     },
   });
 
-  return response.data;
+  return normalizeArrayResponse(response);
 }
 
 export async function fetchBookmarkSnapshots(config: ExtensionConfig): Promise<BookmarkSnapshotResource[]> {
@@ -119,7 +120,7 @@ export async function fetchBookmarkSnapshots(config: ExtensionConfig): Promise<B
     },
   });
 
-  return response.data;
+  return normalizeArrayResponse(response);
 }
 
 export async function fetchBookmarks(config: ExtensionConfig): Promise<NormalizedBookmarkResource[]> {
@@ -130,7 +131,7 @@ export async function fetchBookmarks(config: ExtensionConfig): Promise<Normalize
     },
   });
 
-  return response.data;
+  return normalizeArrayResponse(response);
 }
 
 export async function searchBookmarks(config: ExtensionConfig, query = ''): Promise<NormalizedBookmarkResource[]> {
@@ -171,6 +172,16 @@ export async function uploadTabSnapshot(config: ExtensionConfig, tabs: TabSnapsh
       tabs,
     },
   });
+}
+
+export async function fetchTabSnapshots(config: ExtensionConfig): Promise<TabSnapshotResource[]> {
+  const response = await request<ApiCollection<TabSnapshotResource>>(config, '/api/tabs/snapshots', {
+    query: {
+      device_uuid: config.deviceUuid,
+    },
+  });
+
+  return normalizeArrayResponse(response);
 }
 
 export async function uploadHistoryBatch(config: ExtensionConfig, items: HistoryBatchItem[]): Promise<{ stored: number; skipped: number; skipped_reasons: Record<string, number> } | void> {

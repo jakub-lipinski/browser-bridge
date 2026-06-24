@@ -2,29 +2,68 @@ import './modules/initSafariAdapter';
 import {
   fetchBookmarks,
   fetchDevices,
+  fetchTabSnapshots,
   searchHistory,
 } from '../../chrome-extension/src/modules/apiClient';
 import { connectDevice } from '../../chrome-extension/src/modules/device';
-import { syncHistory } from '../../chrome-extension/src/modules/historySync';
 import { getConfig, isConfigured, updateConfig } from '../../chrome-extension/src/modules/storage';
-import { getCurrentTab, syncOpenTabs } from '../../chrome-extension/src/modules/tabsSync';
+import { getCurrentTab } from '../../chrome-extension/src/modules/tabsSync';
 import {
   dismissIncomingCommand,
   getIncomingCommands,
   openIncomingCommand,
   sendCurrentTabToDevice,
 } from '../../chrome-extension/src/modules/tabCommands';
-import type { ExtensionConfig, TabCommandResource } from '../../chrome-extension/src/modules/types';
+import type {
+  DeviceResource,
+  ExtensionConfig,
+  HistoryItemResource,
+  NormalizedBookmarkResource,
+  TabCommandResource,
+  TabSnapshotItem,
+  TabSnapshotResource,
+} from '../../chrome-extension/src/modules/types';
 
 const SYNC_ALARM_NAME = 'browserbridge.sync';
 const SYNC_INTERVAL_MINUTES = 1;
 
 type RuntimeMessage =
   | { type: 'browserbridge.syncNow' }
+  | { type: 'browserbridge.refreshNow' }
   | { type: 'browserbridge.getStatus' }
   | { type: 'browserbridge.openCommand'; command: TabCommandResource }
   | { type: 'browserbridge.dismissCommand'; commandId: number }
   | { type: 'browserbridge.sendCurrentTab'; targetDeviceUuid: string };
+
+type SafariLoadErrorKey = 'devices' | 'incomingCommands' | 'bookmarks' | 'historyItems' | 'tabSnapshots';
+
+type SafariLoadErrors = Partial<Record<SafariLoadErrorKey, string>>;
+
+type SafariRefreshSummary = {
+  refreshedAt: string;
+  devices?: number;
+  incomingCommands?: number;
+  bookmarks?: number;
+  historyItems?: number;
+  tabSnapshots?: number;
+  errors: SafariLoadErrors;
+  unsupportedMessage: string;
+};
+
+type SafariStatus = {
+  config: ExtensionConfig;
+  configured: boolean;
+  devices: DeviceResource[];
+  incomingCommands: TabCommandResource[];
+  currentTab: TabSnapshotItem | null;
+  bookmarks: NormalizedBookmarkResource[];
+  historyItems: HistoryItemResource[];
+  tabSnapshots: TabSnapshotResource[];
+  loadErrors: SafariLoadErrors;
+  refreshSummary?: SafariRefreshSummary;
+};
+
+const SAFARI_UNSUPPORTED_MESSAGE = 'Safari currently displays BrowserBridge data from your server. Native Safari bookmark/history upload is not implemented in this version.';
 
 async function ensureRegistered(config: ExtensionConfig): Promise<ExtensionConfig> {
   if (!config.apiUrl || !config.apiToken) {
@@ -38,28 +77,91 @@ async function ensureRegistered(config: ExtensionConfig): Promise<ExtensionConfi
   return connectDevice(config);
 }
 
-async function syncOnce(): Promise<void> {
+function friendlyLoadError(key: SafariLoadErrorKey): string {
+  return {
+    devices: 'Could not load devices',
+    incomingCommands: 'Could not load incoming tabs',
+    bookmarks: 'Could not load bookmarks',
+    historyItems: 'Could not load history',
+    tabSnapshots: 'Could not load tab snapshots',
+  }[key];
+}
+
+async function loadSection<T>(
+  key: SafariLoadErrorKey,
+  loadErrors: SafariLoadErrors,
+  loader: () => Promise<T[]>,
+): Promise<T[]> {
+  try {
+    return await loader();
+  } catch (error) {
+    console.warn(`[BrowserBridge Safari] ${friendlyLoadError(key)}:`, error);
+    loadErrors[key] = friendlyLoadError(key);
+
+    return [];
+  }
+}
+
+async function refreshOnce(): Promise<SafariStatus> {
   let config = await getConfig();
 
   if (!config.apiUrl || !config.apiToken) {
-    return;
+    return {
+      config,
+      configured: false,
+      devices: [],
+      incomingCommands: [],
+      currentTab: await getCurrentTab(),
+      bookmarks: [],
+      historyItems: [],
+      tabSnapshots: [],
+      loadErrors: {},
+    };
   }
 
   config = await ensureRegistered(config);
 
-  if (config.sync.tabs) {
-    await syncOpenTabs(config);
-  }
+  const loadErrors: SafariLoadErrors = {};
+  const [devices, incomingCommands, currentTab, bookmarks, historyItems, tabSnapshots] = await Promise.all([
+    loadSection('devices', loadErrors, () => fetchDevices(config)),
+    loadSection('incomingCommands', loadErrors, () => getIncomingCommands(config)),
+    getCurrentTab(),
+    loadSection('bookmarks', loadErrors, () => fetchBookmarks(config)),
+    loadSection('historyItems', loadErrors, () => searchHistory(config)),
+    loadSection('tabSnapshots', loadErrors, () => fetchTabSnapshots(config)),
+  ]);
 
-  if (config.sync.history) {
-    await syncHistory(config);
-  }
+  const refreshedAt = new Date().toISOString();
+  const summary: SafariRefreshSummary = {
+    refreshedAt,
+    devices: loadErrors.devices ? undefined : devices.length,
+    incomingCommands: loadErrors.incomingCommands ? undefined : incomingCommands.length,
+    bookmarks: loadErrors.bookmarks ? undefined : bookmarks.length,
+    historyItems: loadErrors.historyItems ? undefined : historyItems.length,
+    tabSnapshots: loadErrors.tabSnapshots ? undefined : tabSnapshots.length,
+    errors: loadErrors,
+    unsupportedMessage: SAFARI_UNSUPPORTED_MESSAGE,
+  };
 
-  await getIncomingCommands(config);
   await updateConfig({
-    lastSyncAt: new Date().toISOString(),
-    lastError: null,
+    lastSyncAt: refreshedAt,
+    lastError: Object.keys(loadErrors).length > 0 ? Object.values(loadErrors).join(' | ') : null,
   });
+
+  const refreshedConfig = await getConfig();
+
+  return {
+    config: refreshedConfig,
+    configured: true,
+    devices,
+    incomingCommands,
+    currentTab,
+    bookmarks,
+    historyItems,
+    tabSnapshots,
+    loadErrors,
+    refreshSummary: summary,
+  };
 }
 
 async function captureError(error: unknown): Promise<void> {
@@ -80,15 +182,19 @@ async function getStatus() {
       currentTab: await getCurrentTab(),
       bookmarks: [],
       historyItems: [],
+      tabSnapshots: [],
+      loadErrors: {},
     };
   }
 
-  const [devices, incomingCommands, currentTab, bookmarks, historyItems] = await Promise.all([
-    fetchDevices(config),
-    getIncomingCommands(config),
+  const loadErrors: SafariLoadErrors = {};
+  const [devices, incomingCommands, currentTab, bookmarks, historyItems, tabSnapshots] = await Promise.all([
+    loadSection('devices', loadErrors, () => fetchDevices(config)),
+    loadSection('incomingCommands', loadErrors, () => getIncomingCommands(config)),
     getCurrentTab(),
-    fetchBookmarks(config),
-    searchHistory(config),
+    loadSection('bookmarks', loadErrors, () => fetchBookmarks(config)),
+    loadSection('historyItems', loadErrors, () => searchHistory(config)),
+    loadSection('tabSnapshots', loadErrors, () => fetchTabSnapshots(config)),
   ]);
 
   return {
@@ -99,6 +205,8 @@ async function getStatus() {
     currentTab,
     bookmarks,
     historyItems,
+    tabSnapshots,
+    loadErrors,
   };
 }
 
@@ -116,21 +224,19 @@ function installAlarm(): void {
 chrome.runtime.onInstalled.addListener(installAlarm);
 
 chrome.runtime.onStartup?.addListener(() => {
-  void syncOnce().catch(captureError);
+  void refreshOnce().catch(captureError);
 });
 
 chrome.alarms?.onAlarm.addListener((alarm) => {
   if (alarm.name === SYNC_ALARM_NAME) {
-    void syncOnce().catch(captureError);
+    void refreshOnce().catch(captureError);
   }
 });
 
 chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResponse) => {
   const respond = async (): Promise<unknown> => {
-    if (message.type === 'browserbridge.syncNow') {
-      await syncOnce();
-
-      return getStatus();
+    if (message.type === 'browserbridge.syncNow' || message.type === 'browserbridge.refreshNow') {
+      return refreshOnce();
     }
 
     if (message.type === 'browserbridge.getStatus') {

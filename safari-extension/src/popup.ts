@@ -10,7 +10,22 @@ import type {
   NormalizedBookmarkResource,
   TabCommandResource,
   TabSnapshotItem,
+  TabSnapshotResource,
 } from '../../chrome-extension/src/modules/types';
+
+type SafariLoadErrorKey = 'devices' | 'incomingCommands' | 'bookmarks' | 'historyItems' | 'tabSnapshots';
+type SafariLoadErrors = Partial<Record<SafariLoadErrorKey, string>>;
+
+type SafariRefreshSummary = {
+  refreshedAt: string;
+  devices?: number;
+  incomingCommands?: number;
+  bookmarks?: number;
+  historyItems?: number;
+  tabSnapshots?: number;
+  errors: SafariLoadErrors;
+  unsupportedMessage: string;
+};
 
 type PopupStatus = {
   config: ExtensionConfig;
@@ -18,8 +33,11 @@ type PopupStatus = {
   devices: DeviceResource[];
   incomingCommands: TabCommandResource[];
   currentTab: TabSnapshotItem | null;
-  bookmarks?: NormalizedBookmarkResource[];
-  historyItems?: HistoryItemResource[];
+  bookmarks: NormalizedBookmarkResource[];
+  historyItems: HistoryItemResource[];
+  tabSnapshots: TabSnapshotResource[];
+  loadErrors: SafariLoadErrors;
+  refreshSummary?: SafariRefreshSummary;
 };
 
 type RuntimeResponse<T> = {
@@ -34,6 +52,7 @@ const elements = {
   lastSync: document.querySelector<HTMLParagraphElement>('#last-sync'),
   errorMessage: document.querySelector<HTMLParagraphElement>('#error-message'),
   syncNow: document.querySelector<HTMLButtonElement>('#sync-now'),
+  sendCurrentTab: document.querySelector<HTMLButtonElement>('#send-current-tab'),
   currentTabTitle: document.querySelector<HTMLParagraphElement>('#current-tab-title'),
   currentTabUrl: document.querySelector<HTMLParagraphElement>('#current-tab-url'),
   devicesList: document.querySelector<HTMLDivElement>('#devices-list'),
@@ -43,8 +62,13 @@ const elements = {
   historyQuery: document.querySelector<HTMLInputElement>('#history-query'),
   deleteHistory: document.querySelector<HTMLButtonElement>('#delete-history'),
   commandsList: document.querySelector<HTMLDivElement>('#commands-list'),
+  refreshSummary: document.querySelector<HTMLParagraphElement>('#refresh-summary'),
   openOptions: document.querySelector<HTMLButtonElement>('#open-options'),
 };
+
+const SAFARI_UNSUPPORTED_MESSAGE = 'Safari currently displays BrowserBridge data from your server. Native Safari bookmark/history upload is not implemented in this version.';
+
+let latestStatus: PopupStatus | null = null;
 
 function requireElement<T>(element: T | null): T {
   if (!element) {
@@ -68,6 +92,20 @@ function setError(message: string | null): void {
   requireElement(elements.errorMessage).textContent = message || '';
 }
 
+function loadErrorMessage(status: PopupStatus): string | null {
+  const loadErrors = Object.values(status.loadErrors || {});
+
+  if (loadErrors.length > 0) {
+    return loadErrors.join(' | ');
+  }
+
+  if (status.config.lastError && status.config.lastError !== SAFARI_UNSUPPORTED_MESSAGE) {
+    return status.config.lastError;
+  }
+
+  return null;
+}
+
 function crossBrowserTargets(status: PopupStatus): DeviceResource[] {
   return status.devices.filter((device) => {
     return device.uuid !== status.config.deviceUuid && device.browser === 'chrome';
@@ -77,6 +115,12 @@ function crossBrowserTargets(status: PopupStatus): DeviceResource[] {
 function renderDevices(status: PopupStatus): void {
   const devicesList = requireElement(elements.devicesList);
   devicesList.textContent = '';
+
+  if (status.loadErrors.devices) {
+    devicesList.innerHTML = '<p class="muted">Could not load devices</p>';
+
+    return;
+  }
 
   const otherDevices = crossBrowserTargets(status);
 
@@ -122,6 +166,12 @@ function renderDevices(status: PopupStatus): void {
 function renderCommands(status: PopupStatus): void {
   const commandsList = requireElement(elements.commandsList);
   commandsList.textContent = '';
+
+  if (status.loadErrors.incomingCommands) {
+    commandsList.innerHTML = '<p class="muted">Could not load incoming tabs</p>';
+
+    return;
+  }
 
   if (status.incomingCommands.length === 0) {
     commandsList.innerHTML = '<p class="muted">No incoming tab commands.</p>';
@@ -187,9 +237,15 @@ function groupBookmarksByDevice(bookmarks: NormalizedBookmarkResource[]): Map<st
   }, new Map<string, NormalizedBookmarkResource[]>());
 }
 
-function renderBookmarks(bookmarks: NormalizedBookmarkResource[] = []): void {
+function renderBookmarks(bookmarks: NormalizedBookmarkResource[] = [], error?: string): void {
   const bookmarksList = requireElement(elements.bookmarksList);
   bookmarksList.textContent = '';
+
+  if (error) {
+    bookmarksList.innerHTML = '<p class="muted">Could not load bookmarks</p>';
+
+    return;
+  }
 
   if (bookmarks.length === 0) {
     bookmarksList.innerHTML = '<p class="muted">No BrowserBridge bookmarks available yet. Upload bookmarks from Chrome first.</p>';
@@ -253,9 +309,15 @@ function groupHistoryItemsByDevice(historyItems: HistoryItemResource[]): Map<str
   }, new Map<string, HistoryItemResource[]>());
 }
 
-function renderHistoryItems(historyItems: HistoryItemResource[] = []): void {
+function renderHistoryItems(historyItems: HistoryItemResource[] = [], error?: string): void {
   const historyList = requireElement(elements.historyList);
   historyList.textContent = '';
+
+  if (error) {
+    historyList.innerHTML = '<p class="muted">Could not load history</p>';
+
+    return;
+  }
 
   if (historyItems.length === 0) {
     historyList.innerHTML = '<p class="muted">No BrowserBridge history available yet. Enable history sync in Chrome first.</p>';
@@ -304,6 +366,8 @@ function renderHistoryItems(historyItems: HistoryItemResource[] = []): void {
 }
 
 function render(status: PopupStatus): void {
+  latestStatus = status;
+
   const connectionStatus = requireElement(elements.connectionStatus);
   connectionStatus.textContent = status.configured ? 'Connected' : 'Disconnected';
   connectionStatus.className = `status ${status.configured ? 'ok' : 'bad'}`;
@@ -315,12 +379,40 @@ function render(status: PopupStatus): void {
 
   requireElement(elements.currentTabTitle).textContent = status.currentTab?.title || 'No syncable current tab.';
   requireElement(elements.currentTabUrl).textContent = status.currentTab?.url || '';
-  setError(status.config.lastError);
+  requireElement(elements.sendCurrentTab).disabled = !status.currentTab || crossBrowserTargets(status).length === 0;
+  setError(loadErrorMessage(status));
 
   renderDevices(status);
-  renderBookmarks(status.bookmarks || []);
-  renderHistoryItems(status.historyItems || []);
+  renderBookmarks(status.bookmarks, status.loadErrors.bookmarks);
+  renderHistoryItems(status.historyItems, status.loadErrors.historyItems);
   renderCommands(status);
+}
+
+function formatRefreshPart(label: string, value: number | undefined, error?: string): string {
+  if (error) {
+    return `${label}: failed`;
+  }
+
+  return `${label}: ${value ?? 0}`;
+}
+
+function renderRefreshSummary(summary?: SafariRefreshSummary): void {
+  const summaryElement = requireElement(elements.refreshSummary);
+
+  if (!summary) {
+    return;
+  }
+
+  const hasErrors = Object.keys(summary.errors).length > 0;
+  const parts = [
+    formatRefreshPart('Devices', summary.devices, summary.errors.devices),
+    formatRefreshPart('Incoming tabs', summary.incomingCommands, summary.errors.incomingCommands),
+    formatRefreshPart('Bookmarks loaded', summary.bookmarks, summary.errors.bookmarks),
+    formatRefreshPart('History loaded', summary.historyItems, summary.errors.historyItems),
+    formatRefreshPart('Tab snapshots', summary.tabSnapshots, summary.errors.tabSnapshots),
+  ];
+
+  summaryElement.textContent = `${hasErrors ? 'Refresh completed with errors.' : 'Refresh complete.'} ${parts.join(' | ')}`;
 }
 
 async function refresh(): Promise<void> {
@@ -351,9 +443,32 @@ async function deleteBrowserBridgeHistory(): Promise<void> {
 }
 
 requireElement(elements.syncNow).addEventListener('click', () => {
-  void sendMessage<PopupStatus>({ type: 'browserbridge.syncNow' })
-    .then(render)
-    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to sync.'));
+  void sendMessage<PopupStatus>({ type: 'browserbridge.refreshNow' })
+    .then((status) => {
+      render(status);
+      renderRefreshSummary(status.refreshSummary);
+    })
+    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to refresh BrowserBridge data.'));
+});
+
+requireElement(elements.sendCurrentTab).addEventListener('click', () => {
+  const target = latestStatus ? crossBrowserTargets(latestStatus)[0] : null;
+
+  if (!target) {
+    setError('No Chrome device is available for sending this tab.');
+
+    return;
+  }
+
+  void sendMessage<PopupStatus>({
+    type: 'browserbridge.sendCurrentTab',
+    targetDeviceUuid: target.uuid,
+  })
+    .then((nextStatus) => {
+      render(nextStatus);
+      setError(`Sent current tab to ${target.name}.`);
+    })
+    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to send tab.'));
 });
 
 requireElement(elements.openOptions).addEventListener('click', () => {
