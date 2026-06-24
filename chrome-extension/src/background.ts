@@ -72,8 +72,8 @@ async function syncOnce(): Promise<SyncSummary> {
 
   if (config.sync.history) {
     try {
-      const count = await syncHistory(config);
-      summary.history = { success: true, count };
+      const result = await syncHistory(config);
+      summary.history = { success: true, count: result.count, skipped: result.skipped };
     } catch (error) {
       summary.history = { success: false, count: 0, error: error instanceof Error ? error.message : 'Unknown error' };
       globalError = summary.history.error || globalError;

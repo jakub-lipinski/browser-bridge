@@ -314,8 +314,9 @@ it('requires history opt in and deduplicates history items', function (): void {
         ],
     ], browserBridgeHeaders())
         ->assertSuccessful()
-        ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.url', 'https://example.com/a');
+        ->assertJsonPath('data.received', 2)
+        ->assertJsonPath('data.stored', 1)
+        ->assertJsonPath('data.skipped', 0);
 
     expect(HistoryItem::query()->count())->toBe(1);
 });
@@ -332,7 +333,7 @@ it('rejects history upload without a valid token', function (): void {
     ])->assertUnauthorized();
 });
 
-it('rejects invalid and internal history URLs', function (): void {
+it('skips invalid and internal history URLs gracefully', function (): void {
     $device = Device::factory()->create();
 
     $uploadHistoryUrl = fn (string $url) => $this->postJson('/api/history/batch', [
@@ -343,16 +344,17 @@ it('rejects invalid and internal history URLs', function (): void {
         ],
     ], browserBridgeHeaders());
 
-    $uploadHistoryUrl('not-a-url')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('chrome://history')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('edge://settings')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('brave://settings')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('safari-extension://abc/history.html')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('about:blank')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('file:///Users/example/private.html')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('devtools://devtools/bundled/inspector.html')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('view-source:https://example.com')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
-    $uploadHistoryUrl('javascript:alert(1)')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('not-a-url')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('chrome://history')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('edge://settings')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('brave://settings')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('safari-extension://abc/history.html')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('about:blank')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('file:///Users/example/private.html')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('devtools://devtools/bundled/inspector.html')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('view-source:https://example.com')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('javascript:alert(1)')->assertSuccessful()->assertJsonPath('data.skipped', 1);
+    $uploadHistoryUrl('https://example.com/' . str_repeat('a', 2049))->assertSuccessful()->assertJsonPath('data.skipped', 1)->assertJsonPath('data.skipped_reasons.url_too_long', 1);
 });
 
 it('exposes BrowserBridge history across Chrome and Safari devices', function (): void {

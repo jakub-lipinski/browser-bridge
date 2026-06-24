@@ -1,4 +1,4 @@
-import type { BrowserAdapter } from './browserAdapter';
+import type { BrowserAdapter, HistoryBatchResult } from './browserAdapter';
 import type { BookmarkSnapshotItem, HistoryBatchItem, TabSnapshotItem } from './types';
 import { isSyncableUrl } from './urlFilter';
 
@@ -95,20 +95,51 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
     return items;
   }
 
-  async getHistorySince(timestamp: number): Promise<HistoryBatchItem[]> {
+  async getHistorySince(timestamp: number): Promise<HistoryBatchResult> {
     const historyItems = await chrome.history.search({
       text: '',
       startTime: timestamp,
       maxResults: 500,
     });
 
-    return historyItems
-      .filter((item) => isSyncableUrl(item.url))
-      .map((item) => ({
-        url: item.url as string,
-        title: item.title || undefined,
+    const items: HistoryBatchItem[] = [];
+    let skipped = 0;
+    const skippedReasons: Record<string, number> = {};
+
+    for (const item of historyItems) {
+      if (!item.url) {
+        skipped++;
+        skippedReasons['missing_url'] = (skippedReasons['missing_url'] || 0) + 1;
+        continue;
+      }
+
+      if (item.url.length > 2048) {
+        skipped++;
+        skippedReasons['url_too_long'] = (skippedReasons['url_too_long'] || 0) + 1;
+        continue;
+      }
+
+      if (!isSyncableUrl(item.url)) {
+        skipped++;
+        const reason = item.url.match(/^(chrome|edge|brave|safari-extension|about|file|devtools|view-source|javascript):/i) ? 'internal_url' : 'invalid_url';
+        skippedReasons[reason] = (skippedReasons[reason] || 0) + 1;
+        continue;
+      }
+
+      let safeTitle = item.title || undefined;
+      
+      if (safeTitle && safeTitle.length > 512) {
+        safeTitle = safeTitle.substring(0, 512);
+      }
+
+      items.push({
+        url: item.url,
+        title: safeTitle,
         visited_at: new Date(item.lastVisitTime || Date.now()).toISOString(),
-      }));
+      });
+    }
+
+    return { items, skipped, skippedReasons };
   }
 
   async getStorage<T>(key: string): Promise<T | undefined> {

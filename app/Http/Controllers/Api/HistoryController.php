@@ -11,6 +11,7 @@ use App\Models\Device;
 use App\Models\HistoryItem;
 use App\Services\BrowserSyncService;
 use App\Services\DeviceResolver;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -20,11 +21,15 @@ class HistoryController extends Controller
         HistoryBatchRequest $request,
         DeviceResolver $deviceResolver,
         BrowserSyncService $syncService,
-    ): AnonymousResourceCollection {
+    ): JsonResponse {
         $device = $deviceResolver->required($request->string('device_uuid')->toString());
-        $items = $syncService->storeHistoryBatch($device, $request->validated('items'));
+        $summary = $syncService->storeHistoryBatch($device, $request->validated('items'));
 
-        return HistoryItemResource::collection($items);
+        return response()->json([
+            'success' => true,
+            'message' => 'History batch processed.',
+            'data' => $summary,
+        ]);
     }
 
     public function search(HistorySearchRequest $request, DeviceResolver $deviceResolver): AnonymousResourceCollection

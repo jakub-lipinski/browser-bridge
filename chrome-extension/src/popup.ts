@@ -350,14 +350,29 @@ function renderSyncSummary(summary?: SyncSummary): void {
   }
 
   if (summary.history) {
-    parts.push(summary.history.success ? `History: ${summary.history.count}` : 'History: Failed');
+    if (summary.history.success) {
+      const skippedText = summary.history.skipped && summary.history.skipped > 0
+        ? `, ${summary.history.skipped} skipped`
+        : '';
+      parts.push(`History: ${summary.history.count} synced${skippedText}`);
+    } else {
+      parts.push('History: Failed');
+    }
   }
 
+  let finalMessage = '';
+  
   if (parts.length > 0) {
-    setError(`Sync finished. ${parts.join(' | ')}`);
+    finalMessage = `Sync finished. ${parts.join(' | ')}`;
   } else {
-    setError('Sync finished but no categories were enabled.');
+    finalMessage = 'Sync finished but no categories were enabled.';
   }
+
+  if (summary.history?.success && summary.history.count === 0 && summary.history.skipped && summary.history.skipped > 0) {
+    finalMessage += '\nHistory sync completed, but no valid history items were found.';
+  }
+
+  setError(finalMessage);
 }
 
 async function refresh(): Promise<void> {

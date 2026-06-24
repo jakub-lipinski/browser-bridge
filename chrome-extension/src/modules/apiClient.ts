@@ -173,7 +173,7 @@ export async function uploadTabSnapshot(config: ExtensionConfig, tabs: TabSnapsh
   });
 }
 
-export async function uploadHistoryBatch(config: ExtensionConfig, items: HistoryBatchItem[]): Promise<void> {
+export async function uploadHistoryBatch(config: ExtensionConfig, items: HistoryBatchItem[]): Promise<{ stored: number; skipped: number; skipped_reasons: Record<string, number> } | void> {
   if (items.length === 0) {
     return;
   }
@@ -182,7 +182,7 @@ export async function uploadHistoryBatch(config: ExtensionConfig, items: History
     console.log(`[BrowserBridge] Uploading history batch with ${items.length} items.`);
   }
 
-  await request(config, '/api/history/batch', {
+  const response = await request<{ data: { stored: number; skipped: number; skipped_reasons: Record<string, number> } }>(config, '/api/history/batch', {
     method: 'POST',
     body: {
       device_uuid: config.deviceUuid,
@@ -190,6 +190,8 @@ export async function uploadHistoryBatch(config: ExtensionConfig, items: History
       items,
     },
   });
+
+  return response.data;
 }
 
 export async function sendTabCommand(

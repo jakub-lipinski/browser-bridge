@@ -1,5 +1,11 @@
 import type { BookmarkSnapshotItem, HistoryBatchItem, TabSnapshotItem } from './types';
 
+export type HistoryBatchResult = {
+  items: HistoryBatchItem[];
+  skipped: number;
+  skippedReasons: Record<string, number>;
+};
+
 export type BrowserAdapter = {
   getBrowserName(): 'chrome' | 'safari';
   getPlatform(): 'windows' | 'macos' | 'ios';
@@ -7,7 +13,7 @@ export type BrowserAdapter = {
   openTab(url: string): Promise<void>;
   getAllTabs(): Promise<TabSnapshotItem[]>;
   getBookmarksTree(): Promise<BookmarkSnapshotItem[]>;
-  getHistorySince(timestamp: number): Promise<HistoryBatchItem[]>;
+  getHistorySince(timestamp: number): Promise<HistoryBatchResult>;
   getStorage<T>(key: string): Promise<T | undefined>;
   setStorage<T>(key: string, value: T): Promise<void>;
   supportsBookmarks(): boolean;

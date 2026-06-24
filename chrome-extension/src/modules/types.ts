@@ -111,6 +111,7 @@ export type ApiItem<T> = {
 export type SyncCategoryResult = {
   success: boolean;
   count: number;
+  skipped?: number;
   error?: string;
 };
 

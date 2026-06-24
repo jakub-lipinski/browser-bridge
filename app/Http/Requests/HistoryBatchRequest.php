@@ -27,9 +27,6 @@ class HistoryBatchRequest extends FormRequest
             'device_uuid' => ['required', 'uuid'],
             'history_sync_enabled' => ['required', 'accepted'],
             'items' => ['required', 'array', 'max:'.$maxBatchSize],
-            'items.*.url' => ['required', 'string', 'max:2048'],
-            'items.*.title' => ['nullable', 'string', 'max:512'],
-            'items.*.visited_at' => ['required', 'date'],
         ];
     }
 
@@ -38,10 +35,6 @@ class HistoryBatchRequest extends FormRequest
      */
     public function after(): array
     {
-        return [
-            function (Validator $validator): void {
-                $this->rejectUnsyncableProvidedUrls($validator, 'items');
-            },
-        ];
+        return [];
     }
 }

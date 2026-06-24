@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -166,17 +167,66 @@ class BrowserSyncService
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $items
-     * @return EloquentCollection<int, HistoryItem>
+     * @param  array<int, mixed>  $items
+     * @return array<string, mixed>
      */
-    public function storeHistoryBatch(Device $device, array $items): EloquentCollection
+    public function storeHistoryBatch(Device $device, array $items): array
     {
-        return DB::transaction(function () use ($device, $items): EloquentCollection {
-            $historyItems = new EloquentCollection;
-            $syncableItems = collect($this->urlSanitizer->filterSyncableItems($items))
+        return DB::transaction(function () use ($device, $items): array {
+            $received = count($items);
+            $stored = 0;
+            $skipped = 0;
+            $skippedReasons = [];
+
+            $validItems = [];
+
+            foreach ($items as $item) {
+                if (! is_array($item)) {
+                    $skipped++;
+                    $skippedReasons['invalid_item'] = ($skippedReasons['invalid_item'] ?? 0) + 1;
+                    continue;
+                }
+
+                $validator = Validator::make($item, [
+                    'url' => ['required', 'string', 'max:2048'],
+                    'title' => ['nullable', 'string', 'max:512'],
+                    'visited_at' => ['required', 'date'],
+                ]);
+
+                if ($validator->fails()) {
+                    $skipped++;
+                    $failedRules = $validator->failed();
+                    $reason = 'invalid_item';
+
+                    if (isset($failedRules['url']['Max'])) {
+                        $reason = 'url_too_long';
+                    } elseif (isset($failedRules['title']['Max'])) {
+                        $reason = 'title_too_long';
+                    } elseif (isset($failedRules['url']['Required']) || isset($failedRules['url']['String'])) {
+                        $reason = 'invalid_url';
+                    } elseif (isset($failedRules['visited_at'])) {
+                        $reason = 'missing_visit_time';
+                    }
+
+                    $skippedReasons[$reason] = ($skippedReasons[$reason] ?? 0) + 1;
+                    continue;
+                }
+
+                if (! $this->urlSanitizer->isSyncableUrl($item['url'])) {
+                    $skipped++;
+                    $reason = $this->urlSanitizer->isBlockedInternalUrl($item['url']) ? 'internal_url' : 'invalid_url';
+                    $skippedReasons[$reason] = ($skippedReasons[$reason] ?? 0) + 1;
+                    continue;
+                }
+
+                $validItems[] = $item;
+            }
+
+            $syncableItems = collect($validItems)
                 ->unique(fn (array $item): string => $item['url'].'|'.Carbon::parse($item['visited_at'])->toJSON())
                 ->values()
                 ->all();
+
             $maxItemsPerDevice = (int) config('browserbridge.max_history_items_per_device');
 
             if ($device->historyItems()->count() + count($syncableItems) > $maxItemsPerDevice) {
@@ -198,11 +248,16 @@ class BrowserSyncService
                 );
 
                 if ($historyItem->wasRecentlyCreated) {
-                    $historyItems->push($historyItem);
+                    $stored++;
                 }
             }
 
-            return $historyItems;
+            return [
+                'received' => $received,
+                'stored' => $stored,
+                'skipped' => $skipped,
+                'skipped_reasons' => (object) $skippedReasons,
+            ];
         });
     }
 
