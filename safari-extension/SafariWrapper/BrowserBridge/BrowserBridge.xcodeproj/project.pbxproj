@@ -1,0 +1,981 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3BE01BE72FEC85CD00623DBA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BE62FEC85CD00623DBA /* AppDelegate.swift */; };
+		3BE01BE92FEC85CD00623DBA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BE82FEC85CD00623DBA /* SceneDelegate.swift */; };
+		3BE01BEC2FEC85CD00623DBA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BEA2FEC85CD00623DBA /* LaunchScreen.storyboard */; };
+		3BE01BEF2FEC85CD00623DBA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BED2FEC85CD00623DBA /* Main.storyboard */; };
+		3BE01BF82FEC85CD00623DBA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BF72FEC85CD00623DBA /* AppDelegate.swift */; };
+		3BE01BFB2FEC85CD00623DBA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BF92FEC85CD00623DBA /* Main.storyboard */; };
+		3BE01C022FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3BE01C0C2FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3BE01C112FEC85CD00623DBA /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD62FEC85CB00623DBA /* Main.html */; };
+		3BE01C122FEC85CD00623DBA /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD62FEC85CB00623DBA /* Main.html */; };
+		3BE01C132FEC85CD00623DBA /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD82FEC85CB00623DBA /* Icon.png */; };
+		3BE01C142FEC85CD00623DBA /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD82FEC85CB00623DBA /* Icon.png */; };
+		3BE01C152FEC85CD00623DBA /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD92FEC85CB00623DBA /* Style.css */; };
+		3BE01C162FEC85CD00623DBA /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD92FEC85CB00623DBA /* Style.css */; };
+		3BE01C172FEC85CD00623DBA /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDA2FEC85CB00623DBA /* Script.js */; };
+		3BE01C182FEC85CD00623DBA /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDA2FEC85CB00623DBA /* Script.js */; };
+		3BE01C192FEC85CD00623DBA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDB2FEC85CB00623DBA /* ViewController.swift */; };
+		3BE01C1A2FEC85CD00623DBA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDB2FEC85CB00623DBA /* ViewController.swift */; };
+		3BE01C1B2FEC85CD00623DBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */; };
+		3BE01C1C2FEC85CD00623DBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */; };
+		3BE01C1D2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */; };
+		3BE01C1E2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */; };
+		3BE01C342FEC85CE00623DBA /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C302FEC85CE00623DBA /* popup.html */; };
+		3BE01C352FEC85CE00623DBA /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C312FEC85CE00623DBA /* manifest.json */; };
+		3BE01C362FEC85CE00623DBA /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C322FEC85CE00623DBA /* options.html */; };
+		3BE01C372FEC85CE00623DBA /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C332FEC85CE00623DBA /* assets */; };
+		3BE01C382FEC85CE00623DBA /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C302FEC85CE00623DBA /* popup.html */; };
+		3BE01C392FEC85CE00623DBA /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C312FEC85CE00623DBA /* manifest.json */; };
+		3BE01C3A2FEC85CE00623DBA /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C322FEC85CE00623DBA /* options.html */; };
+		3BE01C3B2FEC85CE00623DBA /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C332FEC85CE00623DBA /* assets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3BE01C032FEC85CD00623DBA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3BE01BD02FEC85CB00623DBA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3BE01C002FEC85CD00623DBA;
+			remoteInfo = "BrowserBridge Extension (iOS)";
+		};
+		3BE01C0D2FEC85CD00623DBA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3BE01BD02FEC85CB00623DBA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3BE01C0A2FEC85CD00623DBA;
+			remoteInfo = "BrowserBridge Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3BE01C242FEC85CD00623DBA /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3BE01C022FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01C2B2FEC85CD00623DBA /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3BE01C0C2FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		3BE01BD72FEC85CB00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		3BE01BD82FEC85CB00623DBA /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		3BE01BD92FEC85CB00623DBA /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		3BE01BDA2FEC85CB00623DBA /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		3BE01BDB2FEC85CB00623DBA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		3BE01BE32FEC85CD00623DBA /* BrowserBridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserBridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3BE01BE62FEC85CD00623DBA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3BE01BE82FEC85CD00623DBA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		3BE01BEB2FEC85CD00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3BE01BEE2FEC85CD00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3BE01BF02FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3BE01BF52FEC85CD00623DBA /* BrowserBridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserBridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3BE01BF72FEC85CD00623DBA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3BE01BFA2FEC85CD00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3BE01BFC2FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "BrowserBridge Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3BE01C062FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "BrowserBridge Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3BE01C102FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3BE01C302FEC85CE00623DBA /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist/popup.html; sourceTree = "<group>"; };
+		3BE01C312FEC85CE00623DBA /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist/manifest.json; sourceTree = "<group>"; };
+		3BE01C322FEC85CE00623DBA /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = ../../../dist/options.html; sourceTree = "<group>"; };
+		3BE01C332FEC85CE00623DBA /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../../dist/assets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3BE01BE02FEC85CD00623DBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01BF22FEC85CD00623DBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01BFE2FEC85CD00623DBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01C082FEC85CD00623DBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3BE01BCF2FEC85CB00623DBA = {
+			isa = PBXGroup;
+			children = (
+				3BE01BD42FEC85CB00623DBA /* Shared (App) */,
+				3BE01BDD2FEC85CD00623DBA /* Shared (Extension) */,
+				3BE01BE52FEC85CD00623DBA /* iOS (App) */,
+				3BE01BF62FEC85CD00623DBA /* macOS (App) */,
+				3BE01C052FEC85CD00623DBA /* iOS (Extension) */,
+				3BE01C0F2FEC85CD00623DBA /* macOS (Extension) */,
+				3BE01BE42FEC85CD00623DBA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3BE01BD42FEC85CB00623DBA /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01BDB2FEC85CB00623DBA /* ViewController.swift */,
+				3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */,
+				3BE01BD52FEC85CB00623DBA /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		3BE01BD52FEC85CB00623DBA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01BD62FEC85CB00623DBA /* Main.html */,
+				3BE01BD82FEC85CB00623DBA /* Icon.png */,
+				3BE01BD92FEC85CB00623DBA /* Style.css */,
+				3BE01BDA2FEC85CB00623DBA /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		3BE01BDD2FEC85CD00623DBA /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01C2F2FEC85CE00623DBA /* Resources */,
+				3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		3BE01BE42FEC85CD00623DBA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01BE32FEC85CD00623DBA /* BrowserBridge.app */,
+				3BE01BF52FEC85CD00623DBA /* BrowserBridge.app */,
+				3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */,
+				3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3BE01BE52FEC85CD00623DBA /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01BE62FEC85CD00623DBA /* AppDelegate.swift */,
+				3BE01BE82FEC85CD00623DBA /* SceneDelegate.swift */,
+				3BE01BEA2FEC85CD00623DBA /* LaunchScreen.storyboard */,
+				3BE01BED2FEC85CD00623DBA /* Main.storyboard */,
+				3BE01BF02FEC85CD00623DBA /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		3BE01BF62FEC85CD00623DBA /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01BF72FEC85CD00623DBA /* AppDelegate.swift */,
+				3BE01BF92FEC85CD00623DBA /* Main.storyboard */,
+				3BE01BFC2FEC85CD00623DBA /* Info.plist */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		3BE01C052FEC85CD00623DBA /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01C062FEC85CD00623DBA /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		3BE01C0F2FEC85CD00623DBA /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01C102FEC85CD00623DBA /* Info.plist */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		3BE01C2F2FEC85CE00623DBA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3BE01C302FEC85CE00623DBA /* popup.html */,
+				3BE01C312FEC85CE00623DBA /* manifest.json */,
+				3BE01C322FEC85CE00623DBA /* options.html */,
+				3BE01C332FEC85CE00623DBA /* assets */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3BE01BE22FEC85CD00623DBA /* BrowserBridge (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3BE01C252FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (iOS)" */;
+			buildPhases = (
+				3BE01BDF2FEC85CD00623DBA /* Sources */,
+				3BE01BE02FEC85CD00623DBA /* Frameworks */,
+				3BE01BE12FEC85CD00623DBA /* Resources */,
+				3BE01C242FEC85CD00623DBA /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3BE01C042FEC85CD00623DBA /* PBXTargetDependency */,
+			);
+			name = "BrowserBridge (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "BrowserBridge (iOS)";
+			productReference = 3BE01BE32FEC85CD00623DBA /* BrowserBridge.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3BE01BF42FEC85CD00623DBA /* BrowserBridge (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3BE01C2C2FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (macOS)" */;
+			buildPhases = (
+				3BE01BF12FEC85CD00623DBA /* Sources */,
+				3BE01BF22FEC85CD00623DBA /* Frameworks */,
+				3BE01BF32FEC85CD00623DBA /* Resources */,
+				3BE01C2B2FEC85CD00623DBA /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3BE01C0E2FEC85CD00623DBA /* PBXTargetDependency */,
+			);
+			name = "BrowserBridge (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "BrowserBridge (macOS)";
+			productReference = 3BE01BF52FEC85CD00623DBA /* BrowserBridge.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3BE01C002FEC85CD00623DBA /* BrowserBridge Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3BE01C212FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (iOS)" */;
+			buildPhases = (
+				3BE01BFD2FEC85CD00623DBA /* Sources */,
+				3BE01BFE2FEC85CD00623DBA /* Frameworks */,
+				3BE01BFF2FEC85CD00623DBA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BrowserBridge Extension (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "BrowserBridge Extension (iOS)";
+			productReference = 3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		3BE01C0A2FEC85CD00623DBA /* BrowserBridge Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3BE01C282FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (macOS)" */;
+			buildPhases = (
+				3BE01C072FEC85CD00623DBA /* Sources */,
+				3BE01C082FEC85CD00623DBA /* Frameworks */,
+				3BE01C092FEC85CD00623DBA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BrowserBridge Extension (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "BrowserBridge Extension (macOS)";
+			productReference = 3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3BE01BD02FEC85CB00623DBA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					3BE01BE22FEC85CD00623DBA = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					3BE01BF42FEC85CD00623DBA = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					3BE01C002FEC85CD00623DBA = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					3BE01C0A2FEC85CD00623DBA = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = 3BE01BD32FEC85CB00623DBA /* Build configuration list for PBXProject "BrowserBridge" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3BE01BCF2FEC85CB00623DBA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3BE01BE42FEC85CD00623DBA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3BE01BE22FEC85CD00623DBA /* BrowserBridge (iOS) */,
+				3BE01BF42FEC85CD00623DBA /* BrowserBridge (macOS) */,
+				3BE01C002FEC85CD00623DBA /* BrowserBridge Extension (iOS) */,
+				3BE01C0A2FEC85CD00623DBA /* BrowserBridge Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3BE01BE12FEC85CD00623DBA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C132FEC85CD00623DBA /* Icon.png in Resources */,
+				3BE01BEC2FEC85CD00623DBA /* LaunchScreen.storyboard in Resources */,
+				3BE01C112FEC85CD00623DBA /* Main.html in Resources */,
+				3BE01C172FEC85CD00623DBA /* Script.js in Resources */,
+				3BE01C1B2FEC85CD00623DBA /* Assets.xcassets in Resources */,
+				3BE01BEF2FEC85CD00623DBA /* Main.storyboard in Resources */,
+				3BE01C152FEC85CD00623DBA /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01BF32FEC85CD00623DBA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C142FEC85CD00623DBA /* Icon.png in Resources */,
+				3BE01C162FEC85CD00623DBA /* Style.css in Resources */,
+				3BE01BFB2FEC85CD00623DBA /* Main.storyboard in Resources */,
+				3BE01C182FEC85CD00623DBA /* Script.js in Resources */,
+				3BE01C1C2FEC85CD00623DBA /* Assets.xcassets in Resources */,
+				3BE01C122FEC85CD00623DBA /* Main.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01BFF2FEC85CD00623DBA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C392FEC85CE00623DBA /* manifest.json in Resources */,
+				3BE01C3B2FEC85CE00623DBA /* assets in Resources */,
+				3BE01C382FEC85CE00623DBA /* popup.html in Resources */,
+				3BE01C3A2FEC85CE00623DBA /* options.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01C092FEC85CD00623DBA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C352FEC85CE00623DBA /* manifest.json in Resources */,
+				3BE01C372FEC85CE00623DBA /* assets in Resources */,
+				3BE01C342FEC85CE00623DBA /* popup.html in Resources */,
+				3BE01C362FEC85CE00623DBA /* options.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3BE01BDF2FEC85CD00623DBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C192FEC85CD00623DBA /* ViewController.swift in Sources */,
+				3BE01BE72FEC85CD00623DBA /* AppDelegate.swift in Sources */,
+				3BE01BE92FEC85CD00623DBA /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01BF12FEC85CD00623DBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C1A2FEC85CD00623DBA /* ViewController.swift in Sources */,
+				3BE01BF82FEC85CD00623DBA /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01BFD2FEC85CD00623DBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C1D2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3BE01C072FEC85CD00623DBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3BE01C1E2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3BE01C042FEC85CD00623DBA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3BE01C002FEC85CD00623DBA /* BrowserBridge Extension (iOS) */;
+			targetProxy = 3BE01C032FEC85CD00623DBA /* PBXContainerItemProxy */;
+		};
+		3BE01C0E2FEC85CD00623DBA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3BE01C0A2FEC85CD00623DBA /* BrowserBridge Extension (macOS) */;
+			targetProxy = 3BE01C0D2FEC85CD00623DBA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3BE01BD62FEC85CB00623DBA /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3BE01BD72FEC85CB00623DBA /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		3BE01BEA2FEC85CD00623DBA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3BE01BEB2FEC85CD00623DBA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		3BE01BED2FEC85CD00623DBA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3BE01BEE2FEC85CD00623DBA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		3BE01BF92FEC85CD00623DBA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3BE01BFA2FEC85CD00623DBA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3BE01C1F2FEC85CD00623DBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		3BE01C202FEC85CD00623DBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		3BE01C222FEC85CD00623DBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "BrowserBridge Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge.Extension;
+				PRODUCT_NAME = "BrowserBridge Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3BE01C232FEC85CD00623DBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "BrowserBridge Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge.Extension;
+				PRODUCT_NAME = "BrowserBridge Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3BE01C262FEC85CD00623DBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = BrowserBridge;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge;
+				PRODUCT_NAME = BrowserBridge;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3BE01C272FEC85CD00623DBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = BrowserBridge;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge;
+				PRODUCT_NAME = BrowserBridge;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3BE01C292FEC85CD00623DBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "BrowserBridge Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge.Extension;
+				PRODUCT_NAME = "BrowserBridge Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3BE01C2A2FEC85CD00623DBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "BrowserBridge Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge.Extension;
+				PRODUCT_NAME = "BrowserBridge Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		3BE01C2D2FEC85CD00623DBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = BrowserBridge;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge;
+				PRODUCT_NAME = BrowserBridge;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3BE01C2E2FEC85CD00623DBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = BrowserBridge;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.BrowserBridge;
+				PRODUCT_NAME = BrowserBridge;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3BE01BD32FEC85CB00623DBA /* Build configuration list for PBXProject "BrowserBridge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3BE01C1F2FEC85CD00623DBA /* Debug */,
+				3BE01C202FEC85CD00623DBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3BE01C212FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3BE01C222FEC85CD00623DBA /* Debug */,
+				3BE01C232FEC85CD00623DBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3BE01C252FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3BE01C262FEC85CD00623DBA /* Debug */,
+				3BE01C272FEC85CD00623DBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3BE01C282FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3BE01C292FEC85CD00623DBA /* Debug */,
+				3BE01C2A2FEC85CD00623DBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3BE01C2C2FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3BE01C2D2FEC85CD00623DBA /* Debug */,
+				3BE01C2E2FEC85CD00623DBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3BE01BD02FEC85CB00623DBA /* Project object */;
+}
