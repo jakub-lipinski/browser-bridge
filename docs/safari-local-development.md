@@ -81,14 +81,16 @@ BROWSERBRIDGE_API_TOKEN=replace-with-a-long-random-token
 14. Add bookmarks in Chrome.
 15. Run sync from the Chrome popup.
 16. Open Safari extension and view BrowserBridge Bookmarks.
+17. Search BrowserBridge Bookmarks and click a result to open it in Safari.
 
 ## Safari Limitations
 
 Safari macOS support in this milestone focuses on cross-browser tab sending and shared BrowserBridge views.
 
 - Native Safari bookmark writing is not implemented.
+- Native Safari bookmark upload is not implemented.
 - Native Safari history upload is not implemented.
-- BrowserBridge Bookmarks are shown inside the extension UI.
+- BrowserBridge Bookmarks are shown inside the extension UI from Chrome-uploaded snapshots.
 - BrowserBridge History is shown inside the extension UI.
 - Safari can search and open BrowserBridge History items uploaded by Chrome.
 - Background polling may be less reliable in Safari than Chrome, so opening the popup and pressing Sync now is the fallback.

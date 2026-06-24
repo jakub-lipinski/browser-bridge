@@ -1,14 +1,18 @@
 <?php
 
 use App\Enums\TabCommandStatus;
+use App\Models\BookmarkSnapshot;
 use App\Models\Device;
 use App\Models\HistoryItem;
+use App\Models\NormalizedBookmark;
 use App\Models\TabCommand;
 
 beforeEach(function (): void {
     config([
         'browserbridge.api_token' => 'test-token',
         'browserbridge.max_bookmark_snapshot_payload_bytes' => 1024 * 1024,
+        'browserbridge.max_bookmark_snapshot_size' => 1024 * 1024,
+        'browserbridge.max_bookmark_items_per_device' => 10000,
         'browserbridge.max_tab_snapshot_payload_bytes' => 512 * 1024,
         'browserbridge.max_history_batch_size' => 500,
         'browserbridge.max_history_items_per_device' => 5000,
@@ -110,6 +114,62 @@ it('uploads bookmark snapshots and filters internal browser URLs', function (): 
         ->assertSuccessful()
         ->assertJsonPath('data.item_count', 1)
         ->assertJsonPath('data.payload_json.items.0.url', 'https://laravel.com/docs');
+
+    expect(NormalizedBookmark::query()->count())->toBe(1)
+        ->and(NormalizedBookmark::query()->first()?->url)->toBe('https://laravel.com/docs');
+});
+
+it('normalizes bookmark folders and removes stale bookmarks on each snapshot', function (): void {
+    $device = Device::factory()->create();
+
+    $this->postJson('/api/bookmarks/snapshot', [
+        'device_uuid' => $device->uuid,
+        'items' => [
+            [
+                'external_id' => 'folder-1',
+                'type' => 'folder',
+                'title' => 'Work',
+                'path' => ['Bookmarks Bar', 'Work'],
+            ],
+            [
+                'external_id' => 'bookmark-1',
+                'parent_external_id' => 'folder-1',
+                'type' => 'bookmark',
+                'title' => 'Laravel',
+                'url' => 'https://laravel.com',
+                'path' => ['Bookmarks Bar', 'Work'],
+                'date_added' => now()->toIso8601String(),
+            ],
+            [
+                'external_id' => 'bookmark-2',
+                'type' => 'bookmark',
+                'title' => 'Old',
+                'url' => 'https://old.example.com',
+                'path' => ['Bookmarks Bar'],
+            ],
+        ],
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.item_count', 3);
+
+    expect($device->normalizedBookmarks()->count())->toBe(3);
+
+    $this->postJson('/api/bookmarks/snapshot', [
+        'device_uuid' => $device->uuid,
+        'items' => [
+            [
+                'external_id' => 'bookmark-1',
+                'parent_external_id' => 'folder-1',
+                'type' => 'bookmark',
+                'title' => 'Laravel Docs',
+                'url' => 'https://laravel.com/docs',
+                'path' => ['Bookmarks Bar', 'Work'],
+            ],
+        ],
+    ], browserBridgeHeaders())->assertSuccessful();
+
+    expect($device->normalizedBookmarks()->count())->toBe(1)
+        ->and($device->normalizedBookmarks()->first()?->title)->toBe('Laravel Docs');
 });
 
 it('exposes BrowserBridge bookmark snapshots across Chrome and Safari devices', function (): void {
@@ -137,6 +197,76 @@ it('exposes BrowserBridge bookmark snapshots across Chrome and Safari devices', 
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.device.name', 'Chrome Mac')
         ->assertJsonPath('data.0.payload_json.items.0.url', 'https://example.com/browserbridge');
+});
+
+it('searches normalized bookmarks grouped by device data', function (): void {
+    $chrome = Device::factory()->create([
+        'name' => 'Chrome Mac',
+        'browser' => 'chrome',
+        'platform' => 'macos',
+    ]);
+
+    $safari = Device::factory()->create([
+        'name' => 'Safari Mac',
+        'browser' => 'safari',
+        'platform' => 'macos',
+    ]);
+
+    NormalizedBookmark::factory()->create([
+        'device_id' => $chrome->id,
+        'title' => 'BrowserBridge Docs',
+        'url' => 'https://example.com/browserbridge-docs',
+        'path_json' => ['Bookmarks Bar', 'BrowserBridge'],
+    ]);
+
+    NormalizedBookmark::factory()->create([
+        'device_id' => $chrome->id,
+        'title' => 'Unrelated',
+        'url' => 'https://example.com/unrelated',
+    ]);
+
+    $this->getJson('/api/bookmarks/search?device_uuid='.$safari->uuid.'&q=browserbridge&limit=10', browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.device.name', 'Chrome Mac')
+        ->assertJsonPath('data.0.path.1', 'BrowserBridge')
+        ->assertJsonPath('data.0.url', 'https://example.com/browserbridge-docs');
+});
+
+it('deletes bookmarks for a device', function (): void {
+    $caller = Device::factory()->create();
+    $target = Device::factory()->create();
+
+    NormalizedBookmark::factory()->count(2)->create(['device_id' => $target->id]);
+    BookmarkSnapshot::factory()->count(2)->create(['device_id' => $target->id]);
+    NormalizedBookmark::factory()->create(['device_id' => $caller->id]);
+
+    $this->deleteJson('/api/bookmarks/device/'.$target->id, [
+        'device_uuid' => $caller->uuid,
+    ], browserBridgeHeaders())->assertNoContent();
+
+    expect($target->normalizedBookmarks()->count())->toBe(0)
+        ->and($target->bookmarkSnapshots()->count())->toBe(0)
+        ->and($caller->normalizedBookmarks()->count())->toBe(1);
+});
+
+it('shows bookmark counts and searchable bookmarks on the dashboard', function (): void {
+    $device = Device::factory()->create(['name' => 'Chrome Mac']);
+
+    NormalizedBookmark::factory()->create([
+        'device_id' => $device->id,
+        'title' => 'BrowserBridge Dashboard Bookmark',
+        'url' => 'https://example.com/dashboard-bookmark',
+        'path_json' => ['Bookmarks Bar', 'BrowserBridge'],
+    ]);
+
+    $this->get('/dashboard?bookmark_query=dashboard')
+        ->assertSuccessful()
+        ->assertSee('BrowserBridge Bookmarks')
+        ->assertSee('Chrome Mac')
+        ->assertSee('BrowserBridge Dashboard Bookmark')
+        ->assertSee('Bookmarks Bar / BrowserBridge')
+        ->assertSee('1');
 });
 
 it('uploads tab snapshots and rejects invalid URLs', function (): void {
@@ -500,6 +630,7 @@ it('rejects internal URLs for send tab commands', function (): void {
 it('rejects oversized bookmark and tab snapshot payloads', function (): void {
     config([
         'browserbridge.max_bookmark_snapshot_payload_bytes' => 80,
+        'browserbridge.max_bookmark_snapshot_size' => 80,
         'browserbridge.max_tab_snapshot_payload_bytes' => 80,
     ]);
 

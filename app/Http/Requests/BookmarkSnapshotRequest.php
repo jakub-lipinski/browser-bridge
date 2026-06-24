@@ -21,12 +21,22 @@ class BookmarkSnapshotRequest extends FormRequest
      */
     public function rules(): array
     {
+        $maxItems = (int) config('browserbridge.max_bookmark_items_per_device');
+
         return [
             'device_uuid' => ['required', 'uuid'],
-            'items' => ['required', 'array', 'max:5000'],
+            'items' => ['required', 'array', 'max:'.$maxItems],
+            'items.*.external_id' => ['nullable', 'string', 'max:255'],
+            'items.*.parent_external_id' => ['nullable', 'string', 'max:255'],
+            'items.*.id' => ['nullable', 'string', 'max:255'],
+            'items.*.parentId' => ['nullable', 'string', 'max:255'],
+            'items.*.type' => ['nullable', 'string', 'in:folder,bookmark'],
             'items.*.url' => ['nullable', 'string', 'max:2048'],
             'items.*.title' => ['nullable', 'string', 'max:512'],
             'items.*.folder' => ['nullable', 'string', 'max:512'],
+            'items.*.path' => ['nullable', 'array', 'max:50'],
+            'items.*.path.*' => ['nullable', 'string', 'max:512'],
+            'items.*.date_added' => ['nullable', 'date'],
         ];
     }
 
@@ -37,7 +47,7 @@ class BookmarkSnapshotRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $this->rejectOversizedJson($validator, 'items', (int) config('browserbridge.max_bookmark_snapshot_payload_bytes'));
+                $this->rejectOversizedJson($validator, 'items', (int) config('browserbridge.max_bookmark_snapshot_size'));
                 $this->rejectInvalidProvidedUrls($validator, 'items');
             },
         ];

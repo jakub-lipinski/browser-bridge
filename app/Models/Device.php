@@ -20,6 +20,11 @@ class Device extends Model
         return $this->hasMany(BookmarkSnapshot::class);
     }
 
+    public function normalizedBookmarks(): HasMany
+    {
+        return $this->hasMany(NormalizedBookmark::class);
+    }
+
     public function tabSnapshots(): HasMany
     {
         return $this->hasMany(TabSnapshot::class);

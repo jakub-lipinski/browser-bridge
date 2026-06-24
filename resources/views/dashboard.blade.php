@@ -50,8 +50,9 @@
                     <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['devices'] }}</p>
                 </div>
                 <div class="rounded-lg border border-zinc-200 bg-white p-5">
-                    <p class="text-sm text-zinc-500">Bookmark snapshots</p>
-                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['bookmarkSnapshots'] }}</p>
+                    <p class="text-sm text-zinc-500">Bookmarks</p>
+                    <p class="mt-2 text-3xl font-semibold">{{ $storageCounts['normalizedBookmarks'] }}</p>
+                    <p class="mt-1 text-xs text-zinc-500">{{ $storageCounts['bookmarkSnapshots'] }} snapshots</p>
                 </div>
                 <div class="rounded-lg border border-zinc-200 bg-white p-5">
                     <p class="text-sm text-zinc-500">Tab snapshots</p>
@@ -86,7 +87,8 @@
                                     <th class="px-5 py-3">Platform</th>
                                     <th class="px-5 py-3">Last seen</th>
                                     <th class="px-5 py-3 text-right">Latest tabs</th>
-                                    <th class="px-5 py-3 text-right">Latest bookmarks</th>
+                                    <th class="px-5 py-3 text-right">Bookmarks</th>
+                                    <th class="px-5 py-3">Latest bookmark sync</th>
                                     <th class="px-5 py-3 text-right">History</th>
                                     <th class="px-5 py-3 text-right">Pending commands</th>
                                 </tr>
@@ -107,7 +109,10 @@
                                             {{ $device->latestTabSnapshot?->tab_count ?? 0 }}
                                         </td>
                                         <td class="px-5 py-4 text-right text-zinc-700">
-                                            {{ $device->latestBookmarkSnapshot?->item_count ?? 0 }}
+                                            {{ $device->normalized_bookmarks_count }}
+                                        </td>
+                                        <td class="px-5 py-4 text-zinc-700">
+                                            {{ $device->latestBookmarkSnapshot?->created_at?->diffForHumans() ?? 'Never' }}
                                         </td>
                                         <td class="px-5 py-4 text-right text-zinc-700">{{ $device->history_items_count }}</td>
                                         <td class="px-5 py-4 text-right text-zinc-700">{{ $device->pending_tab_commands_count }}</td>
@@ -120,6 +125,51 @@
             </section>
 
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <section class="overflow-hidden rounded-lg border border-zinc-200 bg-white lg:col-span-2">
+                    <div class="flex flex-col gap-3 border-b border-zinc-200 px-5 py-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 class="text-base font-semibold">BrowserBridge Bookmarks</h2>
+                            <p class="mt-1 text-sm text-zinc-500">Shared bookmark viewer grouped by device. Native bookmark mutation is not enabled yet.</p>
+                        </div>
+                        <form method="GET" action="{{ route('dashboard') }}" class="flex gap-2">
+                            <input
+                                name="bookmark_query"
+                                value="{{ $bookmarkQuery }}"
+                                class="w-64 rounded-md border border-zinc-300 px-3 py-2 text-sm"
+                                placeholder="Search bookmarks"
+                            >
+                            <button type="submit" class="rounded-md bg-teal-700 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-800">
+                                Search
+                            </button>
+                        </form>
+                    </div>
+
+                    @if ($browserBridgeBookmarks->isEmpty())
+                        <div class="px-5 py-8 text-sm text-zinc-500">
+                            No BrowserBridge bookmarks stored.
+                        </div>
+                    @else
+                        <div class="divide-y divide-zinc-100">
+                            @foreach ($browserBridgeBookmarks as $deviceName => $bookmarks)
+                                <div class="px-5 py-4">
+                                    <h3 class="text-sm font-semibold text-zinc-950">{{ $deviceName }}</h3>
+                                    <div class="mt-3 grid gap-3 md:grid-cols-2">
+                                        @foreach ($bookmarks as $bookmark)
+                                            <a href="{{ $bookmark->url }}" class="rounded-lg border border-zinc-200 p-3 hover:border-teal-600" target="_blank" rel="noreferrer">
+                                                <div class="truncate text-sm font-medium text-zinc-950">{{ $bookmark->title ?: $bookmark->url }}</div>
+                                                <div class="mt-1 truncate text-xs text-zinc-500">{{ $bookmark->url }}</div>
+                                                @if (! empty($bookmark->path_json))
+                                                    <div class="mt-2 truncate text-xs text-zinc-500">{{ implode(' / ', $bookmark->path_json) }}</div>
+                                                @endif
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </section>
+
                 <section class="overflow-hidden rounded-lg border border-zinc-200 bg-white">
                     <div class="border-b border-zinc-200 px-5 py-4">
                         <h2 class="text-base font-semibold">Latest history items</h2>

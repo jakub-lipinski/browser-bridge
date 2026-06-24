@@ -14,6 +14,7 @@ export type ExtensionConfig = {
   sync: SyncToggles;
   syncHistory: boolean;
   lastSyncAt: string | null;
+  lastBookmarkSyncAt: string | null;
   lastHistorySyncAt: string | null;
   historyConsentConfirmedAt: string | null;
   lastError: string | null;
@@ -43,8 +44,13 @@ export type TabCommandResource = {
 export type BookmarkSnapshotItem = {
   id?: string;
   parentId?: string;
+  external_id?: string;
+  parent_external_id?: string;
+  type: 'folder' | 'bookmark';
   title?: string;
-  url: string;
+  url?: string | null;
+  path?: string[];
+  date_added?: string | null;
 };
 
 export type BookmarkSnapshotResource = {
@@ -56,6 +62,21 @@ export type BookmarkSnapshotResource = {
     items?: BookmarkSnapshotItem[];
   } | null;
   created_at: string | null;
+};
+
+export type NormalizedBookmarkResource = {
+  id: number;
+  device_id: number;
+  device?: DeviceResource;
+  external_id: string | null;
+  parent_external_id: string | null;
+  type: 'folder' | 'bookmark';
+  title: string | null;
+  url: string | null;
+  path: string[];
+  date_added: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export type TabSnapshotItem = {

@@ -45,17 +45,36 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
     const tree = await chrome.bookmarks.getTree();
     const items: BookmarkSnapshotItem[] = [];
 
-    const visit = (node: chrome.bookmarks.BookmarkTreeNode): void => {
-      if (node.url && isSyncableUrl(node.url)) {
+    const visit = (node: chrome.bookmarks.BookmarkTreeNode, path: string[] = []): void => {
+      const nextPath = node.title ? [...path, node.title] : path;
+
+      if (node.url) {
+        if (!isSyncableUrl(node.url)) {
+          return;
+        }
+
         items.push({
-          id: node.id,
-          parentId: node.parentId,
+          external_id: node.id,
+          parent_external_id: node.parentId,
+          type: 'bookmark',
           title: node.title,
           url: node.url,
+          path,
+          date_added: node.dateAdded ? new Date(node.dateAdded).toISOString() : null,
+        });
+      } else if (node.id !== '0') {
+        items.push({
+          external_id: node.id,
+          parent_external_id: node.parentId,
+          type: 'folder',
+          title: node.title,
+          url: null,
+          path: nextPath,
+          date_added: node.dateAdded ? new Date(node.dateAdded).toISOString() : null,
         });
       }
 
-      node.children?.forEach(visit);
+      node.children?.forEach((child) => visit(child, nextPath));
     };
 
     tree.forEach(visit);

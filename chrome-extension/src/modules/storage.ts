@@ -17,6 +17,7 @@ export const defaultConfig: ExtensionConfig = {
   },
   syncHistory: false,
   lastSyncAt: null,
+  lastBookmarkSyncAt: null,
   lastHistorySyncAt: null,
   historyConsentConfirmedAt: null,
   lastError: null,

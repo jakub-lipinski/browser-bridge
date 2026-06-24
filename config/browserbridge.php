@@ -5,6 +5,8 @@ return [
 
     'max_devices' => env('BROWSERBRIDGE_MAX_DEVICES', 10),
     'max_bookmark_snapshot_payload_bytes' => env('BROWSERBRIDGE_MAX_BOOKMARK_SNAPSHOT_PAYLOAD_BYTES', 1024 * 1024),
+    'max_bookmark_snapshot_size' => env('BROWSERBRIDGE_MAX_BOOKMARK_SNAPSHOT_SIZE', 1024 * 1024),
+    'max_bookmark_items_per_device' => env('BROWSERBRIDGE_MAX_BOOKMARK_ITEMS_PER_DEVICE', 10000),
     'max_tab_snapshot_payload_bytes' => env('BROWSERBRIDGE_MAX_TAB_SNAPSHOT_PAYLOAD_BYTES', 512 * 1024),
     'max_history_batch_size' => env('BROWSERBRIDGE_MAX_HISTORY_BATCH_SIZE', 500),
     'max_history_items_per_device' => env('BROWSERBRIDGE_MAX_HISTORY_ITEMS_PER_DEVICE', 5000),

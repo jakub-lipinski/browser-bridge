@@ -2,7 +2,7 @@
 
 BrowserBridge is a production-oriented browser sync cloud built with Laravel. This milestone targets Chrome <-> Safari on macOS through a Laravel backend, with Chrome as the first full browser-data source and Safari as the first real cross-browser target.
 
-The backend currently supports device registration, bookmark snapshots, tab snapshots, optional history upload, shared BrowserBridge history search, and sending the current tab to a selected device.
+The backend currently supports device registration, bookmark snapshots, shared BrowserBridge bookmark search, tab snapshots, optional history upload, shared BrowserBridge history search, and sending the current tab to a selected device.
 
 BrowserBridge never syncs passwords, cookies, login sessions, localStorage, sessionStorage, or form data.
 
@@ -22,6 +22,8 @@ Set a private API token in `.env`:
 BROWSERBRIDGE_API_TOKEN=replace-with-a-long-random-token
 BROWSERBRIDGE_MAX_DEVICES=10
 BROWSERBRIDGE_MAX_BOOKMARK_SNAPSHOT_PAYLOAD_BYTES=1048576
+BROWSERBRIDGE_MAX_BOOKMARK_SNAPSHOT_SIZE=1048576
+BROWSERBRIDGE_MAX_BOOKMARK_ITEMS_PER_DEVICE=10000
 BROWSERBRIDGE_MAX_TAB_SNAPSHOT_PAYLOAD_BYTES=524288
 BROWSERBRIDGE_MAX_HISTORY_BATCH_SIZE=500
 BROWSERBRIDGE_MAX_HISTORY_ITEMS_PER_DEVICE=5000
@@ -99,6 +101,32 @@ curl -k "$BASE/api/bookmarks/snapshots?device_uuid=$TARGET_DEVICE_UUID" \
   -H "Accept: application/json"
 ```
 
+List shared BrowserBridge bookmarks:
+
+```bash
+curl -k "$BASE/api/bookmarks?device_uuid=$TARGET_DEVICE_UUID&limit=25" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json"
+```
+
+Search shared BrowserBridge bookmarks:
+
+```bash
+curl -k "$BASE/api/bookmarks/search?device_uuid=$TARGET_DEVICE_UUID&q=laravel&limit=25" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json"
+```
+
+Delete synced BrowserBridge bookmarks for one device:
+
+```bash
+curl -k -X DELETE "$BASE/api/bookmarks/device/1" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d "{\"device_uuid\": \"$SOURCE_DEVICE_UUID\"}"
+```
+
 Upload a bookmark snapshot:
 
 ```bash
@@ -109,7 +137,21 @@ curl -k -X POST "$BASE/api/bookmarks/snapshot" \
   -d '{
     "device_uuid": "11111111-1111-4111-8111-111111111111",
     "items": [
-      {"title": "Laravel", "url": "https://laravel.com/docs"},
+      {
+        "external_id": "1",
+        "parent_external_id": "0",
+        "type": "bookmark",
+        "title": "Laravel",
+        "url": "https://laravel.com/docs",
+        "path": ["Bookmarks Bar", "Development"],
+        "date_added": "2026-06-24T12:00:00Z"
+      },
+      {
+        "external_id": "2",
+        "type": "folder",
+        "title": "Development",
+        "path": ["Bookmarks Bar", "Development"]
+      },
       {"title": "Extensions", "url": "chrome://extensions"}
     ]
   }'
@@ -246,6 +288,7 @@ curl -k -X POST "$BASE/api/tabs/$TAB_COMMAND_ID/dismissed" \
 - Build and review the Chromium extension and Safari Web Extension with explicit privacy permissions.
 - Add history retention controls, deletion/export flows, and clearer consent UX.
 - Add conflict resolution and deduplication for bookmark sync.
+- Add native bidirectional bookmark sync: create, update, delete, move, tombstones, conflict resolution, and either last-write-wins or manual conflict resolution.
 - Add production deployment configuration, backups, monitoring, and incident-response docs.
 
 ## Tests
@@ -283,6 +326,16 @@ Manual BrowserBridge History test:
 6. Open the Safari extension popup.
 7. Search BrowserBridge History.
 8. Click a result to open it in Safari.
+
+Manual BrowserBridge Bookmarks test:
+
+1. Add a few normal `http` or `https` bookmarks in Chrome.
+2. Open the Chrome extension popup.
+3. Keep Sync bookmarks enabled.
+4. Click Sync bookmarks now.
+5. Open the Safari extension popup.
+6. Search BrowserBridge Bookmarks.
+7. Click a bookmark result to open it in Safari.
 
 ## Chromium Extension
 
@@ -327,6 +380,7 @@ Chrome capabilities in this milestone:
 - Receive and open tabs sent by Safari.
 - Upload open-tab snapshots.
 - Upload bookmark snapshots.
+- Normalize bookmarks into BrowserBridge Bookmarks for shared viewing/search.
 - Upload browsing history only after explicit opt-in.
 - Display BrowserBridge Bookmarks and BrowserBridge History from the backend.
 
@@ -369,3 +423,17 @@ See [docs/safari-local-development.md](/Users/jakub/Webdev/projekty-prywatne/bro
 BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.
 
 BrowserBridge Bookmarks are shown inside the extension. Native Safari bookmark writing may be added later.
+
+## Future Native Bookmark Sync TODO
+
+The current bookmark mode is a shared BrowserBridge bookmark viewer. It does not create, update, delete, move, or merge native bookmarks in Chrome or Safari yet.
+
+Future native bidirectional bookmark sync needs:
+
+- Create native bookmarks.
+- Update native bookmark title, URL, and folder.
+- Delete native bookmarks.
+- Move bookmarks and folders.
+- Tombstones for deleted records.
+- Conflict detection and resolution.
+- A policy such as last-write-wins or manual conflict resolution.

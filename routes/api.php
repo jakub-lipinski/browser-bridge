@@ -13,6 +13,9 @@ Route::middleware('browserbridge.token')->group(function (): void {
 
     Route::post('/bookmarks/snapshot', [BookmarkSnapshotController::class, 'store']);
     Route::get('/bookmarks/snapshots', [BookmarkSnapshotController::class, 'index']);
+    Route::get('/bookmarks', [BookmarkSnapshotController::class, 'bookmarks']);
+    Route::get('/bookmarks/search', [BookmarkSnapshotController::class, 'search']);
+    Route::delete('/bookmarks/device/{device}', [BookmarkSnapshotController::class, 'destroyForDevice']);
 
     Route::post('/tabs/snapshot', [TabSnapshotController::class, 'store']);
     Route::get('/tabs/snapshots', [TabSnapshotController::class, 'index']);

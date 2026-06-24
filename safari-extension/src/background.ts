@@ -1,6 +1,6 @@
 import './modules/initSafariAdapter';
 import {
-  fetchBookmarkSnapshots,
+  fetchBookmarks,
   fetchDevices,
   searchHistory,
 } from '../../chrome-extension/src/modules/apiClient';
@@ -78,16 +78,16 @@ async function getStatus() {
       devices: [],
       incomingCommands: [],
       currentTab: await getCurrentTab(),
-      bookmarkSnapshots: [],
+      bookmarks: [],
       historyItems: [],
     };
   }
 
-  const [devices, incomingCommands, currentTab, bookmarkSnapshots, historyItems] = await Promise.all([
+  const [devices, incomingCommands, currentTab, bookmarks, historyItems] = await Promise.all([
     fetchDevices(config),
     getIncomingCommands(config),
     getCurrentTab(),
-    fetchBookmarkSnapshots(config),
+    fetchBookmarks(config),
     searchHistory(config),
   ]);
 
@@ -97,7 +97,7 @@ async function getStatus() {
     devices,
     incomingCommands,
     currentTab,
-    bookmarkSnapshots,
+    bookmarks,
     historyItems,
   };
 }

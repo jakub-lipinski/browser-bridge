@@ -7,6 +7,7 @@ import type {
   ExtensionConfig,
   HistoryBatchItem,
   HistoryItemResource,
+  NormalizedBookmarkResource,
   TabCommandResource,
   TabSnapshotItem,
 } from './types';
@@ -82,6 +83,29 @@ export async function fetchBookmarkSnapshots(config: ExtensionConfig): Promise<B
   const response = await request<ApiCollection<BookmarkSnapshotResource>>(config, '/api/bookmarks/snapshots', {
     query: {
       device_uuid: config.deviceUuid,
+    },
+  });
+
+  return response.data;
+}
+
+export async function fetchBookmarks(config: ExtensionConfig): Promise<NormalizedBookmarkResource[]> {
+  const response = await request<ApiCollection<NormalizedBookmarkResource>>(config, '/api/bookmarks', {
+    query: {
+      device_uuid: config.deviceUuid,
+      limit: 100,
+    },
+  });
+
+  return response.data;
+}
+
+export async function searchBookmarks(config: ExtensionConfig, query = ''): Promise<NormalizedBookmarkResource[]> {
+  const response = await request<ApiCollection<NormalizedBookmarkResource>>(config, '/api/bookmarks/search', {
+    query: {
+      device_uuid: config.deviceUuid,
+      q: query,
+      limit: 100,
     },
   });
 

@@ -2,12 +2,12 @@ import './modules/initChromiumAdapter';
 import './styles.css';
 import { getBrowserAdapter } from './modules/browserAdapter';
 import { getConfig, saveConfig } from './modules/storage';
-import { deleteSyncedHistory, searchHistory } from './modules/apiClient';
+import { deleteSyncedHistory, searchBookmarks, searchHistory } from './modules/apiClient';
 import type {
-  BookmarkSnapshotResource,
   DeviceResource,
   ExtensionConfig,
   HistoryItemResource,
+  NormalizedBookmarkResource,
   TabCommandResource,
   TabSnapshotItem,
 } from './modules/types';
@@ -18,7 +18,7 @@ type PopupStatus = {
   devices: DeviceResource[];
   incomingCommands: TabCommandResource[];
   currentTab: TabSnapshotItem | null;
-  bookmarkSnapshots?: BookmarkSnapshotResource[];
+  bookmarks?: NormalizedBookmarkResource[];
   historyItems?: HistoryItemResource[];
 };
 
@@ -41,6 +41,8 @@ const elements = {
   currentTabUrl: document.querySelector<HTMLParagraphElement>('#current-tab-url'),
   devicesList: document.querySelector<HTMLDivElement>('#devices-list'),
   bookmarksList: document.querySelector<HTMLDivElement>('#bookmarks-list'),
+  bookmarksQuery: document.querySelector<HTMLInputElement>('#bookmarks-query'),
+  syncBookmarksNow: document.querySelector<HTMLButtonElement>('#sync-bookmarks-now'),
   historyList: document.querySelector<HTMLDivElement>('#history-list'),
   historyQuery: document.querySelector<HTMLInputElement>('#history-query'),
   deleteHistory: document.querySelector<HTMLButtonElement>('#delete-history'),
@@ -180,16 +182,21 @@ function renderCommands(status: PopupStatus): void {
   });
 }
 
-function renderBookmarks(status: PopupStatus): void {
+function groupBookmarksByDevice(bookmarks: NormalizedBookmarkResource[]): Map<string, NormalizedBookmarkResource[]> {
+  return bookmarks.reduce((groups, bookmark) => {
+    const deviceName = bookmark.device?.name || 'Unknown device';
+    const group = groups.get(deviceName) || [];
+
+    group.push(bookmark);
+    groups.set(deviceName, group);
+
+    return groups;
+  }, new Map<string, NormalizedBookmarkResource[]>());
+}
+
+function renderBookmarks(bookmarks: NormalizedBookmarkResource[] = []): void {
   const bookmarksList = requireElement(elements.bookmarksList);
   bookmarksList.textContent = '';
-
-  const bookmarks = (status.bookmarkSnapshots || []).flatMap((snapshot) => {
-    return (snapshot.payload_json?.items || []).slice(0, 8).map((item) => ({
-      ...item,
-      deviceName: snapshot.device?.name || `Device ${snapshot.device_id}`,
-    }));
-  }).slice(0, 20);
 
   if (bookmarks.length === 0) {
     bookmarksList.innerHTML = '<p class="muted">No BrowserBridge bookmarks available yet.</p>';
@@ -197,20 +204,47 @@ function renderBookmarks(status: PopupStatus): void {
     return;
   }
 
-  bookmarks.forEach((bookmark) => {
-    const item = document.createElement('div');
-    item.className = 'item';
+  groupBookmarksByDevice(bookmarks).forEach((items, deviceName) => {
+    const groupTitle = document.createElement('div');
+    groupTitle.className = 'group-title';
+    groupTitle.textContent = deviceName;
+    bookmarksList.append(groupTitle);
 
-    const title = document.createElement('div');
-    title.className = 'truncate';
-    title.textContent = bookmark.title || bookmark.url;
+    items.forEach((bookmark) => {
+      const item = document.createElement('div');
+      item.className = 'item clickable';
+      item.tabIndex = 0;
 
-    const url = document.createElement('p');
-    url.className = 'muted truncate';
-    url.textContent = `${bookmark.deviceName} - ${bookmark.url}`;
+      const title = document.createElement('div');
+      title.className = 'truncate';
+      title.textContent = bookmark.title || bookmark.url || 'Untitled bookmark';
 
-    item.append(title, url);
-    bookmarksList.append(item);
+      const url = document.createElement('p');
+      url.className = 'muted truncate';
+      url.textContent = bookmark.url || '';
+
+      const path = document.createElement('p');
+      path.className = 'muted truncate';
+      path.textContent = bookmark.path.length > 0 ? bookmark.path.join(' / ') : 'No folder path';
+
+      const open = (): void => {
+        if (bookmark.url) {
+          void getBrowserAdapter().openTab(bookmark.url).catch((error: unknown) => {
+            setError(error instanceof Error ? error.message : 'Unable to open bookmark.');
+          });
+        }
+      };
+
+      item.addEventListener('click', open);
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          open();
+        }
+      });
+
+      item.append(title, url, path);
+      bookmarksList.append(item);
+    });
   });
 }
 
@@ -295,7 +329,7 @@ function render(status: PopupStatus): void {
   setError(status.config.lastError);
 
   renderDevices(status);
-  renderBookmarks(status);
+  renderBookmarks(status.bookmarks || []);
   renderHistoryItems(status.historyItems || []);
   renderCommands(status);
 }
@@ -351,6 +385,13 @@ async function searchBrowserBridgeHistory(): Promise<void> {
   renderHistoryItems(await searchHistory(config, query));
 }
 
+async function searchBrowserBridgeBookmarks(): Promise<void> {
+  const config = await getConfig();
+  const query = requireElement(elements.bookmarksQuery).value.trim();
+
+  renderBookmarks(await searchBookmarks(config, query));
+}
+
 async function deleteBrowserBridgeHistory(): Promise<void> {
   const config = await getConfig();
 
@@ -365,6 +406,15 @@ requireElement(elements.syncNow).addEventListener('click', () => {
     .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to sync.'));
 });
 
+requireElement(elements.syncBookmarksNow).addEventListener('click', () => {
+  void sendMessage<PopupStatus>({ type: 'browserbridge.syncBookmarksNow' })
+    .then((status) => {
+      render(status);
+      setError('Bookmarks synced.');
+    })
+    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to sync bookmarks.'));
+});
+
 requireElement(elements.openOptions).addEventListener('click', () => {
   void chrome.runtime.openOptionsPage();
 });
@@ -372,6 +422,12 @@ requireElement(elements.openOptions).addEventListener('click', () => {
 requireElement(elements.historyQuery).addEventListener('input', () => {
   void searchBrowserBridgeHistory().catch((error: unknown) => {
     setError(error instanceof Error ? error.message : 'Unable to search BrowserBridge History.');
+  });
+});
+
+requireElement(elements.bookmarksQuery).addEventListener('input', () => {
+  void searchBrowserBridgeBookmarks().catch((error: unknown) => {
+    setError(error instanceof Error ? error.message : 'Unable to search BrowserBridge Bookmarks.');
   });
 });
 

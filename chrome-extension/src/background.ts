@@ -1,5 +1,5 @@
 import './modules/initChromiumAdapter';
-import { fetchBookmarkSnapshots, fetchDevices, searchHistory } from './modules/apiClient';
+import { fetchBookmarks, fetchDevices, searchHistory } from './modules/apiClient';
 import { syncBookmarks } from './modules/bookmarksSync';
 import { connectDevice } from './modules/device';
 import { syncHistory } from './modules/historySync';
@@ -18,6 +18,7 @@ const SYNC_INTERVAL_MINUTES = 1;
 
 type RuntimeMessage =
   | { type: 'browserbridge.syncNow' }
+  | { type: 'browserbridge.syncBookmarksNow' }
   | { type: 'browserbridge.getStatus' }
   | { type: 'browserbridge.openCommand'; command: TabCommandResource }
   | { type: 'browserbridge.dismissCommand'; commandId: number }
@@ -82,11 +83,11 @@ async function getStatus() {
     };
   }
 
-  const [devices, incomingCommands, currentTab, bookmarkSnapshots, historyItems] = await Promise.all([
+  const [devices, incomingCommands, currentTab, bookmarks, historyItems] = await Promise.all([
     fetchDevices(config),
     getIncomingCommands(config),
     getCurrentTab(),
-    fetchBookmarkSnapshots(config),
+    fetchBookmarks(config),
     searchHistory(config),
   ]);
 
@@ -96,7 +97,7 @@ async function getStatus() {
     devices,
     incomingCommands,
     currentTab,
-    bookmarkSnapshots,
+    bookmarks,
     historyItems,
   };
 }
@@ -122,6 +123,14 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
   const respond = async (): Promise<unknown> => {
     if (message.type === 'browserbridge.syncNow') {
       await syncOnce();
+
+      return getStatus();
+    }
+
+    if (message.type === 'browserbridge.syncBookmarksNow') {
+      const config = await ensureRegistered(await getConfig());
+
+      await syncBookmarks(config);
 
       return getStatus();
     }
