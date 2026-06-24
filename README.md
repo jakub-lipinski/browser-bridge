@@ -25,6 +25,7 @@ BROWSERBRIDGE_MAX_BOOKMARK_SNAPSHOT_PAYLOAD_BYTES=1048576
 BROWSERBRIDGE_MAX_TAB_SNAPSHOT_PAYLOAD_BYTES=524288
 BROWSERBRIDGE_MAX_HISTORY_BATCH_SIZE=500
 BROWSERBRIDGE_MAX_PENDING_TAB_COMMANDS_PER_TARGET=100
+BROWSERBRIDGE_ALLOW_SAME_DEVICE_TAB_COMMANDS=false
 ```
 
 Laravel Herd serves this project at:
@@ -248,6 +249,8 @@ This milestone intentionally targets Chrome <-> Safari, not Chrome <-> Chrome. A
 10. Send the current tab from Safari to Chrome, then open it in Chrome.
 11. Enable history sync in Chrome, visit a few pages, then search BrowserBridge History in Safari.
 12. Add bookmarks in Chrome, run sync, then view BrowserBridge Bookmarks in Safari.
+
+Incoming tab mode is Ask by default: received tabs appear in the popup and require Open or Dismiss. Auto-open is intentionally reserved for a later explicit setting. Chrome-to-Chrome is not the target flow for this milestone.
 
 ## Chromium Extension
 

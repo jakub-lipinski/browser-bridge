@@ -68,14 +68,20 @@ function setError(message: string | null): void {
   requireElement(elements.errorMessage).textContent = message || '';
 }
 
+function crossBrowserTargets(status: PopupStatus): DeviceResource[] {
+  return status.devices.filter((device) => {
+    return device.uuid !== status.config.deviceUuid && device.browser === 'safari';
+  });
+}
+
 function renderDevices(status: PopupStatus): void {
   const devicesList = requireElement(elements.devicesList);
   devicesList.textContent = '';
 
-  const otherDevices = status.devices.filter((device) => device.uuid !== status.config.deviceUuid);
+  const otherDevices = crossBrowserTargets(status);
 
   if (otherDevices.length === 0) {
-    devicesList.innerHTML = '<p class="muted">No other devices connected yet.</p>';
+    devicesList.innerHTML = '<p class="muted">No Safari device connected yet.</p>';
 
     return;
   }
@@ -94,14 +100,17 @@ function renderDevices(status: PopupStatus): void {
 
     const sendButton = document.createElement('button');
     sendButton.type = 'button';
-    sendButton.textContent = 'Send current tab';
+    sendButton.textContent = 'Send current tab to Safari';
     sendButton.disabled = !status.currentTab;
     sendButton.addEventListener('click', () => {
       void sendMessage<PopupStatus>({
         type: 'browserbridge.sendCurrentTab',
         targetDeviceUuid: device.uuid,
       })
-        .then(render)
+        .then((nextStatus) => {
+          render(nextStatus);
+          setError(`Sent current tab to ${device.name}.`);
+        })
         .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to send tab.'));
     });
 

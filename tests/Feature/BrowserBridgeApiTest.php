@@ -240,8 +240,16 @@ it('limits history batch size', function (): void {
 });
 
 it('sends fetches and marks tab commands as opened for the target device', function (): void {
-    $source = Device::factory()->create();
-    $target = Device::factory()->create();
+    $source = Device::factory()->create([
+        'name' => 'Chrome Mac',
+        'browser' => 'chrome',
+        'platform' => 'macos',
+    ]);
+    $target = Device::factory()->create([
+        'name' => 'Safari Mac',
+        'browser' => 'safari',
+        'platform' => 'macos',
+    ]);
     $other = Device::factory()->create();
 
     $commandId = $this->postJson('/api/tabs/send', [
@@ -276,6 +284,78 @@ it('sends fetches and marks tab commands as opened for the target device', funct
     expect(TabCommand::findOrFail($commandId)->status)->toBe(TabCommandStatus::Opened);
 });
 
+it('dismisses tab commands only for the target device', function (): void {
+    $source = Device::factory()->create([
+        'browser' => 'safari',
+        'platform' => 'macos',
+    ]);
+    $target = Device::factory()->create([
+        'browser' => 'chrome',
+        'platform' => 'macos',
+    ]);
+    $other = Device::factory()->create();
+
+    $commandId = $this->postJson('/api/tabs/send', [
+        'source_device_uuid' => $source->uuid,
+        'target_device_uuid' => $target->uuid,
+        'url' => 'https://example.com/from-safari',
+        'title' => 'From Safari',
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->json('data.id');
+
+    $this->postJson("/api/tabs/{$commandId}/dismissed", [
+        'device_uuid' => $other->uuid,
+    ], browserBridgeHeaders())->assertNotFound();
+
+    $this->postJson("/api/tabs/{$commandId}/dismissed", [
+        'device_uuid' => $target->uuid,
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.status', TabCommandStatus::Dismissed->value);
+
+    $this->getJson('/api/tabs/incoming?device_uuid='.$target->uuid, browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonCount(0, 'data');
+});
+
+it('rejects tab commands for missing or same source and target devices', function (): void {
+    $device = Device::factory()->create();
+
+    $this->postJson('/api/tabs/send', [
+        'source_device_uuid' => $device->uuid,
+        'target_device_uuid' => $device->uuid,
+        'url' => 'https://example.com/same-device',
+        'title' => 'Same device',
+    ], browserBridgeHeaders())
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('target_device_uuid');
+
+    $this->postJson('/api/tabs/send', [
+        'source_device_uuid' => $device->uuid,
+        'target_device_uuid' => fake()->uuid(),
+        'url' => 'https://example.com/missing-target',
+        'title' => 'Missing target',
+    ], browserBridgeHeaders())
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('target_device_uuid');
+});
+
+it('allows same device tab commands only when debugging is explicitly enabled', function (): void {
+    config(['browserbridge.allow_same_device_tab_commands' => true]);
+
+    $device = Device::factory()->create();
+
+    $this->postJson('/api/tabs/send', [
+        'source_device_uuid' => $device->uuid,
+        'target_device_uuid' => $device->uuid,
+        'url' => 'https://example.com/debug-self-send',
+        'title' => 'Debug self-send',
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.status', TabCommandStatus::Pending->value);
+});
+
 it('limits pending tab commands per target device', function (): void {
     config(['browserbridge.max_pending_tab_commands_per_target' => 1]);
 
@@ -302,14 +382,20 @@ it('rejects internal URLs for send tab commands', function (): void {
     $source = Device::factory()->create();
     $target = Device::factory()->create();
 
-    $this->postJson('/api/tabs/send', [
+    $sendInternalUrl = fn (string $url) => $this->postJson('/api/tabs/send', [
         'source_device_uuid' => $source->uuid,
         'target_device_uuid' => $target->uuid,
-        'url' => 'about:blank',
-        'title' => 'Blank',
-    ], browserBridgeHeaders())
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('url');
+        'url' => $url,
+        'title' => 'Internal URL',
+    ], browserBridgeHeaders());
+
+    $sendInternalUrl('about:blank')->assertUnprocessable()->assertJsonValidationErrors('url');
+    $sendInternalUrl('safari-extension://abc/options.html')->assertUnprocessable()->assertJsonValidationErrors('url');
+    $sendInternalUrl('chrome://extensions')->assertUnprocessable()->assertJsonValidationErrors('url');
+    $sendInternalUrl('file:///Users/example/private.html')->assertUnprocessable()->assertJsonValidationErrors('url');
+    $sendInternalUrl('devtools://devtools/bundled/inspector.html')->assertUnprocessable()->assertJsonValidationErrors('url');
+    $sendInternalUrl('view-source:https://example.com')->assertUnprocessable()->assertJsonValidationErrors('url');
+    $sendInternalUrl('javascript:alert(1)')->assertUnprocessable()->assertJsonValidationErrors('url');
 });
 
 it('rejects oversized bookmark and tab snapshot payloads', function (): void {

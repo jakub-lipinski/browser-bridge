@@ -18,6 +18,7 @@ class UrlSanitizer
         'edge',
         'file',
         'javascript',
+        'safari-extension',
         'view-source',
     ];
 

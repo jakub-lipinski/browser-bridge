@@ -96,3 +96,9 @@ Safari macOS support in this milestone focuses on cross-browser tab sending and 
 BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.
 
 BrowserBridge Bookmarks are shown inside the extension. Native Safari bookmark writing may be added later.
+
+## Tab Sending Notes
+
+The default incoming mode is Ask: received tabs appear in the popup and require Open or Dismiss. Auto-open is intentionally left for a later setting.
+
+Chrome-to-Chrome is not the target flow for this milestone. Same-device tab commands are rejected unless `BROWSERBRIDGE_ALLOW_SAME_DEVICE_TAB_COMMANDS=true` is set for explicit debugging.

@@ -6,6 +6,7 @@ const blockedSchemes = [
   'edge:',
   'file:',
   'javascript:',
+  'safari-extension:',
   'view-source:',
 ];
 
