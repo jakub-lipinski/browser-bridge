@@ -1,12 +1,13 @@
 import './modules/initSafariAdapter';
 import '../../chrome-extension/src/styles.css';
-import { getBrowserAdapter } from '../../chrome-extension/src/modules/browserAdapter';
+import { getBrowserAdapter, type BrowserCapabilityAudit } from '../../chrome-extension/src/modules/browserAdapter';
 import { deleteSyncedHistory, searchBookmarks, searchHistory } from '../../chrome-extension/src/modules/apiClient';
-import { getConfig } from '../../chrome-extension/src/modules/storage';
+import { getConfig, saveConfig } from '../../chrome-extension/src/modules/storage';
 import type {
   DeviceResource,
   ExtensionConfig,
   HistoryItemResource,
+  HistorySyncRange,
   NormalizedBookmarkResource,
   TabCommandResource,
   TabSnapshotItem,
@@ -18,13 +19,19 @@ type SafariLoadErrors = Partial<Record<SafariLoadErrorKey, string>>;
 
 type SafariRefreshSummary = {
   refreshedAt: string;
+  bookmarksUploaded?: number;
+  bookmarksUploadUnavailable?: string;
+  historyUploaded?: number;
+  historyUploadMode?: 'native' | 'activity' | 'unavailable';
+  historyUploadUnavailable?: string;
+  tabsUploaded?: number;
   devices?: number;
   incomingCommands?: number;
-  bookmarks?: number;
-  historyItems?: number;
-  tabSnapshots?: number;
+  remoteBookmarks?: number;
+  remoteHistoryItems?: number;
+  remoteTabSnapshots?: number;
   errors: SafariLoadErrors;
-  unsupportedMessage: string;
+  unsupportedMessages: string[];
 };
 
 type PopupStatus = {
@@ -37,6 +44,7 @@ type PopupStatus = {
   historyItems: HistoryItemResource[];
   tabSnapshots: TabSnapshotResource[];
   loadErrors: SafariLoadErrors;
+  capabilityAudit: BrowserCapabilityAudit;
   refreshSummary?: SafariRefreshSummary;
 };
 
@@ -60,7 +68,6 @@ type SearchState<T> = {
 const VISIBLE_RESULT_LIMIT = 5;
 const REMOTE_SEARCH_MIN_LENGTH = 2;
 const SEARCH_DEBOUNCE_MS = 250;
-const SAFARI_UNSUPPORTED_MESSAGE = 'Safari currently displays BrowserBridge data from your server. Native Safari bookmark/history upload is not implemented in this version.';
 
 const elements = {
   connectionStatus: document.querySelector<HTMLSpanElement>('#connection-status'),
@@ -92,6 +99,23 @@ const elements = {
   bookmarksStat: document.querySelector<HTMLElement>('#bookmarks-stat'),
   historyStat: document.querySelector<HTMLElement>('#history-stat'),
   tabsStat: document.querySelector<HTMLElement>('#tabs-stat'),
+  safariBookmarksUploadStatus: document.querySelector<HTMLParagraphElement>('#safari-bookmarks-upload-status'),
+  safariHistoryUploadStatus: document.querySelector<HTMLParagraphElement>('#safari-history-upload-status'),
+  toggleBookmarks: document.querySelector<HTMLInputElement>('#toggle-bookmarks'),
+  toggleHistory: document.querySelector<HTMLInputElement>('#toggle-history'),
+  historySettingsContainer: document.querySelector<HTMLDivElement>('#history-settings-container'),
+  historySyncRange: document.querySelector<HTMLSelectElement>('#history-sync-range'),
+  historyRangeWarning: document.querySelector<HTMLDivElement>('#history-range-warning'),
+  historyConfirmationModal: document.querySelector<HTMLDivElement>('#history-confirmation-modal'),
+  cancelHistoryEnable: document.querySelector<HTMLButtonElement>('#cancel-history-enable'),
+  confirmHistoryEnable: document.querySelector<HTMLButtonElement>('#confirm-history-enable'),
+  capabilityCurrentTab: document.querySelector<HTMLParagraphElement>('#capability-current-tab'),
+  capabilityAllTabs: document.querySelector<HTMLParagraphElement>('#capability-all-tabs'),
+  capabilityBookmarks: document.querySelector<HTMLParagraphElement>('#capability-bookmarks'),
+  capabilityHistory: document.querySelector<HTMLParagraphElement>('#capability-history'),
+  capabilityBackground: document.querySelector<HTMLParagraphElement>('#capability-background'),
+  syncSourceStatus: document.querySelector<HTMLParagraphElement>('#sync-source-status'),
+  capabilityDebugList: document.querySelector<HTMLDivElement>('#capability-debug-list'),
   refreshSummary: document.querySelector<HTMLParagraphElement>('#refresh-summary'),
   openOptions: document.querySelector<HTMLButtonElement>('#open-options'),
 };
@@ -169,7 +193,7 @@ function loadErrorMessage(status: PopupStatus): string | null {
     return loadErrors.join(' | ');
   }
 
-  if (status.config.lastError && status.config.lastError !== SAFARI_UNSUPPORTED_MESSAGE) {
+  if (status.config.lastError) {
     return status.config.lastError;
   }
 
@@ -647,6 +671,18 @@ function formatRefreshPart(label: string, value: number | undefined, error?: str
   return `${label}: ${value ?? 0}`;
 }
 
+function formatUploadPart(label: string, value: number | undefined, unavailable?: string): string {
+  if (unavailable) {
+    return `${label}: not available`;
+  }
+
+  if (value === undefined) {
+    return `${label}: not enabled`;
+  }
+
+  return `${label}: ${value}`;
+}
+
 function renderRefreshSummary(summary?: SafariRefreshSummary): void {
   const summaryElement = requireElement(elements.refreshSummary);
 
@@ -656,14 +692,76 @@ function renderRefreshSummary(summary?: SafariRefreshSummary): void {
 
   const hasErrors = Object.keys(summary.errors).length > 0;
   const parts = [
-    formatRefreshPart('Devices', summary.devices, summary.errors.devices),
+    formatUploadPart('Bookmarks uploaded', summary.bookmarksUploaded, summary.bookmarksUploadUnavailable),
+    formatUploadPart(summary.historyUploadMode === 'activity' ? 'Activity uploaded' : 'History uploaded', summary.historyUploaded, summary.historyUploadUnavailable),
+    formatUploadPart('Tabs uploaded', summary.tabsUploaded),
+    formatRefreshPart('Remote bookmarks', summary.remoteBookmarks, summary.errors.bookmarks),
+    formatRefreshPart('Remote history', summary.remoteHistoryItems, summary.errors.historyItems),
     formatRefreshPart('Incoming tabs', summary.incomingCommands, summary.errors.incomingCommands),
-    formatRefreshPart('Bookmarks loaded', summary.bookmarks, summary.errors.bookmarks),
-    formatRefreshPart('History loaded', summary.historyItems, summary.errors.historyItems),
-    formatRefreshPart('Tab snapshots', summary.tabSnapshots, summary.errors.tabSnapshots),
   ];
 
-  summaryElement.textContent = `${hasErrors ? 'Refresh completed with errors.' : 'Refresh complete.'} ${parts.join(' | ')}`;
+  summaryElement.textContent = `${hasErrors ? 'Safari sync completed with errors.' : 'Safari sync complete.'} ${parts.join(' | ')}`;
+  requireElement(elements.safariBookmarksUploadStatus).textContent = summary.bookmarksUploadUnavailable
+    ? summary.bookmarksUploadUnavailable
+    : `Safari bookmarks synced: ${summary.bookmarksUploaded ?? 'not enabled'}`;
+  requireElement(elements.safariHistoryUploadStatus).textContent = summary.historyUploadUnavailable
+    ? summary.historyUploadUnavailable
+    : `${summary.historyUploadMode === 'activity' ? 'BrowserBridge Activity saved' : 'Safari history synced'}: ${summary.historyUploaded ?? 'not enabled'}`;
+}
+
+function availabilityLabel(available: boolean): string {
+  return available ? 'Available' : 'Not available';
+}
+
+function syncButtonLabel(audit: BrowserCapabilityAudit): string {
+  const nativeSourceCount = Number(audit.canReadNativeBookmarks) + Number(audit.canReadNativeHistory);
+
+  if (nativeSourceCount === 2) {
+    return 'Sync now';
+  }
+
+  if (nativeSourceCount > 0 || audit.historyMode === 'activity' || audit.canReadAllTabs || audit.canReadCurrentTab) {
+    return 'Sync / Refresh';
+  }
+
+  return 'Refresh';
+}
+
+function renderCapabilityAudit(audit: BrowserCapabilityAudit): void {
+  requireElement(elements.syncNow).textContent = syncButtonLabel(audit);
+  requireElement(elements.capabilityCurrentTab).textContent = `Read current tab: ${availabilityLabel(audit.canReadCurrentTab)}`;
+  requireElement(elements.capabilityAllTabs).textContent = `Read open tabs: ${availabilityLabel(audit.canReadAllTabs)}`;
+  requireElement(elements.capabilityBookmarks).textContent = `Native Safari bookmark reading: ${availabilityLabel(audit.canReadNativeBookmarks)}`;
+  requireElement(elements.capabilityHistory).textContent = `Native Safari history reading: ${availabilityLabel(audit.canReadNativeHistory)}`;
+  requireElement(elements.capabilityBackground).textContent = `Background polling: ${availabilityLabel(audit.canUseBackgroundPolling)}`;
+  requireElement(elements.safariBookmarksUploadStatus).textContent = audit.canReadNativeBookmarks
+    ? 'Native Safari bookmark reading is available.'
+    : 'Native Safari bookmark reading is not available in this Safari version.';
+  requireElement(elements.safariHistoryUploadStatus).textContent = audit.canReadNativeHistory
+    ? 'Native Safari history reading is available.'
+    : 'Full native Safari history upload is not available in this Safari version. BrowserBridge can still save Safari pages you send/open through the extension.';
+  requireElement(elements.syncSourceStatus).textContent = audit.historyMode === 'activity'
+    ? 'BrowserBridge Activity is not the same as full Safari history. It only saves Safari pages you send/open through the extension, plus the active tab when you sync.'
+    : 'Safari checks source capabilities first, uploads available data, then refreshes BrowserBridge data from your server.';
+
+  const debugList = requireElement(elements.capabilityDebugList);
+  debugList.textContent = '';
+
+  audit.probes.forEach((probe) => {
+    const item = document.createElement('div');
+    item.className = 'item';
+
+    const title = document.createElement('div');
+    title.className = 'truncate';
+    title.textContent = `${probe.name}: ${probe.success ? 'success' : 'failed'}`;
+
+    const meta = document.createElement('p');
+    meta.className = 'muted truncate';
+    meta.textContent = probe.error ? `${probe.api} - ${probe.error}` : probe.api;
+
+    item.append(title, meta);
+    debugList.append(item);
+  });
 }
 
 function render(status: PopupStatus): void {
@@ -678,6 +776,11 @@ function render(status: PopupStatus): void {
 
   requireElement(elements.currentTabTitle).textContent = status.currentTab?.title || 'No syncable current tab.';
   requireElement(elements.currentTabUrl).textContent = status.currentTab?.url || '';
+  requireElement(elements.toggleBookmarks).checked = status.config.sync.bookmarks;
+  requireElement(elements.toggleHistory).checked = status.config.sync.history;
+  requireElement(elements.historySettingsContainer).hidden = !status.config.sync.history;
+  requireElement(elements.historySyncRange).value = status.config.historySyncRange || '24h';
+  requireElement(elements.historyRangeWarning).hidden = status.config.historySyncRange !== 'all';
   setError(loadErrorMessage(status));
   setSendStatus(null);
 
@@ -699,6 +802,7 @@ function render(status: PopupStatus): void {
   renderCommands(status);
   renderBookmarks(status.loadErrors.bookmarks);
   renderHistoryItems(status.loadErrors.historyItems);
+  renderCapabilityAudit(status.capabilityAudit);
 }
 
 async function refresh(): Promise<void> {
@@ -714,6 +818,45 @@ requireElement(elements.syncNow).addEventListener('click', () => {
     })
     .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to refresh BrowserBridge data.'));
 });
+
+async function updateToggles(): Promise<void> {
+  const config = await getConfig();
+  const historyEnabled = requireElement(elements.toggleHistory).checked;
+
+  await saveConfig({
+    ...config,
+    syncHistory: historyEnabled,
+    sync: {
+      ...config.sync,
+      bookmarks: requireElement(elements.toggleBookmarks).checked,
+      history: historyEnabled,
+    },
+  });
+
+  await refresh();
+}
+
+function showHistoryConfirmationModal(): void {
+  requireElement(elements.historyConfirmationModal).hidden = false;
+}
+
+function hideHistoryConfirmationModal(): void {
+  requireElement(elements.historyConfirmationModal).hidden = true;
+}
+
+async function handleHistoryToggle(): Promise<void> {
+  const config = await getConfig();
+  const historyToggle = requireElement(elements.toggleHistory);
+
+  if (historyToggle.checked && !config.historyConsentConfirmedAt) {
+    historyToggle.checked = false;
+    showHistoryConfirmationModal();
+
+    return;
+  }
+
+  await updateToggles();
+}
 
 requireElement(elements.sendCurrentTab).addEventListener('click', () => {
   const targetDeviceUuid = requireElement(elements.sendTarget).value;
@@ -735,6 +878,56 @@ requireElement(elements.sendCurrentTab).addEventListener('click', () => {
 
 requireElement(elements.openOptions).addEventListener('click', () => {
   void chrome.runtime.openOptionsPage();
+});
+
+requireElement(elements.toggleBookmarks).addEventListener('change', () => {
+  void updateToggles().catch((error: unknown) => {
+    setError(error instanceof Error ? error.message : 'Unable to update bookmark sync.');
+  });
+});
+
+requireElement(elements.toggleHistory).addEventListener('change', () => {
+  void handleHistoryToggle().catch((error: unknown) => {
+    setError(error instanceof Error ? error.message : 'Unable to update Safari history or Activity sync.');
+  });
+});
+
+requireElement(elements.cancelHistoryEnable).addEventListener('click', () => {
+  hideHistoryConfirmationModal();
+  requireElement(elements.toggleHistory).checked = false;
+});
+
+requireElement(elements.confirmHistoryEnable).addEventListener('click', () => {
+  void getConfig()
+    .then(async (config) => {
+      await saveConfig({
+        ...config,
+        syncHistory: true,
+        sync: {
+          ...config.sync,
+          history: true,
+        },
+        historyConsentConfirmedAt: new Date().toISOString(),
+      });
+    })
+    .then(() => {
+      hideHistoryConfirmationModal();
+      requireElement(elements.toggleHistory).checked = true;
+
+      return refresh();
+    })
+    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to enable Safari history or Activity sync.'));
+});
+
+requireElement(elements.historySyncRange).addEventListener('change', (event) => {
+  const value = (event.target as HTMLSelectElement).value as HistorySyncRange;
+  requireElement(elements.historyRangeWarning).hidden = value !== 'all';
+
+  void getConfig()
+    .then((config) => saveConfig({ ...config, historySyncRange: value }))
+    .catch((error: unknown) => {
+      setError(error instanceof Error ? error.message : 'Unable to update Safari history range.');
+    });
 });
 
 requireElement(elements.historyQuery).addEventListener('input', scheduleHistorySearch);

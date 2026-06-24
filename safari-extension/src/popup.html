@@ -90,6 +90,8 @@
             <span class="muted">Latest tabs</span>
           </div>
         </div>
+        <p id="safari-bookmarks-upload-status" class="muted">Native Safari bookmark capability has not been checked yet.</p>
+        <p id="safari-history-upload-status" class="muted">Native Safari history capability has not been checked yet.</p>
       </section>
 
       <nav class="tabs" aria-label="Popup sections">
@@ -145,18 +147,63 @@
           Safari capabilities
         </h2>
         <div class="stack">
+          <p id="capability-current-tab" class="muted">Read current tab: Checking...</p>
+          <p id="capability-all-tabs" class="muted">Read open tabs: Checking...</p>
           <p class="muted">Send current tab: Available</p>
           <p class="muted">Receive tabs: Available</p>
           <p class="muted">Display BrowserBridge Bookmarks: Available</p>
           <p class="muted">Display BrowserBridge History: Available</p>
-          <p class="muted">Upload native Safari bookmarks: Not available in this version</p>
-          <p class="muted">Upload native Safari history: Not available in this version</p>
+          <p id="capability-bookmarks" class="muted">Native Safari bookmark reading: Checking...</p>
+          <p id="capability-history" class="muted">Native Safari history reading: Checking...</p>
+          <p id="capability-background" class="muted">Background polling: Checking...</p>
         </div>
-        <p class="privacy-note">Safari displays BrowserBridge data from your server. Native Safari bookmark/history upload is not available in this version. Refresh checks incoming tabs and reloads BrowserBridge data.</p>
+
+        <label class="row">
+          <span>Sync Safari bookmarks when available</span>
+          <input id="toggle-bookmarks" type="checkbox" />
+        </label>
+        <label class="row">
+          <span>Save Safari history or BrowserBridge Activity</span>
+          <input id="toggle-history" type="checkbox" />
+        </label>
+
+        <div id="history-settings-container" hidden>
+          <label class="row">
+            <span>History range</span>
+            <select id="history-sync-range">
+              <option value="24h">Last 24 hours</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="all">All available history</option>
+            </select>
+          </label>
+          <div id="history-range-warning" class="warning" hidden>
+            This may sync thousands of Safari history entries if native history access is available.
+          </div>
+        </div>
+
+        <p id="sync-source-status" class="privacy-note">Safari displays BrowserBridge data from your server. Sync checks Safari source capabilities first, then refreshes remote BrowserBridge data.</p>
         <h2>Refresh status</h2>
         <p id="refresh-summary" class="muted">Refresh BrowserBridge data from your server.</p>
+        <h2>Capability debug</h2>
+        <div id="capability-debug-list" class="list"></div>
         <button id="open-options" type="button" class="secondary">Options</button>
       </section>
     </main>
+
+    <div id="history-confirmation-modal" class="modal" hidden>
+      <section class="modal-content" role="dialog" aria-modal="true" aria-labelledby="history-confirmation-title">
+        <h2 id="history-confirmation-title">Enable Safari history or Activity sync?</h2>
+        <p class="muted">
+          If Safari allows native history access, BrowserBridge will store visited URLs and page titles on your server.
+          If Safari does not allow full history access, BrowserBridge Activity saves Safari pages you send/open through the extension.
+          BrowserBridge Activity is not the same as full Safari history.
+        </p>
+        <div class="actions">
+          <button id="cancel-history-enable" type="button" class="secondary">Cancel</button>
+          <button id="confirm-history-enable" type="button">Enable sync</button>
+        </div>
+      </section>
+    </div>
   </body>
 </html>

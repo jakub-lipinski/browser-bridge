@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  iOS (App)
 //
-//  Created by Jakub Lipiński on 24.06.2026.
+//  Created by Jakub Lipiński on 25.06.2026.
 //
 
 import UIKit

@@ -21,6 +21,7 @@ export type ExtensionConfig = {
   lastHistorySyncAt: string | null;
   historyConsentConfirmedAt: string | null;
   lastError: string | null;
+  runtimeCapabilities?: import('./browserAdapter').BrowserCapabilityAudit;
 };
 
 export type DeviceResource = {
@@ -29,7 +30,7 @@ export type DeviceResource = {
   name: string;
   browser: string;
   platform: string;
-  capabilities?: Record<string, boolean>;
+  capabilities?: Record<string, unknown>;
   last_seen_at: string | null;
 };
 

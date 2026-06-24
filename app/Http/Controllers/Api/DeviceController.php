@@ -17,7 +17,7 @@ class DeviceController extends Controller
     {
         $device = $syncService->registerDevice(
             $request->string('device_uuid')->trim()->toString() ?: null,
-            $request->safe()->only(['name', 'browser', 'platform']),
+            $request->safe()->only(['name', 'browser', 'platform', 'capabilities']),
         );
 
         return new DeviceResource($device);

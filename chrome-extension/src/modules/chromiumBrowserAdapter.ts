@@ -1,4 +1,4 @@
-import type { BrowserAdapter, HistoryBatchResult } from './browserAdapter';
+import type { BrowserAdapter, BrowserCapabilityAudit, BrowserCapabilityProbe, HistoryBatchResult } from './browserAdapter';
 import type { BookmarkSnapshotItem, HistoryBatchItem, TabSnapshotItem } from './types';
 import { isSyncableUrl } from './urlFilter';
 
@@ -248,6 +248,71 @@ export class ChromiumBrowserAdapter implements BrowserAdapter {
 
   supportsReliableBackgroundSync(): boolean {
     return true;
+  }
+
+  async getCapabilityAudit(): Promise<BrowserCapabilityAudit> {
+    const probes: BrowserCapabilityProbe[] = [];
+    const record = async (name: string, api: string, probe: () => Promise<boolean> | boolean): Promise<boolean> => {
+      try {
+        const success = await probe();
+        probes.push({ name, api, success });
+
+        return success;
+      } catch (error) {
+        probes.push({
+          name,
+          api,
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+
+        return false;
+      }
+    };
+
+    const canReadNativeBookmarks = await record('canReadNativeBookmarks', 'chrome.bookmarks.getTree', async () => {
+      await chrome.bookmarks.getTree();
+
+      return true;
+    });
+    const canWriteNativeBookmarks = await record('canWriteNativeBookmarks', 'chrome.bookmarks.create/update/removeTree', () => (
+      typeof chrome.bookmarks.create === 'function'
+      && typeof chrome.bookmarks.update === 'function'
+      && typeof chrome.bookmarks.removeTree === 'function'
+    ));
+    const canReadNativeHistory = await record('canReadNativeHistory', 'chrome.history.search', async () => {
+      await chrome.history.search({ text: '', startTime: Date.now() - 60_000, maxResults: 1 });
+
+      return true;
+    });
+    const canReadCurrentTab = await record('canReadCurrentTab', 'chrome.tabs.query(active)', async () => {
+      await chrome.tabs.query({ active: true, currentWindow: true });
+
+      return true;
+    });
+    const canReadAllTabs = await record('canReadAllTabs', 'chrome.tabs.query(all)', async () => {
+      await chrome.tabs.query({});
+
+      return true;
+    });
+    const canOpenTab = await record('canOpenTab', 'chrome.tabs.create', () => typeof chrome.tabs.create === 'function');
+    const canUseBackgroundPolling = await record('canUseBackgroundPolling', 'chrome.alarms.get', async () => {
+      await chrome.alarms.get('browserbridge.sync');
+
+      return true;
+    });
+
+    return {
+      canReadNativeBookmarks,
+      canWriteNativeBookmarks,
+      canReadNativeHistory,
+      canReadCurrentTab,
+      canReadAllTabs,
+      canOpenTab,
+      canUseBackgroundPolling,
+      historyMode: canReadNativeHistory ? 'native' : 'unavailable',
+      probes,
+    };
   }
 
   private mapTab(tab: chrome.tabs.Tab | undefined): TabSnapshotItem | null {

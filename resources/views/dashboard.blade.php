@@ -100,6 +100,7 @@
                                     <th>Device</th>
                                     <th>Browser</th>
                                     <th>Platform</th>
+                                    <th>Capabilities</th>
                                     <th>Last seen</th>
                                     <th>Latest tabs</th>
                                     <th>Bookmarks</th>
@@ -109,6 +110,10 @@
                             </thead>
                             <tbody>
                                 @foreach ($devices as $device)
+                                    @php
+                                        $capabilities = $device->capabilities();
+                                        $historyMode = $capabilities['history_mode'] ?? 'native';
+                                    @endphp
                                     <tr>
                                         <td>
                                             <div class="bb-item-title">{{ $device->name }}</div>
@@ -116,10 +121,41 @@
                                         </td>
                                         <td><span class="bb-badge">{{ $device->browser }}</span></td>
                                         <td><span class="bb-badge">{{ $device->platform }}</span></td>
+                                        <td>
+                                            <div class="bb-list">
+                                                <span class="bb-badge {{ $capabilities['bookmarks_read'] ? 'bb-badge-accent' : 'bb-badge-warning' }}">
+                                                    Bookmark upload: {{ $capabilities['bookmarks_read'] ? 'Available' : 'Not available' }}
+                                                </span>
+                                                <span class="bb-badge {{ $capabilities['history_read'] ? 'bb-badge-accent' : 'bb-badge-warning' }}">
+                                                    History upload:
+                                                    @if ($capabilities['history_read'])
+                                                        Available
+                                                    @elseif ($historyMode === 'activity')
+                                                        Activity only
+                                                    @else
+                                                        Not available
+                                                    @endif
+                                                </span>
+                                                <span class="bb-badge bb-badge-accent">Tab sending: Available</span>
+                                                <span class="bb-badge bb-badge-accent">Tab receiving: Available</span>
+                                            </div>
+                                        </td>
                                         <td>{{ $device->last_seen_at?->diffForHumans() ?? 'Never' }}</td>
                                         <td>{{ $device->latestTabSnapshot?->tab_count ?? 0 }}</td>
-                                        <td>{{ $device->normalized_bookmarks_count }}</td>
-                                        <td>{{ $device->history_items_count }}</td>
+                                        <td>
+                                            {{ $device->normalized_bookmarks_count }}
+                                            @if ($device->browser === 'safari' && ! $capabilities['bookmarks_read'])
+                                                <div class="bb-item-meta">Unsupported by Safari API</div>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ $device->history_items_count }}
+                                            @if ($device->browser === 'safari' && $historyMode === 'activity')
+                                                <div class="bb-item-meta">Activity only</div>
+                                            @elseif ($device->browser === 'safari' && ! $capabilities['history_read'])
+                                                <div class="bb-item-meta">Unsupported by Safari API</div>
+                                            @endif
+                                        </td>
                                         <td>{{ $device->pending_tab_commands_count }}</td>
                                     </tr>
                                 @endforeach

@@ -19,11 +19,15 @@ export async function connectDevice(config?: ExtensionConfig): Promise<Extension
   const platform = currentConfig.platform || detectPlatform();
   const deviceName = currentConfig.deviceName || defaultDeviceName();
   const browserName = getBrowserAdapter().getBrowserName();
+  const runtimeCapabilities = await getBrowserAdapter()
+    .getCapabilityAudit()
+    .catch(() => undefined);
   const device = await registerDevice({
     ...currentConfig,
     deviceName,
     browserName,
     platform,
+    runtimeCapabilities,
   });
 
   return updateConfig({
@@ -31,6 +35,7 @@ export async function connectDevice(config?: ExtensionConfig): Promise<Extension
     deviceName: device.name,
     browserName: device.browser,
     platform: device.platform,
+    runtimeCapabilities,
     lastError: null,
   });
 }

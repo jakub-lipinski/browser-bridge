@@ -77,13 +77,14 @@
         </div>
 
         <div class="warning">
-          Native Safari bookmark writing is not available in this Safari version. You can still view BrowserBridge bookmarks, search shared history, refresh server data, send tabs to Chrome, and receive tabs from Chrome.
+          BrowserBridge checks Safari bookmark and history APIs at runtime. If native history is unavailable, BrowserBridge Activity can save Safari pages you send/open through the extension after you opt in.
         </div>
 
         <div class="stack">
-          <p class="muted">Safe Folder Import: Not available for native Safari bookmarks</p>
-          <p class="muted">Merge: Not available for native Safari bookmarks</p>
-          <p class="muted">Mirror: Disabled for Safari</p>
+          <p class="muted">Native Safari bookmark reading: Runtime detected in the popup</p>
+          <p class="muted">Native Safari history reading: Runtime detected in the popup</p>
+          <p class="muted">BrowserBridge Activity: Available after opt-in when full Safari history is unavailable</p>
+          <p class="muted">Mirror: Disabled for Safari unless native bookmark writing is proven reliable</p>
         </div>
       </section>
     </main>

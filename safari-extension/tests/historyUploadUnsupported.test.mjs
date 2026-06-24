@@ -2,28 +2,37 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-test('Safari adapter does not advertise native history upload support', () => {
+test('Safari adapter probes native history and supports Activity fallback', () => {
   const source = readFileSync(new URL('../src/modules/safariBrowserAdapter.ts', import.meta.url), 'utf8');
 
-  assert.match(source, /supportsHistory\(\): boolean\s*{\s*return false;/);
+  assert.match(source, /canReadNativeHistory/);
+  assert.match(source, /history\.search/);
+  assert.match(source, /getActivitySince/);
+  assert.match(source, /historyMode: canReadNativeHistory \? 'native'/);
+  assert.match(source, /supportsHistory\(\): boolean\s*{\s*return true;/);
 });
 
-test('Safari refresh does not upload native history or bookmarks', () => {
+test('Safari sync uploads available source data before refreshing remote data', () => {
   const source = readFileSync(new URL('../src/background.ts', import.meta.url), 'utf8');
 
   assert.match(source, /browserbridge\.refreshNow/);
-  assert.doesNotMatch(source, /syncHistory/);
-  assert.doesNotMatch(source, /syncBookmarks/);
+  assert.match(source, /uploadSafariSources/);
+  assert.match(source, /syncBookmarks/);
+  assert.match(source, /syncHistory/);
+  assert.match(source, /BrowserBridge can still save Safari pages you send\/open through the extension/);
 });
 
-test('Safari popup labels server refresh and capability limitations clearly', () => {
+test('Safari popup labels runtime capabilities clearly', () => {
   const popup = readFileSync(new URL('../src/popup.html', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../src/popup.ts', import.meta.url), 'utf8');
 
   assert.match(popup, />Refresh<\/button>/);
-  assert.match(popup, /Display BrowserBridge Bookmarks: Available/);
-  assert.match(popup, /Display BrowserBridge History: Available/);
-  assert.match(popup, /Upload native Safari bookmarks: Not available in this version/);
-  assert.match(popup, /Upload native Safari history: Not available in this version/);
+  assert.match(popup, /Native Safari bookmark reading: Checking/);
+  assert.match(popup, /Native Safari history reading: Checking/);
+  assert.match(popup, /BrowserBridge Activity is not the same as full Safari history/);
+  assert.match(popup, /id="capability-debug-list"/);
+  assert.match(source, /syncButtonLabel/);
+  assert.match(source, /Safari sync complete/);
 });
 
 test('Safari popup prioritizes tab handoff before long data lists', () => {

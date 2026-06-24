@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Enums\TabCommandStatus;
 use App\Models\BookmarkSnapshot;
 use App\Models\Device;
-use App\Models\HistoryItem;
 use App\Models\NormalizedBookmark;
 use App\Models\TabCommand;
 use App\Models\TabSnapshot;
@@ -22,7 +21,7 @@ class BrowserSyncService
     public function __construct(private UrlSanitizer $urlSanitizer) {}
 
     /**
-     * @param  array{name: string, browser: string, platform: string}  $attributes
+     * @param  array{name: string, browser: string, platform: string, capabilities?: array<string, mixed>}  $attributes
      */
     public function registerDevice(?string $uuid, array $attributes): Device
     {
@@ -41,6 +40,7 @@ class BrowserSyncService
                 'name' => $attributes['name'],
                 'browser' => $attributes['browser'],
                 'platform' => $attributes['platform'],
+                'capabilities_json' => $attributes['capabilities'] ?? null,
                 'last_seen_at' => now(),
             ],
         );
@@ -184,6 +184,7 @@ class BrowserSyncService
                 if (! is_array($item)) {
                     $skipped++;
                     $skippedReasons['invalid_item'] = ($skippedReasons['invalid_item'] ?? 0) + 1;
+
                     continue;
                 }
 
@@ -209,6 +210,7 @@ class BrowserSyncService
                     }
 
                     $skippedReasons[$reason] = ($skippedReasons[$reason] ?? 0) + 1;
+
                     continue;
                 }
 
@@ -216,6 +218,7 @@ class BrowserSyncService
                     $skipped++;
                     $reason = $this->urlSanitizer->isBlockedInternalUrl($item['url']) ? 'internal_url' : 'invalid_url';
                     $skippedReasons[$reason] = ($skippedReasons[$reason] ?? 0) + 1;
+
                     continue;
                 }
 

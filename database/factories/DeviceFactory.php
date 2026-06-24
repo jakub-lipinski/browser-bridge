@@ -22,6 +22,7 @@ class DeviceFactory extends Factory
             'name' => fake()->words(2, true),
             'browser' => fake()->randomElement(['chrome', 'safari']),
             'platform' => fake()->randomElement(['macos', 'windows', 'ios']),
+            'capabilities_json' => null,
             'last_seen_at' => now(),
         ];
     }

@@ -4,8 +4,12 @@ import {
   fetchDevices,
   fetchTabSnapshots,
   searchHistory,
+  uploadTabSnapshot,
 } from '../../chrome-extension/src/modules/apiClient';
+import { getBrowserAdapter, type BrowserCapabilityAudit } from '../../chrome-extension/src/modules/browserAdapter';
+import { syncBookmarks } from '../../chrome-extension/src/modules/bookmarksSync';
 import { connectDevice } from '../../chrome-extension/src/modules/device';
+import { syncHistory } from '../../chrome-extension/src/modules/historySync';
 import { getConfig, isConfigured, updateConfig } from '../../chrome-extension/src/modules/storage';
 import { getCurrentTab } from '../../chrome-extension/src/modules/tabsSync';
 import {
@@ -23,6 +27,14 @@ import type {
   TabSnapshotItem,
   TabSnapshotResource,
 } from '../../chrome-extension/src/modules/types';
+import {
+  activityItemFromTab,
+  activityItemFromUrl,
+  SAFARI_ACTIVITY_STORAGE_KEY,
+  uniqueRecentActivity,
+  type SafariActivityItem,
+  type SafariActivitySource,
+} from './modules/safariActivity';
 
 const SYNC_ALARM_NAME = 'browserbridge.sync';
 const SYNC_INTERVAL_MINUTES = 1;
@@ -41,13 +53,19 @@ type SafariLoadErrors = Partial<Record<SafariLoadErrorKey, string>>;
 
 type SafariRefreshSummary = {
   refreshedAt: string;
+  bookmarksUploaded?: number;
+  bookmarksUploadUnavailable?: string;
+  historyUploaded?: number;
+  historyUploadMode?: 'native' | 'activity' | 'unavailable';
+  historyUploadUnavailable?: string;
+  tabsUploaded?: number;
   devices?: number;
   incomingCommands?: number;
-  bookmarks?: number;
-  historyItems?: number;
-  tabSnapshots?: number;
+  remoteBookmarks?: number;
+  remoteHistoryItems?: number;
+  remoteTabSnapshots?: number;
   errors: SafariLoadErrors;
-  unsupportedMessage: string;
+  unsupportedMessages: string[];
 };
 
 type SafariStatus = {
@@ -60,18 +78,16 @@ type SafariStatus = {
   historyItems: HistoryItemResource[];
   tabSnapshots: TabSnapshotResource[];
   loadErrors: SafariLoadErrors;
+  capabilityAudit: BrowserCapabilityAudit;
   refreshSummary?: SafariRefreshSummary;
 };
 
-const SAFARI_UNSUPPORTED_MESSAGE = 'Safari currently displays BrowserBridge data from your server. Native Safari bookmark/history upload is not implemented in this version.';
+const SAFARI_BOOKMARKS_UNAVAILABLE = 'Native Safari bookmark reading is not available in this Safari version.';
+const SAFARI_HISTORY_UNAVAILABLE = 'Full native Safari history upload is not available in this Safari version. BrowserBridge can still save Safari pages you send/open through the extension.';
 
 async function ensureRegistered(config: ExtensionConfig): Promise<ExtensionConfig> {
   if (!config.apiUrl || !config.apiToken) {
     throw new Error('BrowserBridge is not configured.');
-  }
-
-  if (config.deviceUuid) {
-    return config;
   }
 
   return connectDevice(config);
@@ -104,6 +120,7 @@ async function loadSection<T>(
 
 async function refreshOnce(): Promise<SafariStatus> {
   let config = await getConfig();
+  const capabilityAudit = await getBrowserAdapter().getCapabilityAudit();
 
   if (!config.apiUrl || !config.apiToken) {
     return {
@@ -116,10 +133,12 @@ async function refreshOnce(): Promise<SafariStatus> {
       historyItems: [],
       tabSnapshots: [],
       loadErrors: {},
+      capabilityAudit,
     };
   }
 
   config = await ensureRegistered(config);
+  const syncResult = await uploadSafariSources(config, capabilityAudit);
 
   const loadErrors: SafariLoadErrors = {};
   const [devices, incomingCommands, currentTab, bookmarks, historyItems, tabSnapshots] = await Promise.all([
@@ -134,13 +153,22 @@ async function refreshOnce(): Promise<SafariStatus> {
   const refreshedAt = new Date().toISOString();
   const summary: SafariRefreshSummary = {
     refreshedAt,
+    bookmarksUploaded: syncResult.bookmarksUploaded,
+    bookmarksUploadUnavailable: syncResult.bookmarksUploadUnavailable,
+    historyUploaded: syncResult.historyUploaded,
+    historyUploadMode: syncResult.historyUploadMode,
+    historyUploadUnavailable: syncResult.historyUploadUnavailable,
+    tabsUploaded: syncResult.tabsUploaded,
     devices: loadErrors.devices ? undefined : devices.length,
     incomingCommands: loadErrors.incomingCommands ? undefined : incomingCommands.length,
-    bookmarks: loadErrors.bookmarks ? undefined : bookmarks.length,
-    historyItems: loadErrors.historyItems ? undefined : historyItems.length,
-    tabSnapshots: loadErrors.tabSnapshots ? undefined : tabSnapshots.length,
+    remoteBookmarks: loadErrors.bookmarks ? undefined : bookmarks.length,
+    remoteHistoryItems: loadErrors.historyItems ? undefined : historyItems.length,
+    remoteTabSnapshots: loadErrors.tabSnapshots ? undefined : tabSnapshots.length,
     errors: loadErrors,
-    unsupportedMessage: SAFARI_UNSUPPORTED_MESSAGE,
+    unsupportedMessages: [
+      ...(syncResult.bookmarksUploadUnavailable ? [syncResult.bookmarksUploadUnavailable] : []),
+      ...(syncResult.historyUploadUnavailable ? [syncResult.historyUploadUnavailable] : []),
+    ],
   };
 
   await updateConfig({
@@ -160,8 +188,59 @@ async function refreshOnce(): Promise<SafariStatus> {
     historyItems,
     tabSnapshots,
     loadErrors,
+    capabilityAudit,
     refreshSummary: summary,
   };
+}
+
+type SafariSourceSyncResult = {
+  bookmarksUploaded?: number;
+  bookmarksUploadUnavailable?: string;
+  historyUploaded?: number;
+  historyUploadMode?: 'native' | 'activity' | 'unavailable';
+  historyUploadUnavailable?: string;
+  tabsUploaded?: number;
+};
+
+async function uploadSafariSources(config: ExtensionConfig, capabilityAudit: BrowserCapabilityAudit): Promise<SafariSourceSyncResult> {
+  const result: SafariSourceSyncResult = {
+    historyUploadMode: capabilityAudit.historyMode,
+  };
+
+  if (config.sync.bookmarks && capabilityAudit.canReadNativeBookmarks) {
+    result.bookmarksUploaded = await syncBookmarks(config);
+  } else if (config.sync.bookmarks) {
+    result.bookmarksUploadUnavailable = SAFARI_BOOKMARKS_UNAVAILABLE;
+  }
+
+  const currentTab = capabilityAudit.canReadCurrentTab ? await getCurrentTab() : null;
+
+  if (config.sync.history && capabilityAudit.historyMode === 'activity' && currentTab) {
+    await recordSafariActivity(currentTab, 'manual_sync_current_tab');
+  }
+
+  if (config.sync.history) {
+    if (capabilityAudit.canReadNativeHistory || capabilityAudit.historyMode === 'activity') {
+      const historyResult = await syncHistory(config);
+      result.historyUploaded = historyResult.count;
+    } else {
+      result.historyUploadUnavailable = SAFARI_HISTORY_UNAVAILABLE;
+      result.historyUploadMode = 'unavailable';
+    }
+  } else if (!capabilityAudit.canReadNativeHistory) {
+    result.historyUploadUnavailable = SAFARI_HISTORY_UNAVAILABLE;
+  }
+
+  if (capabilityAudit.canReadAllTabs) {
+    const tabs = await getBrowserAdapter().getAllTabs();
+    await uploadTabSnapshot(config, tabs);
+    result.tabsUploaded = tabs.length;
+  } else if (currentTab) {
+    await uploadTabSnapshot(config, [currentTab]);
+    result.tabsUploaded = 1;
+  }
+
+  return result;
 }
 
 async function captureError(error: unknown): Promise<void> {
@@ -172,6 +251,7 @@ async function captureError(error: unknown): Promise<void> {
 
 async function getStatus() {
   const config = await getConfig();
+  const capabilityAudit = await getBrowserAdapter().getCapabilityAudit();
 
   if (!isConfigured(config)) {
     return {
@@ -184,6 +264,7 @@ async function getStatus() {
       historyItems: [],
       tabSnapshots: [],
       loadErrors: {},
+      capabilityAudit,
     };
   }
 
@@ -207,6 +288,7 @@ async function getStatus() {
     historyItems,
     tabSnapshots,
     loadErrors,
+    capabilityAudit,
   };
 }
 
@@ -248,6 +330,10 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
     if (message.type === 'browserbridge.openCommand') {
       await openIncomingCommand(config, message.command);
 
+      if (config.sync.history) {
+        await recordSafariActivityFromUrl(message.command.url, message.command.title, 'opened_incoming_tab');
+      }
+
       return getStatus();
     }
 
@@ -265,6 +351,10 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
       }
 
       await sendCurrentTabToDevice(config, message.targetDeviceUuid, currentTab);
+
+      if (config.sync.history) {
+        await recordSafariActivity(currentTab, 'sent_tab');
+      }
 
       return getStatus();
     }
@@ -284,3 +374,30 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
 
   return true;
 });
+
+async function recordSafariActivity(tab: TabSnapshotItem | null, source: SafariActivitySource): Promise<void> {
+  const item = activityItemFromTab(tab, source);
+
+  if (!item) {
+    return;
+  }
+
+  await storeSafariActivity(item);
+}
+
+async function recordSafariActivityFromUrl(url: string | null | undefined, title: string | null | undefined, source: SafariActivitySource): Promise<void> {
+  const item = activityItemFromUrl(url, title, source);
+
+  if (!item) {
+    return;
+  }
+
+  await storeSafariActivity(item);
+}
+
+async function storeSafariActivity(item: SafariActivityItem): Promise<void> {
+  const adapter = getBrowserAdapter();
+  const existing = await adapter.getStorage<SafariActivityItem[]>(SAFARI_ACTIVITY_STORAGE_KEY) || [];
+
+  await adapter.setStorage(SAFARI_ACTIVITY_STORAGE_KEY, uniqueRecentActivity([item, ...existing]));
+}

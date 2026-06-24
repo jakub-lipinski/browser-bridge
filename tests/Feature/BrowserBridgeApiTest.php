@@ -89,6 +89,41 @@ it('requires a registered device UUID when listing devices', function (): void {
         ->assertJsonValidationErrors('device_uuid');
 });
 
+it('stores runtime Safari capability audits for dashboard badges', function (): void {
+    $deviceUuid = fake()->uuid();
+
+    $this->postJson('/api/device/register', [
+        'device_uuid' => $deviceUuid,
+        'name' => 'Safari Mac',
+        'browser' => 'safari',
+        'platform' => 'macos',
+        'capabilities' => [
+            'canReadNativeBookmarks' => true,
+            'canWriteNativeBookmarks' => false,
+            'canReadNativeHistory' => false,
+            'canReadCurrentTab' => true,
+            'canReadAllTabs' => true,
+            'canOpenTab' => true,
+            'canUseBackgroundPolling' => true,
+            'historyMode' => 'activity',
+            'probes' => [
+                ['name' => 'canReadNativeHistory', 'api' => 'browser.history.search', 'success' => false, 'error' => 'Permission denied'],
+            ],
+        ],
+    ], browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.capabilities.bookmarks_read', true)
+        ->assertJsonPath('data.capabilities.history_read', false)
+        ->assertJsonPath('data.capabilities.history_mode', 'activity')
+        ->assertJsonPath('data.capabilities.reliable_background_sync', true);
+
+    $this->get('/dashboard')
+        ->assertSuccessful()
+        ->assertSee('Bookmark upload: Available')
+        ->assertSee('History upload:')
+        ->assertSee('Activity only');
+});
+
 it('enforces the registered device limit', function (): void {
     config(['browserbridge.max_devices' => 1]);
 

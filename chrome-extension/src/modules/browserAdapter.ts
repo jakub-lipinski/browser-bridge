@@ -6,6 +6,25 @@ export type HistoryBatchResult = {
   skippedReasons: Record<string, number>;
 };
 
+export type BrowserCapabilityProbe = {
+  name: string;
+  api: string;
+  success: boolean;
+  error?: string;
+};
+
+export type BrowserCapabilityAudit = {
+  canReadNativeBookmarks: boolean;
+  canWriteNativeBookmarks: boolean;
+  canReadNativeHistory: boolean;
+  canReadCurrentTab: boolean;
+  canReadAllTabs: boolean;
+  canOpenTab: boolean;
+  canUseBackgroundPolling: boolean;
+  historyMode: 'native' | 'activity' | 'unavailable';
+  probes: BrowserCapabilityProbe[];
+};
+
 export type BrowserAdapter = {
   getBrowserName(): 'chrome' | 'safari';
   getPlatform(): 'windows' | 'macos' | 'ios';
@@ -28,6 +47,7 @@ export type BrowserAdapter = {
   supportsHistory(): boolean;
   supportsNativeBookmarkWrite(): boolean;
   supportsReliableBackgroundSync(): boolean;
+  getCapabilityAudit(): Promise<BrowserCapabilityAudit>;
 };
 
 let activeAdapter: BrowserAdapter | null = null;

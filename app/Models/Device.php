@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['uuid', 'name', 'browser', 'platform', 'last_seen_at'])]
+#[Fillable(['uuid', 'name', 'browser', 'platform', 'capabilities_json', 'last_seen_at'])]
 class Device extends Model
 {
     /** @use HasFactory<DeviceFactory> */
@@ -71,11 +71,11 @@ class Device extends Model
     }
 
     /**
-     * @return array<string, bool>
+     * @return array<string, mixed>
      */
     public function capabilities(): array
     {
-        return match ($this->browser) {
+        $defaults = match ($this->browser) {
             'chrome' => [
                 'bookmarks_read' => true,
                 'history_read' => true,
@@ -101,6 +101,24 @@ class Device extends Model
                 'reliable_background_sync' => false,
             ],
         };
+
+        $runtime = $this->capabilities_json ?? [];
+
+        if ($runtime === []) {
+            return $defaults;
+        }
+
+        return [
+            ...$defaults,
+            'bookmarks_read' => (bool) data_get($runtime, 'canReadNativeBookmarks', $defaults['bookmarks_read']),
+            'history_read' => (bool) data_get($runtime, 'canReadNativeHistory', $defaults['history_read']),
+            'tabs_read' => (bool) data_get($runtime, 'canReadAllTabs', data_get($runtime, 'canReadCurrentTab', $defaults['tabs_read'])),
+            'tab_commands' => (bool) data_get($runtime, 'canOpenTab', $defaults['tab_commands']),
+            'native_bookmark_write' => (bool) data_get($runtime, 'canWriteNativeBookmarks', $defaults['native_bookmark_write']),
+            'reliable_background_sync' => (bool) data_get($runtime, 'canUseBackgroundPolling', $defaults['reliable_background_sync']),
+            'history_mode' => data_get($runtime, 'historyMode', data_get($runtime, 'history_mode', 'native')),
+            'capability_probes' => data_get($runtime, 'probes', []),
+        ];
     }
 
     /**
@@ -109,6 +127,7 @@ class Device extends Model
     protected function casts(): array
     {
         return [
+            'capabilities_json' => 'array',
             'last_seen_at' => 'datetime',
         ];
     }

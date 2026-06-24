@@ -102,6 +102,7 @@ export async function registerDevice(config: ExtensionConfig): Promise<DeviceRes
       name: config.deviceName,
       browser: config.browserName || 'Chrome',
       platform: config.platform,
+      ...(config.runtimeCapabilities ? { capabilities: config.runtimeCapabilities } : {}),
     },
   });
 

@@ -7,74 +7,74 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3BE01BE72FEC85CD00623DBA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BE62FEC85CD00623DBA /* AppDelegate.swift */; };
-		3BE01BE92FEC85CD00623DBA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BE82FEC85CD00623DBA /* SceneDelegate.swift */; };
-		3BE01BEC2FEC85CD00623DBA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BEA2FEC85CD00623DBA /* LaunchScreen.storyboard */; };
-		3BE01BEF2FEC85CD00623DBA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BED2FEC85CD00623DBA /* Main.storyboard */; };
-		3BE01BF82FEC85CD00623DBA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BF72FEC85CD00623DBA /* AppDelegate.swift */; };
-		3BE01BFB2FEC85CD00623DBA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BF92FEC85CD00623DBA /* Main.storyboard */; };
-		3BE01C022FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		3BE01C0C2FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		3BE01C112FEC85CD00623DBA /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD62FEC85CB00623DBA /* Main.html */; };
-		3BE01C122FEC85CD00623DBA /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD62FEC85CB00623DBA /* Main.html */; };
-		3BE01C132FEC85CD00623DBA /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD82FEC85CB00623DBA /* Icon.png */; };
-		3BE01C142FEC85CD00623DBA /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD82FEC85CB00623DBA /* Icon.png */; };
-		3BE01C152FEC85CD00623DBA /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD92FEC85CB00623DBA /* Style.css */; };
-		3BE01C162FEC85CD00623DBA /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BD92FEC85CB00623DBA /* Style.css */; };
-		3BE01C172FEC85CD00623DBA /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDA2FEC85CB00623DBA /* Script.js */; };
-		3BE01C182FEC85CD00623DBA /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDA2FEC85CB00623DBA /* Script.js */; };
-		3BE01C192FEC85CD00623DBA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDB2FEC85CB00623DBA /* ViewController.swift */; };
-		3BE01C1A2FEC85CD00623DBA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDB2FEC85CB00623DBA /* ViewController.swift */; };
-		3BE01C1B2FEC85CD00623DBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */; };
-		3BE01C1C2FEC85CD00623DBA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */; };
-		3BE01C1D2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */; };
-		3BE01C1E2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */; };
-		3BE01C342FEC85CE00623DBA /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C302FEC85CE00623DBA /* popup.html */; };
-		3BE01C352FEC85CE00623DBA /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C312FEC85CE00623DBA /* manifest.json */; };
-		3BE01C362FEC85CE00623DBA /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C322FEC85CE00623DBA /* options.html */; };
-		3BE01C372FEC85CE00623DBA /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C332FEC85CE00623DBA /* assets */; };
-		3BE01C382FEC85CE00623DBA /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C302FEC85CE00623DBA /* popup.html */; };
-		3BE01C392FEC85CE00623DBA /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C312FEC85CE00623DBA /* manifest.json */; };
-		3BE01C3A2FEC85CE00623DBA /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C322FEC85CE00623DBA /* options.html */; };
-		3BE01C3B2FEC85CE00623DBA /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 3BE01C332FEC85CE00623DBA /* assets */; };
+		3B11FAF22FECA41500E021F0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B11FAF12FECA41500E021F0 /* AppDelegate.swift */; };
+		3B11FAF42FECA41500E021F0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B11FAF32FECA41500E021F0 /* SceneDelegate.swift */; };
+		3B11FAF72FECA41500E021F0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAF52FECA41500E021F0 /* LaunchScreen.storyboard */; };
+		3B11FAFA2FECA41500E021F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAF82FECA41500E021F0 /* Main.storyboard */; };
+		3B11FB032FECA41500E021F0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B11FB022FECA41500E021F0 /* AppDelegate.swift */; };
+		3B11FB062FECA41500E021F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB042FECA41500E021F0 /* Main.storyboard */; };
+		3B11FB0D2FECA41500E021F0 /* BrowserBridge Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3B11FB0C2FECA41500E021F0 /* BrowserBridge Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3B11FB172FECA41500E021F0 /* BrowserBridge Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3B11FB162FECA41500E021F0 /* BrowserBridge Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3B11FB1C2FECA41500E021F0 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE12FECA41200E021F0 /* Main.html */; };
+		3B11FB1D2FECA41500E021F0 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE12FECA41200E021F0 /* Main.html */; };
+		3B11FB1E2FECA41500E021F0 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE32FECA41200E021F0 /* Icon.png */; };
+		3B11FB1F2FECA41500E021F0 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE32FECA41200E021F0 /* Icon.png */; };
+		3B11FB202FECA41500E021F0 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE42FECA41200E021F0 /* Style.css */; };
+		3B11FB212FECA41500E021F0 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE42FECA41200E021F0 /* Style.css */; };
+		3B11FB222FECA41500E021F0 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE52FECA41200E021F0 /* Script.js */; };
+		3B11FB232FECA41500E021F0 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE52FECA41200E021F0 /* Script.js */; };
+		3B11FB242FECA41500E021F0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B11FAE62FECA41200E021F0 /* ViewController.swift */; };
+		3B11FB252FECA41500E021F0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B11FAE62FECA41200E021F0 /* ViewController.swift */; };
+		3B11FB262FECA41500E021F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE72FECA41400E021F0 /* Assets.xcassets */; };
+		3B11FB272FECA41500E021F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FAE72FECA41400E021F0 /* Assets.xcassets */; };
+		3B11FB282FECA41500E021F0 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B11FAE92FECA41400E021F0 /* SafariWebExtensionHandler.swift */; };
+		3B11FB292FECA41500E021F0 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B11FAE92FECA41400E021F0 /* SafariWebExtensionHandler.swift */; };
+		3B11FB3F2FECA41600E021F0 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3B2FECA41600E021F0 /* popup.html */; };
+		3B11FB402FECA41600E021F0 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3C2FECA41600E021F0 /* manifest.json */; };
+		3B11FB412FECA41600E021F0 /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3D2FECA41600E021F0 /* options.html */; };
+		3B11FB422FECA41600E021F0 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3E2FECA41600E021F0 /* assets */; };
+		3B11FB432FECA41600E021F0 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3B2FECA41600E021F0 /* popup.html */; };
+		3B11FB442FECA41600E021F0 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3C2FECA41600E021F0 /* manifest.json */; };
+		3B11FB452FECA41600E021F0 /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3D2FECA41600E021F0 /* options.html */; };
+		3B11FB462FECA41600E021F0 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 3B11FB3E2FECA41600E021F0 /* assets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3BE01C032FEC85CD00623DBA /* PBXContainerItemProxy */ = {
+		3B11FB0E2FECA41500E021F0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3BE01BD02FEC85CB00623DBA /* Project object */;
+			containerPortal = 3B11FADB2FECA41100E021F0 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3BE01C002FEC85CD00623DBA;
+			remoteGlobalIDString = 3B11FB0B2FECA41500E021F0;
 			remoteInfo = "BrowserBridge Extension (iOS)";
 		};
-		3BE01C0D2FEC85CD00623DBA /* PBXContainerItemProxy */ = {
+		3B11FB182FECA41500E021F0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3BE01BD02FEC85CB00623DBA /* Project object */;
+			containerPortal = 3B11FADB2FECA41100E021F0 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3BE01C0A2FEC85CD00623DBA;
+			remoteGlobalIDString = 3B11FB152FECA41500E021F0;
 			remoteInfo = "BrowserBridge Extension (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3BE01C242FEC85CD00623DBA /* Embed Foundation Extensions */ = {
+		3B11FB2F2FECA41500E021F0 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				3BE01C022FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */,
+				3B11FB0D2FECA41500E021F0 /* BrowserBridge Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01C2B2FEC85CD00623DBA /* Embed Foundation Extensions */ = {
+		3B11FB362FECA41500E021F0 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				3BE01C0C2FEC85CD00623DBA /* BrowserBridge Extension.appex in Embed Foundation Extensions */,
+				3B11FB172FECA41500E021F0 /* BrowserBridge Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,56 +82,56 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3BE01BD72FEC85CB00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
-		3BE01BD82FEC85CB00623DBA /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		3BE01BD92FEC85CB00623DBA /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
-		3BE01BDA2FEC85CB00623DBA /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
-		3BE01BDB2FEC85CB00623DBA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		3BE01BE32FEC85CD00623DBA /* BrowserBridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserBridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BE01BE62FEC85CD00623DBA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		3BE01BE82FEC85CD00623DBA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		3BE01BEB2FEC85CD00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		3BE01BEE2FEC85CD00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		3BE01BF02FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3BE01BF52FEC85CD00623DBA /* BrowserBridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserBridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BE01BF72FEC85CD00623DBA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		3BE01BFA2FEC85CD00623DBA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		3BE01BFC2FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "BrowserBridge Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BE01C062FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "BrowserBridge Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BE01C102FEC85CD00623DBA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3BE01C302FEC85CE00623DBA /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist/popup.html; sourceTree = "<group>"; };
-		3BE01C312FEC85CE00623DBA /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist/manifest.json; sourceTree = "<group>"; };
-		3BE01C322FEC85CE00623DBA /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = ../../../dist/options.html; sourceTree = "<group>"; };
-		3BE01C332FEC85CE00623DBA /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../../dist/assets; sourceTree = "<group>"; };
+		3B11FAE22FECA41200E021F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		3B11FAE32FECA41200E021F0 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		3B11FAE42FECA41200E021F0 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		3B11FAE52FECA41200E021F0 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		3B11FAE62FECA41200E021F0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		3B11FAE72FECA41400E021F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3B11FAE92FECA41400E021F0 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		3B11FAEE2FECA41500E021F0 /* BrowserBridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserBridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B11FAF12FECA41500E021F0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3B11FAF32FECA41500E021F0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		3B11FAF62FECA41500E021F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3B11FAF92FECA41500E021F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3B11FAFB2FECA41500E021F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3B11FB002FECA41500E021F0 /* BrowserBridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrowserBridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B11FB022FECA41500E021F0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3B11FB052FECA41500E021F0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3B11FB072FECA41500E021F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3B11FB0C2FECA41500E021F0 /* BrowserBridge Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "BrowserBridge Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B11FB112FECA41500E021F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3B11FB162FECA41500E021F0 /* BrowserBridge Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "BrowserBridge Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B11FB1B2FECA41500E021F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3B11FB3B2FECA41600E021F0 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist/popup.html; sourceTree = "<group>"; };
+		3B11FB3C2FECA41600E021F0 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist/manifest.json; sourceTree = "<group>"; };
+		3B11FB3D2FECA41600E021F0 /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = ../../../dist/options.html; sourceTree = "<group>"; };
+		3B11FB3E2FECA41600E021F0 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../../dist/assets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3BE01BE02FEC85CD00623DBA /* Frameworks */ = {
+		3B11FAEB2FECA41400E021F0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01BF22FEC85CD00623DBA /* Frameworks */ = {
+		3B11FAFD2FECA41500E021F0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01BFE2FEC85CD00623DBA /* Frameworks */ = {
+		3B11FB092FECA41500E021F0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01C082FEC85CD00623DBA /* Frameworks */ = {
+		3B11FB132FECA41500E021F0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -141,105 +141,105 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3BE01BCF2FEC85CB00623DBA = {
+		3B11FADA2FECA41100E021F0 = {
 			isa = PBXGroup;
 			children = (
-				3BE01BD42FEC85CB00623DBA /* Shared (App) */,
-				3BE01BDD2FEC85CD00623DBA /* Shared (Extension) */,
-				3BE01BE52FEC85CD00623DBA /* iOS (App) */,
-				3BE01BF62FEC85CD00623DBA /* macOS (App) */,
-				3BE01C052FEC85CD00623DBA /* iOS (Extension) */,
-				3BE01C0F2FEC85CD00623DBA /* macOS (Extension) */,
-				3BE01BE42FEC85CD00623DBA /* Products */,
+				3B11FADF2FECA41200E021F0 /* Shared (App) */,
+				3B11FAE82FECA41400E021F0 /* Shared (Extension) */,
+				3B11FAF02FECA41500E021F0 /* iOS (App) */,
+				3B11FB012FECA41500E021F0 /* macOS (App) */,
+				3B11FB102FECA41500E021F0 /* iOS (Extension) */,
+				3B11FB1A2FECA41500E021F0 /* macOS (Extension) */,
+				3B11FAEF2FECA41500E021F0 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		3BE01BD42FEC85CB00623DBA /* Shared (App) */ = {
+		3B11FADF2FECA41200E021F0 /* Shared (App) */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01BDB2FEC85CB00623DBA /* ViewController.swift */,
-				3BE01BDC2FEC85CD00623DBA /* Assets.xcassets */,
-				3BE01BD52FEC85CB00623DBA /* Resources */,
+				3B11FAE62FECA41200E021F0 /* ViewController.swift */,
+				3B11FAE72FECA41400E021F0 /* Assets.xcassets */,
+				3B11FAE02FECA41200E021F0 /* Resources */,
 			);
 			path = "Shared (App)";
 			sourceTree = "<group>";
 		};
-		3BE01BD52FEC85CB00623DBA /* Resources */ = {
+		3B11FAE02FECA41200E021F0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01BD62FEC85CB00623DBA /* Main.html */,
-				3BE01BD82FEC85CB00623DBA /* Icon.png */,
-				3BE01BD92FEC85CB00623DBA /* Style.css */,
-				3BE01BDA2FEC85CB00623DBA /* Script.js */,
+				3B11FAE12FECA41200E021F0 /* Main.html */,
+				3B11FAE32FECA41200E021F0 /* Icon.png */,
+				3B11FAE42FECA41200E021F0 /* Style.css */,
+				3B11FAE52FECA41200E021F0 /* Script.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		3BE01BDD2FEC85CD00623DBA /* Shared (Extension) */ = {
+		3B11FAE82FECA41400E021F0 /* Shared (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01C2F2FEC85CE00623DBA /* Resources */,
-				3BE01BDE2FEC85CD00623DBA /* SafariWebExtensionHandler.swift */,
+				3B11FB3A2FECA41600E021F0 /* Resources */,
+				3B11FAE92FECA41400E021F0 /* SafariWebExtensionHandler.swift */,
 			);
 			path = "Shared (Extension)";
 			sourceTree = "<group>";
 		};
-		3BE01BE42FEC85CD00623DBA /* Products */ = {
+		3B11FAEF2FECA41500E021F0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01BE32FEC85CD00623DBA /* BrowserBridge.app */,
-				3BE01BF52FEC85CD00623DBA /* BrowserBridge.app */,
-				3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */,
-				3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */,
+				3B11FAEE2FECA41500E021F0 /* BrowserBridge.app */,
+				3B11FB002FECA41500E021F0 /* BrowserBridge.app */,
+				3B11FB0C2FECA41500E021F0 /* BrowserBridge Extension.appex */,
+				3B11FB162FECA41500E021F0 /* BrowserBridge Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3BE01BE52FEC85CD00623DBA /* iOS (App) */ = {
+		3B11FAF02FECA41500E021F0 /* iOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01BE62FEC85CD00623DBA /* AppDelegate.swift */,
-				3BE01BE82FEC85CD00623DBA /* SceneDelegate.swift */,
-				3BE01BEA2FEC85CD00623DBA /* LaunchScreen.storyboard */,
-				3BE01BED2FEC85CD00623DBA /* Main.storyboard */,
-				3BE01BF02FEC85CD00623DBA /* Info.plist */,
+				3B11FAF12FECA41500E021F0 /* AppDelegate.swift */,
+				3B11FAF32FECA41500E021F0 /* SceneDelegate.swift */,
+				3B11FAF52FECA41500E021F0 /* LaunchScreen.storyboard */,
+				3B11FAF82FECA41500E021F0 /* Main.storyboard */,
+				3B11FAFB2FECA41500E021F0 /* Info.plist */,
 			);
 			path = "iOS (App)";
 			sourceTree = "<group>";
 		};
-		3BE01BF62FEC85CD00623DBA /* macOS (App) */ = {
+		3B11FB012FECA41500E021F0 /* macOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01BF72FEC85CD00623DBA /* AppDelegate.swift */,
-				3BE01BF92FEC85CD00623DBA /* Main.storyboard */,
-				3BE01BFC2FEC85CD00623DBA /* Info.plist */,
+				3B11FB022FECA41500E021F0 /* AppDelegate.swift */,
+				3B11FB042FECA41500E021F0 /* Main.storyboard */,
+				3B11FB072FECA41500E021F0 /* Info.plist */,
 			);
 			path = "macOS (App)";
 			sourceTree = "<group>";
 		};
-		3BE01C052FEC85CD00623DBA /* iOS (Extension) */ = {
+		3B11FB102FECA41500E021F0 /* iOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01C062FEC85CD00623DBA /* Info.plist */,
+				3B11FB112FECA41500E021F0 /* Info.plist */,
 			);
 			path = "iOS (Extension)";
 			sourceTree = "<group>";
 		};
-		3BE01C0F2FEC85CD00623DBA /* macOS (Extension) */ = {
+		3B11FB1A2FECA41500E021F0 /* macOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01C102FEC85CD00623DBA /* Info.plist */,
+				3B11FB1B2FECA41500E021F0 /* Info.plist */,
 			);
 			path = "macOS (Extension)";
 			sourceTree = "<group>";
 		};
-		3BE01C2F2FEC85CE00623DBA /* Resources */ = {
+		3B11FB3A2FECA41600E021F0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				3BE01C302FEC85CE00623DBA /* popup.html */,
-				3BE01C312FEC85CE00623DBA /* manifest.json */,
-				3BE01C322FEC85CE00623DBA /* options.html */,
-				3BE01C332FEC85CE00623DBA /* assets */,
+				3B11FB3B2FECA41600E021F0 /* popup.html */,
+				3B11FB3C2FECA41600E021F0 /* manifest.json */,
+				3B11FB3D2FECA41600E021F0 /* options.html */,
+				3B11FB3E2FECA41600E021F0 /* assets */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -248,55 +248,55 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3BE01BE22FEC85CD00623DBA /* BrowserBridge (iOS) */ = {
+		3B11FAED2FECA41400E021F0 /* BrowserBridge (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3BE01C252FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (iOS)" */;
+			buildConfigurationList = 3B11FB302FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge (iOS)" */;
 			buildPhases = (
-				3BE01BDF2FEC85CD00623DBA /* Sources */,
-				3BE01BE02FEC85CD00623DBA /* Frameworks */,
-				3BE01BE12FEC85CD00623DBA /* Resources */,
-				3BE01C242FEC85CD00623DBA /* Embed Foundation Extensions */,
+				3B11FAEA2FECA41400E021F0 /* Sources */,
+				3B11FAEB2FECA41400E021F0 /* Frameworks */,
+				3B11FAEC2FECA41400E021F0 /* Resources */,
+				3B11FB2F2FECA41500E021F0 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				3BE01C042FEC85CD00623DBA /* PBXTargetDependency */,
+				3B11FB0F2FECA41500E021F0 /* PBXTargetDependency */,
 			);
 			name = "BrowserBridge (iOS)";
 			packageProductDependencies = (
 			);
 			productName = "BrowserBridge (iOS)";
-			productReference = 3BE01BE32FEC85CD00623DBA /* BrowserBridge.app */;
+			productReference = 3B11FAEE2FECA41500E021F0 /* BrowserBridge.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3BE01BF42FEC85CD00623DBA /* BrowserBridge (macOS) */ = {
+		3B11FAFF2FECA41500E021F0 /* BrowserBridge (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3BE01C2C2FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (macOS)" */;
+			buildConfigurationList = 3B11FB372FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge (macOS)" */;
 			buildPhases = (
-				3BE01BF12FEC85CD00623DBA /* Sources */,
-				3BE01BF22FEC85CD00623DBA /* Frameworks */,
-				3BE01BF32FEC85CD00623DBA /* Resources */,
-				3BE01C2B2FEC85CD00623DBA /* Embed Foundation Extensions */,
+				3B11FAFC2FECA41500E021F0 /* Sources */,
+				3B11FAFD2FECA41500E021F0 /* Frameworks */,
+				3B11FAFE2FECA41500E021F0 /* Resources */,
+				3B11FB362FECA41500E021F0 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				3BE01C0E2FEC85CD00623DBA /* PBXTargetDependency */,
+				3B11FB192FECA41500E021F0 /* PBXTargetDependency */,
 			);
 			name = "BrowserBridge (macOS)";
 			packageProductDependencies = (
 			);
 			productName = "BrowserBridge (macOS)";
-			productReference = 3BE01BF52FEC85CD00623DBA /* BrowserBridge.app */;
+			productReference = 3B11FB002FECA41500E021F0 /* BrowserBridge.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3BE01C002FEC85CD00623DBA /* BrowserBridge Extension (iOS) */ = {
+		3B11FB0B2FECA41500E021F0 /* BrowserBridge Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3BE01C212FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (iOS)" */;
+			buildConfigurationList = 3B11FB2C2FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (iOS)" */;
 			buildPhases = (
-				3BE01BFD2FEC85CD00623DBA /* Sources */,
-				3BE01BFE2FEC85CD00623DBA /* Frameworks */,
-				3BE01BFF2FEC85CD00623DBA /* Resources */,
+				3B11FB082FECA41500E021F0 /* Sources */,
+				3B11FB092FECA41500E021F0 /* Frameworks */,
+				3B11FB0A2FECA41500E021F0 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -306,16 +306,16 @@
 			packageProductDependencies = (
 			);
 			productName = "BrowserBridge Extension (iOS)";
-			productReference = 3BE01C012FEC85CD00623DBA /* BrowserBridge Extension.appex */;
+			productReference = 3B11FB0C2FECA41500E021F0 /* BrowserBridge Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		3BE01C0A2FEC85CD00623DBA /* BrowserBridge Extension (macOS) */ = {
+		3B11FB152FECA41500E021F0 /* BrowserBridge Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3BE01C282FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (macOS)" */;
+			buildConfigurationList = 3B11FB332FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (macOS)" */;
 			buildPhases = (
-				3BE01C072FEC85CD00623DBA /* Sources */,
-				3BE01C082FEC85CD00623DBA /* Frameworks */,
-				3BE01C092FEC85CD00623DBA /* Resources */,
+				3B11FB122FECA41500E021F0 /* Sources */,
+				3B11FB132FECA41500E021F0 /* Frameworks */,
+				3B11FB142FECA41500E021F0 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -325,187 +325,187 @@
 			packageProductDependencies = (
 			);
 			productName = "BrowserBridge Extension (macOS)";
-			productReference = 3BE01C0B2FEC85CD00623DBA /* BrowserBridge Extension.appex */;
+			productReference = 3B11FB162FECA41500E021F0 /* BrowserBridge Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		3BE01BD02FEC85CB00623DBA /* Project object */ = {
+		3B11FADB2FECA41100E021F0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
-					3BE01BE22FEC85CD00623DBA = {
+					3B11FAED2FECA41400E021F0 = {
 						CreatedOnToolsVersion = 26.5;
 					};
-					3BE01BF42FEC85CD00623DBA = {
+					3B11FAFF2FECA41500E021F0 = {
 						CreatedOnToolsVersion = 26.5;
 					};
-					3BE01C002FEC85CD00623DBA = {
+					3B11FB0B2FECA41500E021F0 = {
 						CreatedOnToolsVersion = 26.5;
 					};
-					3BE01C0A2FEC85CD00623DBA = {
+					3B11FB152FECA41500E021F0 = {
 						CreatedOnToolsVersion = 26.5;
 					};
 				};
 			};
-			buildConfigurationList = 3BE01BD32FEC85CB00623DBA /* Build configuration list for PBXProject "BrowserBridge" */;
+			buildConfigurationList = 3B11FADE2FECA41100E021F0 /* Build configuration list for PBXProject "BrowserBridge" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 3BE01BCF2FEC85CB00623DBA;
+			mainGroup = 3B11FADA2FECA41100E021F0;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 3BE01BE42FEC85CD00623DBA /* Products */;
+			productRefGroup = 3B11FAEF2FECA41500E021F0 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3BE01BE22FEC85CD00623DBA /* BrowserBridge (iOS) */,
-				3BE01BF42FEC85CD00623DBA /* BrowserBridge (macOS) */,
-				3BE01C002FEC85CD00623DBA /* BrowserBridge Extension (iOS) */,
-				3BE01C0A2FEC85CD00623DBA /* BrowserBridge Extension (macOS) */,
+				3B11FAED2FECA41400E021F0 /* BrowserBridge (iOS) */,
+				3B11FAFF2FECA41500E021F0 /* BrowserBridge (macOS) */,
+				3B11FB0B2FECA41500E021F0 /* BrowserBridge Extension (iOS) */,
+				3B11FB152FECA41500E021F0 /* BrowserBridge Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		3BE01BE12FEC85CD00623DBA /* Resources */ = {
+		3B11FAEC2FECA41400E021F0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C132FEC85CD00623DBA /* Icon.png in Resources */,
-				3BE01BEC2FEC85CD00623DBA /* LaunchScreen.storyboard in Resources */,
-				3BE01C112FEC85CD00623DBA /* Main.html in Resources */,
-				3BE01C172FEC85CD00623DBA /* Script.js in Resources */,
-				3BE01C1B2FEC85CD00623DBA /* Assets.xcassets in Resources */,
-				3BE01BEF2FEC85CD00623DBA /* Main.storyboard in Resources */,
-				3BE01C152FEC85CD00623DBA /* Style.css in Resources */,
+				3B11FB1E2FECA41500E021F0 /* Icon.png in Resources */,
+				3B11FAF72FECA41500E021F0 /* LaunchScreen.storyboard in Resources */,
+				3B11FB1C2FECA41500E021F0 /* Main.html in Resources */,
+				3B11FB222FECA41500E021F0 /* Script.js in Resources */,
+				3B11FB262FECA41500E021F0 /* Assets.xcassets in Resources */,
+				3B11FAFA2FECA41500E021F0 /* Main.storyboard in Resources */,
+				3B11FB202FECA41500E021F0 /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01BF32FEC85CD00623DBA /* Resources */ = {
+		3B11FAFE2FECA41500E021F0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C142FEC85CD00623DBA /* Icon.png in Resources */,
-				3BE01C162FEC85CD00623DBA /* Style.css in Resources */,
-				3BE01BFB2FEC85CD00623DBA /* Main.storyboard in Resources */,
-				3BE01C182FEC85CD00623DBA /* Script.js in Resources */,
-				3BE01C1C2FEC85CD00623DBA /* Assets.xcassets in Resources */,
-				3BE01C122FEC85CD00623DBA /* Main.html in Resources */,
+				3B11FB1F2FECA41500E021F0 /* Icon.png in Resources */,
+				3B11FB212FECA41500E021F0 /* Style.css in Resources */,
+				3B11FB062FECA41500E021F0 /* Main.storyboard in Resources */,
+				3B11FB232FECA41500E021F0 /* Script.js in Resources */,
+				3B11FB272FECA41500E021F0 /* Assets.xcassets in Resources */,
+				3B11FB1D2FECA41500E021F0 /* Main.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01BFF2FEC85CD00623DBA /* Resources */ = {
+		3B11FB0A2FECA41500E021F0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C392FEC85CE00623DBA /* manifest.json in Resources */,
-				3BE01C3B2FEC85CE00623DBA /* assets in Resources */,
-				3BE01C382FEC85CE00623DBA /* popup.html in Resources */,
-				3BE01C3A2FEC85CE00623DBA /* options.html in Resources */,
+				3B11FB442FECA41600E021F0 /* manifest.json in Resources */,
+				3B11FB462FECA41600E021F0 /* assets in Resources */,
+				3B11FB432FECA41600E021F0 /* popup.html in Resources */,
+				3B11FB452FECA41600E021F0 /* options.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01C092FEC85CD00623DBA /* Resources */ = {
+		3B11FB142FECA41500E021F0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C352FEC85CE00623DBA /* manifest.json in Resources */,
-				3BE01C372FEC85CE00623DBA /* assets in Resources */,
-				3BE01C342FEC85CE00623DBA /* popup.html in Resources */,
-				3BE01C362FEC85CE00623DBA /* options.html in Resources */,
+				3B11FB402FECA41600E021F0 /* manifest.json in Resources */,
+				3B11FB422FECA41600E021F0 /* assets in Resources */,
+				3B11FB3F2FECA41600E021F0 /* popup.html in Resources */,
+				3B11FB412FECA41600E021F0 /* options.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3BE01BDF2FEC85CD00623DBA /* Sources */ = {
+		3B11FAEA2FECA41400E021F0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C192FEC85CD00623DBA /* ViewController.swift in Sources */,
-				3BE01BE72FEC85CD00623DBA /* AppDelegate.swift in Sources */,
-				3BE01BE92FEC85CD00623DBA /* SceneDelegate.swift in Sources */,
+				3B11FB242FECA41500E021F0 /* ViewController.swift in Sources */,
+				3B11FAF22FECA41500E021F0 /* AppDelegate.swift in Sources */,
+				3B11FAF42FECA41500E021F0 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01BF12FEC85CD00623DBA /* Sources */ = {
+		3B11FAFC2FECA41500E021F0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C1A2FEC85CD00623DBA /* ViewController.swift in Sources */,
-				3BE01BF82FEC85CD00623DBA /* AppDelegate.swift in Sources */,
+				3B11FB252FECA41500E021F0 /* ViewController.swift in Sources */,
+				3B11FB032FECA41500E021F0 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01BFD2FEC85CD00623DBA /* Sources */ = {
+		3B11FB082FECA41500E021F0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C1D2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */,
+				3B11FB282FECA41500E021F0 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3BE01C072FEC85CD00623DBA /* Sources */ = {
+		3B11FB122FECA41500E021F0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BE01C1E2FEC85CD00623DBA /* SafariWebExtensionHandler.swift in Sources */,
+				3B11FB292FECA41500E021F0 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3BE01C042FEC85CD00623DBA /* PBXTargetDependency */ = {
+		3B11FB0F2FECA41500E021F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3BE01C002FEC85CD00623DBA /* BrowserBridge Extension (iOS) */;
-			targetProxy = 3BE01C032FEC85CD00623DBA /* PBXContainerItemProxy */;
+			target = 3B11FB0B2FECA41500E021F0 /* BrowserBridge Extension (iOS) */;
+			targetProxy = 3B11FB0E2FECA41500E021F0 /* PBXContainerItemProxy */;
 		};
-		3BE01C0E2FEC85CD00623DBA /* PBXTargetDependency */ = {
+		3B11FB192FECA41500E021F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3BE01C0A2FEC85CD00623DBA /* BrowserBridge Extension (macOS) */;
-			targetProxy = 3BE01C0D2FEC85CD00623DBA /* PBXContainerItemProxy */;
+			target = 3B11FB152FECA41500E021F0 /* BrowserBridge Extension (macOS) */;
+			targetProxy = 3B11FB182FECA41500E021F0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		3BE01BD62FEC85CB00623DBA /* Main.html */ = {
+		3B11FAE12FECA41200E021F0 /* Main.html */ = {
 			isa = PBXVariantGroup;
 			children = (
-				3BE01BD72FEC85CB00623DBA /* Base */,
+				3B11FAE22FECA41200E021F0 /* Base */,
 			);
 			name = Main.html;
 			sourceTree = "<group>";
 		};
-		3BE01BEA2FEC85CD00623DBA /* LaunchScreen.storyboard */ = {
+		3B11FAF52FECA41500E021F0 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				3BE01BEB2FEC85CD00623DBA /* Base */,
+				3B11FAF62FECA41500E021F0 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
-		3BE01BED2FEC85CD00623DBA /* Main.storyboard */ = {
+		3B11FAF82FECA41500E021F0 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				3BE01BEE2FEC85CD00623DBA /* Base */,
+				3B11FAF92FECA41500E021F0 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
-		3BE01BF92FEC85CD00623DBA /* Main.storyboard */ = {
+		3B11FB042FECA41500E021F0 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				3BE01BFA2FEC85CD00623DBA /* Base */,
+				3B11FB052FECA41500E021F0 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -513,7 +513,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		3BE01C1F2FEC85CD00623DBA /* Debug */ = {
+		3B11FB2A2FECA41500E021F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -574,7 +574,7 @@
 			};
 			name = Debug;
 		};
-		3BE01C202FEC85CD00623DBA /* Release */ = {
+		3B11FB2B2FECA41500E021F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -627,7 +627,7 @@
 			};
 			name = Release;
 		};
-		3BE01C222FEC85CD00623DBA /* Debug */ = {
+		3B11FB2D2FECA41500E021F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -660,7 +660,7 @@
 			};
 			name = Debug;
 		};
-		3BE01C232FEC85CD00623DBA /* Release */ = {
+		3B11FB2E2FECA41500E021F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -694,7 +694,7 @@
 			};
 			name = Release;
 		};
-		3BE01C262FEC85CD00623DBA /* Debug */ = {
+		3B11FB312FECA41500E021F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -734,7 +734,7 @@
 			};
 			name = Debug;
 		};
-		3BE01C272FEC85CD00623DBA /* Release */ = {
+		3B11FB322FECA41500E021F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -775,7 +775,7 @@
 			};
 			name = Release;
 		};
-		3BE01C292FEC85CD00623DBA /* Debug */ = {
+		3B11FB342FECA41500E021F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -810,7 +810,7 @@
 			};
 			name = Debug;
 		};
-		3BE01C2A2FEC85CD00623DBA /* Release */ = {
+		3B11FB352FECA41500E021F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -845,7 +845,7 @@
 			};
 			name = Release;
 		};
-		3BE01C2D2FEC85CD00623DBA /* Debug */ = {
+		3B11FB382FECA41500E021F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -886,7 +886,7 @@
 			};
 			name = Debug;
 		};
-		3BE01C2E2FEC85CD00623DBA /* Release */ = {
+		3B11FB392FECA41500E021F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -930,52 +930,52 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3BE01BD32FEC85CB00623DBA /* Build configuration list for PBXProject "BrowserBridge" */ = {
+		3B11FADE2FECA41100E021F0 /* Build configuration list for PBXProject "BrowserBridge" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3BE01C1F2FEC85CD00623DBA /* Debug */,
-				3BE01C202FEC85CD00623DBA /* Release */,
+				3B11FB2A2FECA41500E021F0 /* Debug */,
+				3B11FB2B2FECA41500E021F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3BE01C212FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (iOS)" */ = {
+		3B11FB2C2FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3BE01C222FEC85CD00623DBA /* Debug */,
-				3BE01C232FEC85CD00623DBA /* Release */,
+				3B11FB2D2FECA41500E021F0 /* Debug */,
+				3B11FB2E2FECA41500E021F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3BE01C252FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (iOS)" */ = {
+		3B11FB302FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3BE01C262FEC85CD00623DBA /* Debug */,
-				3BE01C272FEC85CD00623DBA /* Release */,
+				3B11FB312FECA41500E021F0 /* Debug */,
+				3B11FB322FECA41500E021F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3BE01C282FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (macOS)" */ = {
+		3B11FB332FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3BE01C292FEC85CD00623DBA /* Debug */,
-				3BE01C2A2FEC85CD00623DBA /* Release */,
+				3B11FB342FECA41500E021F0 /* Debug */,
+				3B11FB352FECA41500E021F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3BE01C2C2FEC85CD00623DBA /* Build configuration list for PBXNativeTarget "BrowserBridge (macOS)" */ = {
+		3B11FB372FECA41500E021F0 /* Build configuration list for PBXNativeTarget "BrowserBridge (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3BE01C2D2FEC85CD00623DBA /* Debug */,
-				3BE01C2E2FEC85CD00623DBA /* Release */,
+				3B11FB382FECA41500E021F0 /* Debug */,
+				3B11FB392FECA41500E021F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 3BE01BD02FEC85CB00623DBA /* Project object */;
+	rootObject = 3B11FADB2FECA41100E021F0 /* Project object */;
 }

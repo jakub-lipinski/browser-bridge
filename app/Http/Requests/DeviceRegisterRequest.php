@@ -23,6 +23,7 @@ class DeviceRegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'browser' => ['required', 'string', Rule::in(['chrome', 'safari'])],
             'platform' => ['required', 'string', Rule::in(['windows', 'macos', 'ios'])],
+            'capabilities' => ['nullable', 'array'],
         ];
     }
 }

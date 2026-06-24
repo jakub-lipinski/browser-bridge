@@ -3,7 +3,7 @@
   "name": "BrowserBridge Safari",
   "description": "Sync selected browser data with BrowserBridge.",
   "version": "0.1.0",
-  "permissions": ["alarms", "storage", "tabs"],
+  "permissions": ["alarms", "bookmarks", "history", "storage", "tabs"],
   "host_permissions": ["http://*/*", "https://*/*"],
   "background": {
     "service_worker": "assets/background.js",
