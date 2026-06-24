@@ -79,8 +79,19 @@ class BrowserSyncService
     {
         return DB::transaction(function () use ($device, $items): EloquentCollection {
             $historyItems = new EloquentCollection;
+            $syncableItems = collect($this->urlSanitizer->filterSyncableItems($items))
+                ->unique(fn (array $item): string => $item['url'].'|'.Carbon::parse($item['visited_at'])->toJSON())
+                ->values()
+                ->all();
+            $maxItemsPerDevice = (int) config('browserbridge.max_history_items_per_device');
 
-            foreach ($this->urlSanitizer->filterSyncableItems($items) as $item) {
+            if ($device->historyItems()->count() + count($syncableItems) > $maxItemsPerDevice) {
+                throw ValidationException::withMessages([
+                    'items' => "The device may store at most {$maxItemsPerDevice} history items.",
+                ]);
+            }
+
+            foreach ($syncableItems as $item) {
                 $historyItem = $device->historyItems()->firstOrCreate(
                     [
                         'url' => $item['url'],

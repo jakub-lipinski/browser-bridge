@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\HistoryBatchRequest;
 use App\Http\Requests\HistorySearchRequest;
+use App\Http\Requests\IncomingTabCommandsRequest;
 use App\Http\Resources\HistoryItemResource;
+use App\Models\Device;
 use App\Models\HistoryItem;
 use App\Services\BrowserSyncService;
 use App\Services\DeviceResolver;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class HistoryController extends Controller
 {
@@ -44,5 +47,26 @@ class HistoryController extends Controller
                 ->limit($limit)
                 ->get(),
         );
+    }
+
+    public function destroy(IncomingTabCommandsRequest $request, DeviceResolver $deviceResolver): Response
+    {
+        $deviceResolver->required($request->string('device_uuid')->toString());
+
+        HistoryItem::query()->delete();
+
+        return response()->noContent();
+    }
+
+    public function destroyForDevice(
+        IncomingTabCommandsRequest $request,
+        Device $device,
+        DeviceResolver $deviceResolver,
+    ): Response {
+        $deviceResolver->required($request->string('device_uuid')->toString());
+
+        $device->historyItems()->delete();
+
+        return response()->noContent();
     }
 }

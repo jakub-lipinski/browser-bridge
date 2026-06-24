@@ -164,6 +164,21 @@ h2 {
   padding: 10px;
 }
 
+.item.clickable {
+  cursor: pointer;
+}
+
+.item.clickable:hover {
+  border-color: #0f766e;
+}
+
+.group-title {
+  color: #3f3f46;
+  font-size: 12px;
+  font-weight: 750;
+  margin-top: 4px;
+}
+
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -179,4 +194,28 @@ h2 {
 .form {
   display: grid;
   gap: 14px;
+}
+
+.modal[hidden] {
+  display: none;
+}
+
+.modal {
+  align-items: center;
+  background: rgb(24 24 27 / 0.5);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 18px;
+  position: fixed;
+  z-index: 20;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  padding: 16px;
 }

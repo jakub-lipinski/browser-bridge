@@ -23,4 +23,6 @@ Route::middleware('browserbridge.token')->group(function (): void {
 
     Route::post('/history/batch', [HistoryController::class, 'batch']);
     Route::get('/history/search', [HistoryController::class, 'search']);
+    Route::delete('/history', [HistoryController::class, 'destroy']);
+    Route::delete('/history/device/{device}', [HistoryController::class, 'destroyForDevice']);
 });

@@ -12,7 +12,7 @@ import type {
 } from './types';
 
 type RequestOptions = {
-  method?: 'GET' | 'POST';
+  method?: 'DELETE' | 'GET' | 'POST';
   body?: unknown;
   query?: Record<string, string | number | boolean | undefined>;
 };
@@ -155,12 +155,21 @@ export async function searchHistory(config: ExtensionConfig, query = ''): Promis
   const response = await request<ApiCollection<HistoryItemResource>>(config, '/api/history/search', {
     query: {
       device_uuid: config.deviceUuid,
-      query,
+      q: query,
       limit: 50,
     },
   });
 
   return response.data;
+}
+
+export async function deleteSyncedHistory(config: ExtensionConfig): Promise<void> {
+  await request(config, '/api/history', {
+    method: 'DELETE',
+    body: {
+      device_uuid: config.deviceUuid,
+    },
+  });
 }
 
 export async function markTabCommandOpened(config: ExtensionConfig, commandId: number): Promise<TabCommandResource> {

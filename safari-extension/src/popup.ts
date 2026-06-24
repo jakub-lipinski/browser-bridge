@@ -1,6 +1,7 @@
 import './modules/initSafariAdapter';
 import '../../chrome-extension/src/styles.css';
-import { searchHistory } from '../../chrome-extension/src/modules/apiClient';
+import { getBrowserAdapter } from '../../chrome-extension/src/modules/browserAdapter';
+import { deleteSyncedHistory, searchHistory } from '../../chrome-extension/src/modules/apiClient';
 import { getConfig } from '../../chrome-extension/src/modules/storage';
 import type {
   BookmarkSnapshotResource,
@@ -39,6 +40,7 @@ const elements = {
   bookmarksList: document.querySelector<HTMLDivElement>('#bookmarks-list'),
   historyList: document.querySelector<HTMLDivElement>('#history-list'),
   historyQuery: document.querySelector<HTMLInputElement>('#history-query'),
+  deleteHistory: document.querySelector<HTMLButtonElement>('#delete-history'),
   commandsList: document.querySelector<HTMLDivElement>('#commands-list'),
   openOptions: document.querySelector<HTMLButtonElement>('#open-options'),
 };
@@ -206,6 +208,18 @@ function renderBookmarks(status: PopupStatus): void {
   });
 }
 
+function groupHistoryItemsByDevice(historyItems: HistoryItemResource[]): Map<string, HistoryItemResource[]> {
+  return historyItems.reduce((groups, historyItem) => {
+    const deviceName = historyItem.device?.name || 'Unknown device';
+    const group = groups.get(deviceName) || [];
+
+    group.push(historyItem);
+    groups.set(deviceName, group);
+
+    return groups;
+  }, new Map<string, HistoryItemResource[]>());
+}
+
 function renderHistoryItems(historyItems: HistoryItemResource[] = []): void {
   const historyList = requireElement(elements.historyList);
   historyList.textContent = '';
@@ -216,20 +230,43 @@ function renderHistoryItems(historyItems: HistoryItemResource[] = []): void {
     return;
   }
 
-  historyItems.forEach((historyItem) => {
-    const item = document.createElement('div');
-    item.className = 'item';
+  groupHistoryItemsByDevice(historyItems).forEach((items, deviceName) => {
+    const groupTitle = document.createElement('div');
+    groupTitle.className = 'group-title';
+    groupTitle.textContent = deviceName;
+    historyList.append(groupTitle);
 
-    const title = document.createElement('div');
-    title.className = 'truncate';
-    title.textContent = historyItem.title || historyItem.url;
+    items.forEach((historyItem) => {
+      const item = document.createElement('div');
+      item.className = 'item clickable';
+      item.tabIndex = 0;
 
-    const meta = document.createElement('p');
-    meta.className = 'muted truncate';
-    meta.textContent = `${historyItem.device?.name || 'Unknown device'} - ${historyItem.url}`;
+      const title = document.createElement('div');
+      title.className = 'truncate';
+      title.textContent = historyItem.title || historyItem.url;
 
-    item.append(title, meta);
-    historyList.append(item);
+      const meta = document.createElement('p');
+      meta.className = 'muted truncate';
+      meta.textContent = historyItem.url;
+
+      const open = (): void => {
+        if (historyItem.url) {
+          void getBrowserAdapter().openTab(historyItem.url).catch((error: unknown) => {
+            setError(error instanceof Error ? error.message : 'Unable to open history item.');
+          });
+        }
+      };
+
+      item.addEventListener('click', open);
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          open();
+        }
+      });
+
+      item.append(title, meta);
+      historyList.append(item);
+    });
   });
 }
 
@@ -265,6 +302,14 @@ async function searchBrowserBridgeHistory(): Promise<void> {
   renderHistoryItems(await searchHistory(config, query));
 }
 
+async function deleteBrowserBridgeHistory(): Promise<void> {
+  const config = await getConfig();
+
+  await deleteSyncedHistory(config);
+  renderHistoryItems([]);
+  setError('Deleted synced BrowserBridge History.');
+}
+
 requireElement(elements.syncNow).addEventListener('click', () => {
   void sendMessage<PopupStatus>({ type: 'browserbridge.syncNow' })
     .then(render)
@@ -278,6 +323,16 @@ requireElement(elements.openOptions).addEventListener('click', () => {
 requireElement(elements.historyQuery).addEventListener('input', () => {
   void searchBrowserBridgeHistory().catch((error: unknown) => {
     setError(error instanceof Error ? error.message : 'Unable to search BrowserBridge History.');
+  });
+});
+
+requireElement(elements.deleteHistory).addEventListener('click', () => {
+  if (!confirm('Delete all synced BrowserBridge History from the server?')) {
+    return;
+  }
+
+  void deleteBrowserBridgeHistory().catch((error: unknown) => {
+    setError(error instanceof Error ? error.message : 'Unable to delete BrowserBridge History.');
   });
 });
 

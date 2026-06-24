@@ -50,6 +50,26 @@ trait ValidatesBrowserBridgePayloads
         }
     }
 
+    public function rejectUnsyncableProvidedUrls(Validator $validator, string $itemsKey): void
+    {
+        $sanitizer = app(UrlSanitizer::class);
+        $items = $this->input($itemsKey, []);
+
+        if (! is_array($items)) {
+            return;
+        }
+
+        foreach ($items as $index => $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            if (! $sanitizer->isSyncableUrl(Arr::get($item, 'url'))) {
+                $validator->errors()->add("{$itemsKey}.{$index}.url", 'The URL must be a syncable http or https URL.');
+            }
+        }
+    }
+
     public function rejectUnsyncableUrl(Validator $validator, string $key): void
     {
         $url = $this->input($key);

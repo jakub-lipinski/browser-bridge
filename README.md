@@ -24,6 +24,7 @@ BROWSERBRIDGE_MAX_DEVICES=10
 BROWSERBRIDGE_MAX_BOOKMARK_SNAPSHOT_PAYLOAD_BYTES=1048576
 BROWSERBRIDGE_MAX_TAB_SNAPSHOT_PAYLOAD_BYTES=524288
 BROWSERBRIDGE_MAX_HISTORY_BATCH_SIZE=500
+BROWSERBRIDGE_MAX_HISTORY_ITEMS_PER_DEVICE=5000
 BROWSERBRIDGE_MAX_PENDING_TAB_COMMANDS_PER_TARGET=100
 BROWSERBRIDGE_ALLOW_SAME_DEVICE_TAB_COMMANDS=false
 ```
@@ -160,9 +161,29 @@ curl -k -X POST "$BASE/api/history/batch" \
 Search shared BrowserBridge history:
 
 ```bash
-curl -k "$BASE/api/history/search?device_uuid=$SOURCE_DEVICE_UUID&query=example&limit=10" \
+curl -k "$BASE/api/history/search?device_uuid=$SOURCE_DEVICE_UUID&q=example&limit=10" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Accept: application/json"
+```
+
+Delete all synced BrowserBridge history:
+
+```bash
+curl -k -X DELETE "$BASE/api/history" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d "{\"device_uuid\": \"$SOURCE_DEVICE_UUID\"}"
+```
+
+Delete synced BrowserBridge history for one device:
+
+```bash
+curl -k -X DELETE "$BASE/api/history/device/1" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d "{\"device_uuid\": \"$SOURCE_DEVICE_UUID\"}"
 ```
 
 Send a tab to another device:
@@ -251,6 +272,17 @@ This milestone intentionally targets Chrome <-> Safari, not Chrome <-> Chrome. A
 12. Add bookmarks in Chrome, run sync, then view BrowserBridge Bookmarks in Safari.
 
 Incoming tab mode is Ask by default: received tabs appear in the popup and require Open or Dismiss. Auto-open is intentionally reserved for a later explicit setting. Chrome-to-Chrome is not the target flow for this milestone.
+
+Manual BrowserBridge History test:
+
+1. Open the Chrome extension popup.
+2. Turn on Sync browsing history.
+3. Confirm the Enable history sync modal.
+4. Visit a few normal `http` or `https` pages in Chrome.
+5. Click Sync now in Chrome.
+6. Open the Safari extension popup.
+7. Search BrowserBridge History.
+8. Click a result to open it in Safari.
 
 ## Chromium Extension
 

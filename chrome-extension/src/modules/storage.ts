@@ -15,8 +15,10 @@ export const defaultConfig: ExtensionConfig = {
     tabs: true,
     history: false,
   },
+  syncHistory: false,
   lastSyncAt: null,
   lastHistorySyncAt: null,
+  historyConsentConfirmedAt: null,
   lastError: null,
 };
 
@@ -26,9 +28,11 @@ export async function getConfig(): Promise<ExtensionConfig> {
   return {
     ...defaultConfig,
     ...config,
+    syncHistory: config?.syncHistory ?? config?.sync?.history ?? defaultConfig.syncHistory,
     sync: {
       ...defaultConfig.sync,
       ...config?.sync,
+      history: config?.syncHistory ?? config?.sync?.history ?? defaultConfig.sync.history,
     },
   };
 }
@@ -42,9 +46,11 @@ export async function updateConfig(patch: Partial<ExtensionConfig>): Promise<Ext
   const nextConfig: ExtensionConfig = {
     ...config,
     ...patch,
+    syncHistory: patch.syncHistory ?? patch.sync?.history ?? config.syncHistory,
     sync: {
       ...config.sync,
       ...patch.sync,
+      ...(patch.syncHistory === undefined ? {} : { history: patch.syncHistory }),
     },
   };
 

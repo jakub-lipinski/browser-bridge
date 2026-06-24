@@ -40,7 +40,7 @@ class HistoryBatchRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $this->rejectInvalidProvidedUrls($validator, 'items');
+                $this->rejectUnsyncableProvidedUrls($validator, 'items');
             },
         ];
     }

@@ -75,7 +75,10 @@
           <span class="muted">Shared view</span>
         </div>
         <p class="muted">BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.</p>
-        <input id="history-query" type="text" placeholder="Search BrowserBridge History" />
+        <div class="row">
+          <input id="history-query" type="text" placeholder="Search BrowserBridge History" />
+          <button id="delete-history" type="button" class="danger">Delete</button>
+        </div>
         <div id="history-list" class="list"></div>
       </section>
 
@@ -89,5 +92,16 @@
         <button id="open-options" type="button" class="secondary">Options</button>
       </section>
     </main>
+
+    <div id="history-confirmation-modal" class="modal" hidden>
+      <section class="modal-content" role="dialog" aria-modal="true" aria-labelledby="history-confirmation-title">
+        <h2 id="history-confirmation-title">Enable history sync?</h2>
+        <p class="muted">This will sync visited URLs and page titles to your BrowserBridge server. Do not enable this if you do not want browsing history synced.</p>
+        <div class="actions">
+          <button id="cancel-history-enable" type="button" class="secondary">Cancel</button>
+          <button id="confirm-history-enable" type="button">Enable history sync</button>
+        </div>
+      </section>
+    </div>
   </body>
 </html>

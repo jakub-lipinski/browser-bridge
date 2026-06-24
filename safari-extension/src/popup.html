@@ -31,7 +31,8 @@
       <section class="panel">
         <h2>Safari capabilities</h2>
         <p class="muted">Safari can send and receive tabs in this milestone.</p>
-        <p class="muted">Native Safari bookmark/history upload and native bookmark writing are disabled for now.</p>
+        <p class="muted">Native Safari history upload is disabled because Safari history access is unsupported or unreliable in this milestone.</p>
+        <p class="muted">Native Safari bookmark upload and native bookmark writing are disabled for now.</p>
       </section>
 
       <section class="panel">
@@ -60,7 +61,10 @@
           <span class="muted">Shared view</span>
         </div>
         <p class="muted">BrowserBridge History is a shared history view inside the extension. Native Safari/Chrome history merging may be limited and is not guaranteed in this version.</p>
-        <input id="history-query" type="text" placeholder="Search BrowserBridge History" />
+        <div class="row">
+          <input id="history-query" type="text" placeholder="Search BrowserBridge History" />
+          <button id="delete-history" type="button" class="danger">Delete</button>
+        </div>
         <div id="history-list" class="list"></div>
       </section>
 

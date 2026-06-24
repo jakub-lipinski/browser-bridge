@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\TabCommandStatus;
 use App\Models\HistoryItem;
 use App\Models\TabCommand;
 use Illuminate\Console\Attributes\Description;
@@ -23,6 +24,7 @@ class BrowserBridgeCleanup extends Command
 
         $deletedTabCommands = TabCommand::query()
             ->where('created_at', '<', $tabCommandCutoff)
+            ->whereIn('status', [TabCommandStatus::Opened->value, TabCommandStatus::Dismissed->value])
             ->delete();
 
         $this->components->info("Deleted {$deletedHistoryItems} history items and {$deletedTabCommands} tab commands.");

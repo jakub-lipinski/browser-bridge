@@ -11,6 +11,7 @@ beforeEach(function (): void {
         'browserbridge.max_bookmark_snapshot_payload_bytes' => 1024 * 1024,
         'browserbridge.max_tab_snapshot_payload_bytes' => 512 * 1024,
         'browserbridge.max_history_batch_size' => 500,
+        'browserbridge.max_history_items_per_device' => 5000,
         'browserbridge.max_pending_tab_commands_per_target' => 100,
     ]);
 });
@@ -180,7 +181,6 @@ it('requires history opt in and deduplicates history items', function (): void {
         'items' => [
             ['url' => 'https://example.com/a', 'title' => 'A', 'visited_at' => $visitedAt],
             ['url' => 'https://example.com/a', 'title' => 'A again', 'visited_at' => $visitedAt],
-            ['url' => 'javascript:alert(1)', 'title' => 'Script', 'visited_at' => $visitedAt],
         ],
     ], browserBridgeHeaders())
         ->assertSuccessful()
@@ -188,6 +188,41 @@ it('requires history opt in and deduplicates history items', function (): void {
         ->assertJsonPath('data.0.url', 'https://example.com/a');
 
     expect(HistoryItem::query()->count())->toBe(1);
+});
+
+it('rejects history upload without a valid token', function (): void {
+    $device = Device::factory()->create();
+
+    $this->postJson('/api/history/batch', [
+        'device_uuid' => $device->uuid,
+        'history_sync_enabled' => true,
+        'items' => [
+            ['url' => 'https://example.com/a', 'title' => 'A', 'visited_at' => now()->toIso8601String()],
+        ],
+    ])->assertUnauthorized();
+});
+
+it('rejects invalid and internal history URLs', function (): void {
+    $device = Device::factory()->create();
+
+    $uploadHistoryUrl = fn (string $url) => $this->postJson('/api/history/batch', [
+        'device_uuid' => $device->uuid,
+        'history_sync_enabled' => true,
+        'items' => [
+            ['url' => $url, 'title' => 'Private', 'visited_at' => now()->toIso8601String()],
+        ],
+    ], browserBridgeHeaders());
+
+    $uploadHistoryUrl('not-a-url')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('chrome://history')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('edge://settings')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('brave://settings')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('safari-extension://abc/history.html')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('about:blank')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('file:///Users/example/private.html')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('devtools://devtools/bundled/inspector.html')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('view-source:https://example.com')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
+    $uploadHistoryUrl('javascript:alert(1)')->assertUnprocessable()->assertJsonValidationErrors('items.0.url');
 });
 
 it('exposes BrowserBridge history across Chrome and Safari devices', function (): void {
@@ -222,6 +257,52 @@ it('exposes BrowserBridge history across Chrome and Safari devices', function ()
         ->assertJsonPath('data.0.url', 'https://example.com/shared-history');
 });
 
+it('searches history with the q parameter', function (): void {
+    $device = Device::factory()->create();
+
+    HistoryItem::factory()->create([
+        'device_id' => $device->id,
+        'url' => 'https://example.com/browserbridge-history',
+        'title' => 'BrowserBridge History',
+        'visited_at' => now(),
+    ]);
+
+    HistoryItem::factory()->create([
+        'device_id' => $device->id,
+        'url' => 'https://example.com/other',
+        'title' => 'Other',
+        'visited_at' => now(),
+    ]);
+
+    $this->getJson('/api/history/search?device_uuid='.$device->uuid.'&q=browserbridge&limit=10', browserBridgeHeaders())
+        ->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.title', 'BrowserBridge History');
+});
+
+it('deletes all BrowserBridge history and per-device history', function (): void {
+    $chrome = Device::factory()->create();
+    $safari = Device::factory()->create([
+        'browser' => 'safari',
+        'platform' => 'macos',
+    ]);
+
+    HistoryItem::factory()->count(2)->create(['device_id' => $chrome->id]);
+    HistoryItem::factory()->count(3)->create(['device_id' => $safari->id]);
+
+    $this->deleteJson('/api/history/device/'.$chrome->id, [
+        'device_uuid' => $safari->uuid,
+    ], browserBridgeHeaders())->assertNoContent();
+
+    expect(HistoryItem::query()->count())->toBe(3);
+
+    $this->deleteJson('/api/history', [
+        'device_uuid' => $safari->uuid,
+    ], browserBridgeHeaders())->assertNoContent();
+
+    expect(HistoryItem::query()->count())->toBe(0);
+});
+
 it('limits history batch size', function (): void {
     config(['browserbridge.max_history_batch_size' => 1]);
 
@@ -233,6 +314,24 @@ it('limits history batch size', function (): void {
         'items' => [
             ['url' => 'https://example.com/a', 'title' => 'A', 'visited_at' => now()->toIso8601String()],
             ['url' => 'https://example.com/b', 'title' => 'B', 'visited_at' => now()->toIso8601String()],
+        ],
+    ], browserBridgeHeaders())
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('items');
+});
+
+it('limits stored history items per device', function (): void {
+    config(['browserbridge.max_history_items_per_device' => 1]);
+
+    $device = Device::factory()->create();
+
+    HistoryItem::factory()->create(['device_id' => $device->id]);
+
+    $this->postJson('/api/history/batch', [
+        'device_uuid' => $device->uuid,
+        'history_sync_enabled' => true,
+        'items' => [
+            ['url' => 'https://example.com/new-history', 'title' => 'New', 'visited_at' => now()->toIso8601String()],
         ],
     ], browserBridgeHeaders())
         ->assertUnprocessable()
@@ -442,15 +541,22 @@ it('cleans up expired history items and tab commands', function (): void {
 
     TabCommand::factory()->create([
         'created_at' => now()->subDays(8),
+        'status' => TabCommandStatus::Opened,
     ]);
 
     TabCommand::factory()->create([
         'created_at' => now()->subDays(2),
+        'status' => TabCommandStatus::Dismissed,
+    ]);
+
+    TabCommand::factory()->create([
+        'created_at' => now()->subDays(8),
+        'status' => TabCommandStatus::Pending,
     ]);
 
     $this->artisan('browserbridge:cleanup')
         ->assertSuccessful();
 
     expect(HistoryItem::query()->count())->toBe(1)
-        ->and(TabCommand::query()->count())->toBe(1);
+        ->and(TabCommand::query()->count())->toBe(2);
 });

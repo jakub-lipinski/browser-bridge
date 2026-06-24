@@ -1,7 +1,8 @@
 import './modules/initChromiumAdapter';
 import './styles.css';
+import { getBrowserAdapter } from './modules/browserAdapter';
 import { getConfig, saveConfig } from './modules/storage';
-import { searchHistory } from './modules/apiClient';
+import { deleteSyncedHistory, searchHistory } from './modules/apiClient';
 import type {
   BookmarkSnapshotResource,
   DeviceResource,
@@ -42,8 +43,12 @@ const elements = {
   bookmarksList: document.querySelector<HTMLDivElement>('#bookmarks-list'),
   historyList: document.querySelector<HTMLDivElement>('#history-list'),
   historyQuery: document.querySelector<HTMLInputElement>('#history-query'),
+  deleteHistory: document.querySelector<HTMLButtonElement>('#delete-history'),
   commandsList: document.querySelector<HTMLDivElement>('#commands-list'),
   openOptions: document.querySelector<HTMLButtonElement>('#open-options'),
+  historyConfirmationModal: document.querySelector<HTMLDivElement>('#history-confirmation-modal'),
+  cancelHistoryEnable: document.querySelector<HTMLButtonElement>('#cancel-history-enable'),
+  confirmHistoryEnable: document.querySelector<HTMLButtonElement>('#confirm-history-enable'),
 };
 
 function requireElement<T>(element: T | null): T {
@@ -209,6 +214,18 @@ function renderBookmarks(status: PopupStatus): void {
   });
 }
 
+function groupHistoryItemsByDevice(historyItems: HistoryItemResource[]): Map<string, HistoryItemResource[]> {
+  return historyItems.reduce((groups, historyItem) => {
+    const deviceName = historyItem.device?.name || 'Unknown device';
+    const group = groups.get(deviceName) || [];
+
+    group.push(historyItem);
+    groups.set(deviceName, group);
+
+    return groups;
+  }, new Map<string, HistoryItemResource[]>());
+}
+
 function renderHistoryItems(historyItems: HistoryItemResource[] = []): void {
   const historyList = requireElement(elements.historyList);
   historyList.textContent = '';
@@ -219,20 +236,43 @@ function renderHistoryItems(historyItems: HistoryItemResource[] = []): void {
     return;
   }
 
-  historyItems.forEach((historyItem) => {
-    const item = document.createElement('div');
-    item.className = 'item';
+  groupHistoryItemsByDevice(historyItems).forEach((items, deviceName) => {
+    const groupTitle = document.createElement('div');
+    groupTitle.className = 'group-title';
+    groupTitle.textContent = deviceName;
+    historyList.append(groupTitle);
 
-    const title = document.createElement('div');
-    title.className = 'truncate';
-    title.textContent = historyItem.title || historyItem.url;
+    items.forEach((historyItem) => {
+      const item = document.createElement('div');
+      item.className = 'item clickable';
+      item.tabIndex = 0;
 
-    const meta = document.createElement('p');
-    meta.className = 'muted truncate';
-    meta.textContent = `${historyItem.device?.name || 'Unknown device'} - ${historyItem.url}`;
+      const title = document.createElement('div');
+      title.className = 'truncate';
+      title.textContent = historyItem.title || historyItem.url;
 
-    item.append(title, meta);
-    historyList.append(item);
+      const meta = document.createElement('p');
+      meta.className = 'muted truncate';
+      meta.textContent = historyItem.url;
+
+      const open = (): void => {
+        if (historyItem.url) {
+          void getBrowserAdapter().openTab(historyItem.url).catch((error: unknown) => {
+            setError(error instanceof Error ? error.message : 'Unable to open history item.');
+          });
+        }
+      };
+
+      item.addEventListener('click', open);
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          open();
+        }
+      });
+
+      item.append(title, meta);
+      historyList.append(item);
+    });
   });
 }
 
@@ -267,17 +307,41 @@ async function refresh(): Promise<void> {
 
 async function updateToggles(): Promise<void> {
   const config = await getConfig();
+  const historyEnabled = requireElement(elements.toggleHistory).checked;
 
   await saveConfig({
     ...config,
+    syncHistory: historyEnabled,
     sync: {
       bookmarks: requireElement(elements.toggleBookmarks).checked,
       tabs: requireElement(elements.toggleTabs).checked,
-      history: requireElement(elements.toggleHistory).checked,
+      history: historyEnabled,
     },
   });
 
   await refresh();
+}
+
+function showHistoryConfirmationModal(): void {
+  requireElement(elements.historyConfirmationModal).hidden = false;
+}
+
+function hideHistoryConfirmationModal(): void {
+  requireElement(elements.historyConfirmationModal).hidden = true;
+}
+
+async function handleHistoryToggle(): Promise<void> {
+  const config = await getConfig();
+  const historyToggle = requireElement(elements.toggleHistory);
+
+  if (historyToggle.checked && !config.historyConsentConfirmedAt) {
+    historyToggle.checked = false;
+    showHistoryConfirmationModal();
+
+    return;
+  }
+
+  await updateToggles();
 }
 
 async function searchBrowserBridgeHistory(): Promise<void> {
@@ -285,6 +349,14 @@ async function searchBrowserBridgeHistory(): Promise<void> {
   const query = requireElement(elements.historyQuery).value.trim();
 
   renderHistoryItems(await searchHistory(config, query));
+}
+
+async function deleteBrowserBridgeHistory(): Promise<void> {
+  const config = await getConfig();
+
+  await deleteSyncedHistory(config);
+  renderHistoryItems([]);
+  setError('Deleted synced BrowserBridge History.');
 }
 
 requireElement(elements.syncNow).addEventListener('click', () => {
@@ -303,15 +375,57 @@ requireElement(elements.historyQuery).addEventListener('input', () => {
   });
 });
 
+requireElement(elements.deleteHistory).addEventListener('click', () => {
+  if (!confirm('Delete all synced BrowserBridge History from the server?')) {
+    return;
+  }
+
+  void deleteBrowserBridgeHistory().catch((error: unknown) => {
+    setError(error instanceof Error ? error.message : 'Unable to delete BrowserBridge History.');
+  });
+});
+
+requireElement(elements.cancelHistoryEnable).addEventListener('click', () => {
+  hideHistoryConfirmationModal();
+  requireElement(elements.toggleHistory).checked = false;
+});
+
+requireElement(elements.confirmHistoryEnable).addEventListener('click', () => {
+  void getConfig()
+    .then(async (config) => {
+      await saveConfig({
+        ...config,
+        syncHistory: true,
+        sync: {
+          ...config.sync,
+          history: true,
+        },
+        historyConsentConfirmedAt: new Date().toISOString(),
+      });
+    })
+    .then(() => {
+      hideHistoryConfirmationModal();
+      requireElement(elements.toggleHistory).checked = true;
+
+      return refresh();
+    })
+    .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to enable history sync.'));
+});
+
 [
   requireElement(elements.toggleBookmarks),
   requireElement(elements.toggleTabs),
-  requireElement(elements.toggleHistory),
 ].forEach((toggle) => {
   toggle.addEventListener('change', () => {
     void updateToggles().catch((error: unknown) => {
       setError(error instanceof Error ? error.message : 'Unable to update sync toggles.');
     });
+  });
+});
+
+requireElement(elements.toggleHistory).addEventListener('change', () => {
+  void handleHistoryToggle().catch((error: unknown) => {
+    setError(error instanceof Error ? error.message : 'Unable to update history sync.');
   });
 });
 

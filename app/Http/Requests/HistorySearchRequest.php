@@ -22,7 +22,15 @@ class HistorySearchRequest extends FormRequest
         return [
             'device_uuid' => ['required', 'uuid'],
             'query' => ['nullable', 'string', 'max:200'],
+            'q' => ['nullable', 'string', 'max:200'],
             'limit' => ['nullable', 'integer', 'min:1', 'max:'.$maxLimit],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('q') && ! $this->has('query')) {
+            $this->merge(['query' => $this->query('q')]);
+        }
     }
 }

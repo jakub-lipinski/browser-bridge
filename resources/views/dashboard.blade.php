@@ -22,6 +22,28 @@
                 </div>
             </header>
 
+            @if (session('status'))
+                <div class="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-950">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <section class="flex flex-col gap-4 rounded-lg border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h2 class="text-base font-semibold">BrowserBridge History retention</h2>
+                    <p class="mt-1">
+                        Synced history is retained for {{ config('browserbridge.history_retention_days') }} days by default and is only a BrowserBridge shared view.
+                    </p>
+                </div>
+                <form method="POST" action="{{ route('dashboard.history.destroy') }}" onsubmit="return confirm('Delete all synced BrowserBridge history?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="rounded-md bg-red-700 px-3 py-2 text-sm font-semibold text-white hover:bg-red-800">
+                        Delete synced history
+                    </button>
+                </form>
+            </section>
+
             <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 <div class="rounded-lg border border-zinc-200 bg-white p-5">
                     <p class="text-sm text-zinc-500">Devices</p>

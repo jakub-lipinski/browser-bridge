@@ -12,8 +12,10 @@ export type ExtensionConfig = {
   browserName: string;
   platform: string;
   sync: SyncToggles;
+  syncHistory: boolean;
   lastSyncAt: string | null;
   lastHistorySyncAt: string | null;
+  historyConsentConfirmedAt: string | null;
   lastError: string | null;
 };
 
