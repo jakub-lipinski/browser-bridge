@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Http\Requests\Concerns\ValidatesBrowserBridgePayloads;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
 
 class HistoryBatchRequest extends FormRequest
 {

@@ -87,6 +87,7 @@ class Device extends Model
                 'tab_commands' => true,
                 'native_bookmark_write' => true,
                 'reliable_background_sync' => true,
+                'history_mode' => 'native',
             ],
             'safari' => [
                 'bookmarks_read' => false,
@@ -95,6 +96,7 @@ class Device extends Model
                 'tab_commands' => true,
                 'native_bookmark_write' => false,
                 'reliable_background_sync' => false,
+                'history_mode' => 'activity',
             ],
             default => [
                 'bookmarks_read' => false,
@@ -103,6 +105,7 @@ class Device extends Model
                 'tab_commands' => false,
                 'native_bookmark_write' => false,
                 'reliable_background_sync' => false,
+                'history_mode' => 'native',
             ],
         };
 

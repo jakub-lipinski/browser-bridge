@@ -33,30 +33,43 @@ function renderBookmarkResults(items) {
 
     return Object.entries(groups).map(([deviceName, bookmarks]) => `
         <div data-result-group>
-            <h3 class="bb-section-title">${escapeHtml(deviceName)}</h3>
-            <div class="bb-list">
-                ${bookmarks.map((bookmark) => `
-                    <a href="${escapeHtml(bookmark.url)}" class="bb-list-item" target="_blank" rel="noreferrer">
-                        <div class="bb-item-title">${escapeHtml(bookmark.title || bookmark.url || 'Untitled bookmark')}</div>
-                        <div class="bb-item-meta">${escapeHtml(bookmark.url || '')}</div>
-                        ${(bookmark.path || []).length > 0 ? `<div class="bb-item-meta">${escapeHtml(bookmark.path.join(' / '))}</div>` : ''}
+            <h5 class="text-xs font-bold text-[var(--color-muted)] uppercase tracking-wider mb-2">${escapeHtml(deviceName)}</h5>
+            <div class="flex flex-col gap-1.5">
+                ${bookmarks.map((bookmark) => {
+                    const domain = new URL(bookmark.url).hostname || '';
+                    const firstLetter = domain ? domain.replace('www.', '').charAt(0).toUpperCase() : '?';
+                    return `
+                    <a href="${escapeHtml(bookmark.url)}" class="flex items-center gap-3 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors" target="_blank" rel="noreferrer">
+                        <div class="w-6 h-6 shrink-0 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[10px] font-bold text-[var(--color-muted)] uppercase">${firstLetter}</div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-semibold text-[var(--color-text)] truncate">${escapeHtml(bookmark.title || bookmark.url || 'Untitled bookmark')}</div>
+                            <div class="text-xs text-[var(--color-muted)] truncate">
+                                ${(bookmark.path || []).length > 0 ? escapeHtml(bookmark.path.join(' / ')) + ' &middot; ' : ''}
+                                ${escapeHtml(bookmark.url || '')}
+                            </div>
+                        </div>
                     </a>
-                `).join('')}
+                `}).join('')}
             </div>
         </div>
     `).join('');
 }
 
 function renderHistoryResults(items) {
-    return items.map((historyItem) => `
-        <a href="${escapeHtml(historyItem.url)}" target="_blank" rel="noreferrer" class="bb-list-item">
-            <div class="bb-item-title">${escapeHtml(historyItem.title || historyItem.url || 'Untitled history item')}</div>
-            <div class="bb-item-meta">${escapeHtml(historyItem.url || '')}</div>
-            <div class="bb-item-meta">
-                ${escapeHtml(historyItem.device?.name || 'Unknown device')} - ${escapeHtml(formatDate(historyItem.visited_at))}
+    return items.map((historyItem) => {
+        const domain = new URL(historyItem.url).hostname || '';
+        const firstLetter = domain ? domain.replace('www.', '').charAt(0).toUpperCase() : '?';
+        return `
+        <a href="${escapeHtml(historyItem.url)}" target="_blank" rel="noreferrer" class="flex items-center gap-3 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors">
+            <div class="w-6 h-6 shrink-0 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[10px] font-bold text-[var(--color-muted)] uppercase">${firstLetter}</div>
+            <div class="min-w-0 flex-1">
+                <div class="text-sm font-semibold text-[var(--color-text)] truncate">${escapeHtml(historyItem.title || historyItem.url || 'Untitled history item')}</div>
+                <div class="text-xs text-[var(--color-muted)] truncate">
+                    ${escapeHtml(historyItem.device?.name || 'Unknown device')} &middot; ${escapeHtml(formatDate(historyItem.visited_at))}
+                </div>
             </div>
         </a>
-    `).join('');
+    `}).join('');
 }
 
 function initializeDashboardBrowser(section) {

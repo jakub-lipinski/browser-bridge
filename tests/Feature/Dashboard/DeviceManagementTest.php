@@ -1,10 +1,10 @@
 <?php
 
+use App\Enums\TabCommandStatus;
 use App\Models\Device;
 use App\Models\HistoryItem;
 use App\Models\NormalizedBookmark;
 use App\Models\TabCommand;
-use App\Enums\TabCommandStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -25,7 +25,7 @@ test('device can be disconnected safely', function () {
     ]);
 
     $response = $this->delete(route('dashboard.device.destroy', $device));
-    
+
     $response->assertRedirect();
     $response->assertSessionHas('status', 'Device disconnected. Existing synced data was kept.');
 
@@ -95,8 +95,8 @@ test('sending api requests to disconnected device is rejected', function () {
     config()->set('browserbridge.api_token', 'test-token');
     $device = Device::factory()->create(['deleted_at' => now(), 'is_active' => false]);
 
-    $response = $this->withToken('test-token')->getJson('/api/devices?device_uuid=' . $device->uuid);
-    
+    $response = $this->withToken('test-token')->getJson('/api/devices?device_uuid='.$device->uuid);
+
     $response->assertStatus(403);
     $response->assertJsonFragment(['message' => 'This device was disconnected. Register again.']);
 });

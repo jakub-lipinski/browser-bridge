@@ -3,88 +3,152 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BrowserBridge Safari Options</title>
+    <title>BrowserBridge Options</title>
     <script type="module" src="/options.ts"></script>
   </head>
-  <body>
-    <main class="options-shell">
-      <section class="panel">
-        <div class="brand-row">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+  <body class="bg-[var(--color-bg)] text-[var(--color-text)] antialiased m-0 font-sans text-sm leading-normal">
+    <main class="max-w-[720px] mx-auto p-8 flex flex-col gap-8">
+      <section class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 shadow-sm">
+        <div class="flex items-center gap-4 mb-6">
+          <span class="w-10 h-10 rounded-lg bg-[var(--color-primary-subtle)] text-[var(--color-primary-text)] border border-[var(--color-primary-border)] flex items-center justify-center shadow-sm shrink-0" aria-hidden="true">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
           </span>
           <div>
-            <p class="eyebrow">BrowserBridge</p>
-            <h1>Safari setup</h1>
-            <p class="muted">Connect Safari to your private BrowserBridge server for tab handoff and shared BrowserBridge views.</p>
+            <p class="text-xs font-bold text-[var(--color-primary)] uppercase tracking-wider m-0">BrowserBridge</p>
+            <h1 class="text-xl font-bold m-0 tracking-tight">Safari profile setup</h1>
+            <p class="text-sm text-[var(--color-muted)] m-0 mt-1">Connect this browser profile to your private BrowserBridge server.</p>
           </div>
         </div>
 
-        <form id="options-form" class="form">
-          <label>
+        <form id="options-form" class="flex flex-col gap-4">
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
             API URL
-            <input id="api-url" type="url" placeholder="https://browserbridge.test" autocomplete="off" />
+            <input id="api-url" type="url" placeholder="https://browserbridge.test" autocomplete="off" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal" />
           </label>
 
-          <label>
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
             API token
-            <input id="api-token" type="password" autocomplete="off" />
+            <input id="api-token" type="password" autocomplete="off" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal" />
           </label>
 
-          <label>
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
             Device name
-            <input id="device-name" type="text" autocomplete="off" />
+            <input id="device-name" type="text" autocomplete="off" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal" />
           </label>
 
-          <div class="row wrap">
-            <label>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
               Browser
-              <input id="browser-name" type="text" autocomplete="off" readonly />
+              <input id="browser-name" type="text" autocomplete="off" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal" />
             </label>
-            <label>
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
               Platform
-              <input id="platform" type="text" autocomplete="off" readonly />
+              <input id="platform" type="text" autocomplete="off" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal" />
             </label>
           </div>
 
-          <div class="privacy-note">
-            Safari displays BrowserBridge data from your server. Native Safari bookmark/history upload is not available in this version.
+          <div class="bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-[var(--color-warning-text)] rounded-[var(--radius-md)] p-4 text-sm mt-2">
+            History sync is off by default. If enabled, BrowserBridge stores a shared searchable history view on your server.
+            BrowserBridge never syncs passwords, cookies, login sessions or form data.
           </div>
 
-          <div class="warning">
-            History sync remains explicit and opt-in. BrowserBridge never syncs passwords, cookies, login sessions or form data.
-          </div>
-
-          <div class="actions">
-            <button id="save-button" type="submit">Save settings</button>
-            <button id="connect-button" type="button" class="secondary">Save and register device</button>
+          <div class="flex items-center gap-3 mt-4">
+            <button id="save-button" type="submit" class="text-sm font-bold px-4 py-2 bg-[var(--color-primary)] text-white rounded-[var(--radius-sm)] border border-[var(--color-primary-strong)] shadow-sm hover:bg-[var(--color-primary-strong)] transition-colors">Save settings</button>
+            <button id="connect-button" type="button" class="text-sm font-semibold px-4 py-2 bg-[var(--color-surface-muted)] text-[var(--color-text)] rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] hover:bg-[var(--color-border)] transition-colors shadow-sm">Save and register device</button>
           </div>
         </form>
 
-        <div id="status" class="muted" role="status"></div>
+        <div id="status" class="text-sm text-[var(--color-muted)] mt-4 empty:hidden" role="status"></div>
       </section>
 
-      <section class="panel">
-        <div class="brand-row">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <section class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] p-6 shadow-sm">
+        <div class="flex items-center gap-4 mb-6">
+          <span class="w-10 h-10 rounded-lg bg-[var(--color-primary-subtle)] text-[var(--color-primary-text)] border border-[var(--color-primary-border)] flex items-center justify-center shadow-sm shrink-0" aria-hidden="true">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           </span>
           <div>
-            <p class="eyebrow">Bookmark Sync</p>
-            <h1>Safari support</h1>
-            <p class="muted">Safari displays BrowserBridge bookmarks from your server and supports tab handoff.</p>
+            <p class="text-xs font-bold text-[var(--color-primary)] uppercase tracking-wider m-0">Bookmark Sync</p>
+            <h1 class="text-xl font-bold m-0 tracking-tight">Import modes</h1>
+            <p class="text-sm text-[var(--color-muted)] m-0 mt-1">Safe Folder Import is recommended. Mirror is scoped and always requires preview, confirmation, and backup.</p>
           </div>
         </div>
 
-        <div class="warning">
-          BrowserBridge checks Safari bookmark and history APIs at runtime. If native history is unavailable, BrowserBridge Activity can save Safari pages you send/open through the extension after you opt in.
-        </div>
+        <div class="flex flex-col gap-4">
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+            Profile
+            <select id="bookmark-sync-profile" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal"></select>
+          </label>
 
-        <div class="stack">
-          <p class="muted">Native Safari bookmark reading: Runtime detected in the popup</p>
-          <p class="muted">Native Safari history reading: Runtime detected in the popup</p>
-          <p class="muted">BrowserBridge Activity: Available after opt-in when full Safari history is unavailable</p>
-          <p class="muted">Mirror: Disabled for Safari unless native bookmark writing is proven reliable</p>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+              Source device
+              <select id="bookmark-sync-source" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal"></select>
+            </label>
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+              Target device
+              <select id="bookmark-sync-target" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal"></select>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+              Mode
+              <select id="bookmark-sync-mode" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal">
+                <option value="safe_folder">Safe Folder Import — Recommended</option>
+                <option value="merge">Merge — Advanced</option>
+                <option value="mirror">Mirror — Dangerous</option>
+              </select>
+            </label>
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+              Direction
+              <select id="bookmark-sync-direction" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal">
+                <option value="source_to_target">Source → target</option>
+                <option value="target_to_source">Target → source</option>
+                <option value="two_way" disabled>Two-way (experimental)</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+              Target scope
+              <select id="bookmark-sync-scope" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal">
+                <option value="browserbridge_folder">BrowserBridge managed folder</option>
+                <option value="selected_folder">Selected folder ID</option>
+                <option value="entire_bookmarks_root" disabled>Entire root (disabled)</option>
+              </select>
+            </label>
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+              Selected folder ID
+              <input id="bookmark-sync-selected-folder" type="text" placeholder="Optional folder id" autocomplete="off" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal" />
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+              Auto sync
+              <select id="bookmark-sync-auto" class="w-full bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded-[var(--radius-md)] px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-[var(--color-surface)] transition-all font-normal">
+                <option value="">Manual only</option>
+                <option value="5">Every 5 minutes</option>
+                <option value="15">Every 15 minutes</option>
+                <option value="30">Every 30 minutes</option>
+                <option value="60">Hourly</option>
+                <option value="1440">Daily</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] text-[var(--color-warning-text)] rounded-[var(--radius-md)] p-4 text-sm mt-2">
+            Mirror may delete or move bookmarks in the selected destination scope. BrowserBridge creates a backup first and never runs full-root Mirror in this build.
+          </div>
+
+          <div class="flex items-center gap-3 mt-4">
+            <button id="bookmark-sync-save" type="button" class="text-sm font-bold px-4 py-2 bg-[var(--color-primary)] text-white rounded-[var(--radius-sm)] border border-[var(--color-primary-strong)] shadow-sm hover:bg-[var(--color-primary-strong)] transition-colors">Save profile</button>
+            <button id="bookmark-sync-preview" type="button" class="text-sm font-semibold px-4 py-2 bg-[var(--color-surface-muted)] text-[var(--color-text)] rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] hover:bg-[var(--color-border)] transition-colors shadow-sm">Preview</button>
+            <button id="bookmark-sync-run" type="button" class="text-sm font-semibold px-4 py-2 bg-[var(--color-surface-muted)] text-[var(--color-text)] rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] hover:bg-[var(--color-border)] transition-colors shadow-sm">Run now</button>
+          </div>
+
+          <div id="bookmark-sync-status" class="text-sm text-[var(--color-muted)] mt-2" role="status">Register this device, then create a bookmark sync profile.</div>
         </div>
       </section>
     </main>

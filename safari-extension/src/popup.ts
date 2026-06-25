@@ -284,14 +284,14 @@ function renderDevices(status: PopupStatus): void {
 
   targets.slice(0, 3).forEach((device) => {
     const item = document.createElement('div');
-    item.className = 'item';
+    item.className = 'flex flex-col gap-0.5 mb-2 last:mb-0';
 
     const title = document.createElement('div');
-    title.className = 'truncate';
+    title.className = 'text-sm font-semibold text-[var(--color-text)] truncate';
     title.textContent = `${device.name} (${device.browser} on ${device.platform})`;
 
     const meta = document.createElement('p');
-    meta.className = 'muted truncate';
+    meta.className = 'text-[11px] text-[var(--color-muted)] truncate m-0';
     meta.textContent = device.last_seen_at ? `Last seen ${new Date(device.last_seen_at).toLocaleString()}` : 'Never seen';
 
     item.append(title, meta);
@@ -323,21 +323,22 @@ function renderCommands(status: PopupStatus): void {
 
   status.incomingCommands.slice(0, 5).forEach((command) => {
     const item = document.createElement('div');
-    item.className = 'item';
+    item.className = 'flex flex-col gap-1 p-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-sm)]';
 
     const title = document.createElement('div');
-    title.className = 'truncate';
+    title.className = 'text-[13px] font-semibold text-[var(--color-text)] truncate';
     title.textContent = command.title || command.url || 'Untitled tab';
 
     const url = document.createElement('p');
-    url.className = 'muted truncate';
+    url.className = 'text-[11px] text-[var(--color-muted)] truncate m-0';
     url.textContent = command.url || '';
 
     const actions = document.createElement('div');
-    actions.className = 'actions';
+    actions.className = 'flex items-center gap-2 mt-1';
 
     const openButton = document.createElement('button');
     openButton.type = 'button';
+    openButton.className = 'flex-1 text-[11px] font-bold px-2 py-1 bg-[var(--color-primary)] text-white rounded border border-[var(--color-primary-strong)] hover:bg-[var(--color-primary-strong)] transition-colors';
     openButton.textContent = 'Open';
     openButton.addEventListener('click', () => {
       void sendMessage<PopupStatus>({ type: 'browserbridge.openCommand', command })
@@ -347,7 +348,7 @@ function renderCommands(status: PopupStatus): void {
 
     const dismissButton = document.createElement('button');
     dismissButton.type = 'button';
-    dismissButton.className = 'secondary';
+    dismissButton.className = 'flex-1 text-[11px] font-semibold px-2 py-1 bg-[var(--color-surface-muted)] text-[var(--color-text)] rounded border border-[var(--color-border-strong)] hover:bg-[var(--color-border)] transition-colors';
     dismissButton.textContent = 'Dismiss';
     dismissButton.addEventListener('click', () => {
       void sendMessage<PopupStatus>({ type: 'browserbridge.dismissCommand', commandId: command.id })
@@ -431,25 +432,25 @@ function renderBookmarks(loadError?: string): void {
 
   groupBookmarksByDevice(visible).forEach((items, deviceName) => {
     const groupTitle = document.createElement('div');
-    groupTitle.className = 'group-title';
+    groupTitle.className = 'text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-wider mb-1 mt-2 first:mt-0';
     groupTitle.textContent = deviceName;
     list.append(groupTitle);
 
     items.forEach((bookmark) => {
       const item = document.createElement('div');
-      item.className = 'item clickable';
+      item.className = 'flex flex-col gap-0.5 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[var(--color-primary)]';
       item.tabIndex = 0;
 
       const title = document.createElement('div');
-      title.className = 'truncate';
+      title.className = 'text-[13px] font-semibold text-[var(--color-text)] truncate';
       title.textContent = bookmark.title || bookmark.url || 'Untitled bookmark';
 
       const url = document.createElement('p');
-      url.className = 'muted truncate';
+      url.className = 'text-[11px] text-[var(--color-muted)] truncate m-0';
       url.textContent = bookmark.url || '';
 
       const path = document.createElement('p');
-      path.className = 'muted truncate';
+      path.className = 'text-[10px] text-[var(--color-muted)] opacity-70 truncate m-0';
       path.textContent = bookmark.path.length > 0 ? bookmark.path.join(' / ') : 'No folder path';
 
       const open = (): void => {
@@ -524,25 +525,25 @@ function renderHistoryItems(loadError?: string): void {
 
   groupHistoryItemsByDevice(visible).forEach((items, deviceName) => {
     const groupTitle = document.createElement('div');
-    groupTitle.className = 'group-title';
+    groupTitle.className = 'text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-wider mb-1 mt-2 first:mt-0';
     groupTitle.textContent = deviceName;
     list.append(groupTitle);
 
     items.forEach((historyItem) => {
       const item = document.createElement('div');
-      item.className = 'item clickable';
+      item.className = 'flex flex-col gap-0.5 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[var(--color-primary)]';
       item.tabIndex = 0;
 
       const title = document.createElement('div');
-      title.className = 'truncate';
+      title.className = 'text-[13px] font-semibold text-[var(--color-text)] truncate';
       title.textContent = historyItem.title || historyItem.url;
 
       const url = document.createElement('p');
-      url.className = 'muted truncate';
+      url.className = 'text-[11px] text-[var(--color-muted)] truncate m-0';
       url.textContent = historyItem.url;
 
       const visitedAt = document.createElement('p');
-      visitedAt.className = 'muted truncate';
+      visitedAt.className = 'text-[10px] text-[var(--color-muted)] opacity-70 truncate m-0';
       visitedAt.textContent = historyItem.visited_at ? new Date(historyItem.visited_at).toLocaleString() : '';
 
       const open = (): void => {
@@ -749,14 +750,14 @@ function renderCapabilityAudit(audit: BrowserCapabilityAudit): void {
 
   audit.probes.forEach((probe) => {
     const item = document.createElement('div');
-    item.className = 'item';
+    item.className = 'flex flex-col gap-0.5 mb-2 last:mb-0';
 
     const title = document.createElement('div');
-    title.className = 'truncate';
+    title.className = 'text-[13px] font-semibold text-[var(--color-text)] truncate';
     title.textContent = `${probe.name}: ${probe.success ? 'success' : 'failed'}`;
 
     const meta = document.createElement('p');
-    meta.className = 'muted truncate';
+    meta.className = 'text-[11px] text-[var(--color-muted)] truncate m-0';
     meta.textContent = probe.error ? `${probe.api} - ${probe.error}` : probe.api;
 
     item.append(title, meta);

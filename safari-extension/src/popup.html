@@ -3,180 +3,177 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BrowserBridge Safari</title>
+    <title>BrowserBridge</title>
     <script type="module" src="/popup.ts"></script>
   </head>
-  <body>
-    <main class="shell" style="padding: 16px; min-width: 380px;">
-      <header class="header" style="margin-bottom: 16px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div class="brand-mark" style="height:32px; width:32px;" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+  <body class="bg-[var(--color-bg)] text-[var(--color-text)] antialiased m-0 font-sans text-[13px] leading-normal w-[380px]">
+    <main class="p-4 flex flex-col min-h-[400px]">
+      <header class="flex items-start justify-between gap-4 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-[var(--color-primary-subtle)] text-[var(--color-primary-text)] border border-[var(--color-primary-border)] flex items-center justify-center shadow-sm shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
           </div>
-          <div>
-            <h1 style="font-size: 16px;">BrowserBridge Safari <span id="activity-dot" class="activity-dot" hidden></span></h1>
-            <p id="device-summary" class="muted" style="font-size: 12px; margin-top:2px;">Connecting...</p>
+          <div class="flex flex-col min-w-0">
+            <h1 class="text-sm font-bold m-0 tracking-tight flex items-center gap-1.5 truncate">
+                BrowserBridge
+                <span id="activity-dot" class="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" hidden></span>
+            </h1>
+            <p id="device-summary" class="text-xs text-[var(--color-muted)] m-0 truncate">Connecting...</p>
           </div>
         </div>
-        <div style="text-align: right;">
-          <span id="connection-status" class="status bad">Disconnected</span>
-          <p class="muted" style="font-size: 10px; margin-top:4px;">Last sync: <span id="last-sync">Never</span></p>
+        <div class="flex flex-col items-end text-right shrink-0">
+          <span id="connection-status" class="text-xs font-bold px-2 py-0.5 rounded-full bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] border border-[var(--color-danger-border)]">Disconnected</span>
+          <p class="text-[10px] text-[var(--color-muted)] m-0 mt-1">Last sync: <span id="last-sync">Never</span></p>
         </div>
       </header>
 
-      <nav class="tabs" aria-label="Popup sections" style="margin-bottom: 16px;">
-        <button type="button" class="tab-button active" data-tab="send">Send</button>
-        <button type="button" class="tab-button" data-tab="bookmarks">Bookmarks</button>
-        <button type="button" class="tab-button" data-tab="history">History</button>
-        <button type="button" class="tab-button" data-tab="settings">Settings</button>
+      <nav class="flex items-center gap-1 p-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-sm)] mb-4 shadow-sm" aria-label="Popup sections">
+        <button type="button" class="tab-button flex-1 text-xs font-semibold py-1.5 rounded text-center transition-colors hover:bg-[var(--color-surface-muted)] text-[var(--color-muted)] [&.active]:bg-[var(--color-bg)] [&.active]:text-[var(--color-text)] [&.active]:shadow-sm [&.active]:border-[var(--color-border)] border border-transparent" data-tab="send">Send</button>
+        <button type="button" class="tab-button flex-1 text-xs font-semibold py-1.5 rounded text-center transition-colors hover:bg-[var(--color-surface-muted)] text-[var(--color-muted)] [&.active]:bg-[var(--color-bg)] [&.active]:text-[var(--color-text)] [&.active]:shadow-sm [&.active]:border-[var(--color-border)] border border-transparent" data-tab="bookmarks">Bookmarks</button>
+        <button type="button" class="tab-button flex-1 text-xs font-semibold py-1.5 rounded text-center transition-colors hover:bg-[var(--color-surface-muted)] text-[var(--color-muted)] [&.active]:bg-[var(--color-bg)] [&.active]:text-[var(--color-text)] [&.active]:shadow-sm [&.active]:border-[var(--color-border)] border border-transparent" data-tab="history">History</button>
+        <button type="button" class="tab-button flex-1 text-xs font-semibold py-1.5 rounded text-center transition-colors hover:bg-[var(--color-surface-muted)] text-[var(--color-muted)] [&.active]:bg-[var(--color-bg)] [&.active]:text-[var(--color-text)] [&.active]:shadow-sm [&.active]:border-[var(--color-border)] border border-transparent" data-tab="settings">Settings</button>
       </nav>
 
-      <section id="send-card" class="panel tab-panel primary-panel">
-        <div class="row">
-          <h2 style="font-size: 14px;">Send current tab</h2>
-          <button id="sync-now" type="button" class="secondary" style="min-height: 28px; padding: 4px 8px;">Refresh</button>
-        </div>
-        <div style="margin: 8px 0;">
-            <p id="current-tab-title" class="truncate" style="font-weight: 600; font-size: 13px;">No syncable current tab.</p>
-            <p id="current-tab-url" class="muted truncate" style="font-size: 11px; margin-top: 2px;"></p>
-        </div>
-        <div class="row wrap" style="gap: 8px;">
-          <select id="send-target" aria-label="Target device" style="flex:1; min-height: 32px; padding: 4px 8px;"></select>
-          <button id="send-current-tab" type="button" style="min-height: 32px;">Send to Chrome</button>
-        </div>
-        <p id="send-status" class="send-status" style="margin-top: 8px;"></p>
-        <p id="send-toast" class="toast" hidden></p>
-        <p id="error-message" class="muted"></p>
-
-        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bb-border);">
-            <div class="row">
-                <h2 style="font-size: 14px;">Received tabs</h2>
-                <span id="incoming-count" class="badge">0</span>
+      <div class="flex-1 overflow-hidden flex flex-col relative">
+          <section id="send-card" class="tab-panel absolute inset-0 flex flex-col overflow-y-auto hidden [&.active]:flex">
+            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] p-3 shadow-sm flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                <h2 class="text-sm font-bold m-0">Send current tab</h2>
+                <button id="sync-now" type="button" class="text-xs font-semibold px-2.5 py-1 bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded hover:bg-[var(--color-border)] transition-colors">Sync</button>
+                </div>
+                <div class="flex flex-col gap-0.5 bg-[var(--color-surface-muted)] p-2 rounded border border-[var(--color-border)]">
+                    <p id="current-tab-title" class="text-[13px] font-semibold m-0 truncate">No syncable current tab.</p>
+                    <p id="current-tab-url" class="text-[11px] text-[var(--color-muted)] m-0 truncate"></p>
+                </div>
+                <div class="flex items-center gap-2">
+                <select id="send-target" aria-label="Target device" class="flex-1 text-xs bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded px-2 py-1.5 outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"></select>
+                <button id="send-current-tab" type="button" class="text-xs font-bold px-3 py-1.5 bg-[var(--color-primary)] text-white rounded border border-[var(--color-primary-strong)] shadow-sm hover:bg-[var(--color-primary-strong)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Send</button>
+                </div>
+                <p id="send-status" class="text-xs text-[var(--color-muted)] m-0 empty:hidden"></p>
+                <p id="send-toast" class="text-xs font-bold px-2.5 py-1.5 bg-[var(--color-primary-subtle)] text-[var(--color-primary-text)] border border-[var(--color-primary-border)] rounded m-0 mt-1" hidden></p>
+                <p id="error-message" class="text-xs text-[var(--color-danger)] m-0 empty:hidden"></p>
             </div>
-            <div id="commands-list" class="list" style="margin-top: 12px; max-height: 200px; overflow-y: auto;"></div>
-        </div>
-      </section>
 
-      <section id="bookmarks-panel" class="panel tab-panel" hidden>
-        <div class="row" style="margin-bottom: 8px;">
-          <h2 style="font-size: 14px;">Bookmarks</h2>
-          <span class="badge">Server view</span>
-        </div>
-        <input id="bookmarks-query" type="text" placeholder="Search bookmarks..." style="margin-bottom: 8px;" />
-        <p id="bookmarks-count" class="muted" style="margin-bottom: 8px;">0 bookmarks</p>
-        <div id="bookmarks-list" class="list" style="max-height: 280px; overflow-y: auto;"></div>
-        <div class="actions" style="margin-top: 8px;">
-          <button id="bookmarks-more" type="button" class="secondary" style="width: 100%;">Show more</button>
-          <button id="bookmarks-less" type="button" class="secondary" style="width: 100%;">Show less</button>
-        </div>
-      </section>
+            <div class="mt-4 pt-4 border-t border-[var(--color-border)] flex flex-col flex-1">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold m-0">Received tabs</h2>
+                    <span id="incoming-count" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--color-surface-muted)] text-[var(--color-muted)] border border-[var(--color-border)] [&.accent]:bg-[var(--color-primary-subtle)] [&.accent]:text-[var(--color-primary-text)] [&.accent]:border-[var(--color-primary-border)]">0</span>
+                </div>
+                <div id="commands-list" class="flex flex-col gap-2 overflow-y-auto pb-4"></div>
+            </div>
+          </section>
 
-      <section id="history-panel" class="panel tab-panel" hidden>
-        <div class="row" style="margin-bottom: 8px;">
-          <h2 style="font-size: 14px;">History</h2>
-          <button id="delete-history" type="button" class="danger" style="min-height: 28px; padding: 4px 8px;">Delete</button>
-        </div>
-        <input id="history-query" type="text" placeholder="Search history..." style="margin-bottom: 8px;" />
-        <p id="history-count" class="muted" style="margin-bottom: 8px;">0 history items</p>
-        <div id="history-list" class="list" style="max-height: 280px; overflow-y: auto;"></div>
-        <div class="actions" style="margin-top: 8px;">
-          <button id="history-more" type="button" class="secondary" style="width: 100%;">Show more</button>
-          <button id="history-less" type="button" class="secondary" style="width: 100%;">Show less</button>
-        </div>
-      </section>
+          <section id="bookmarks-panel" class="tab-panel absolute inset-0 flex flex-col overflow-hidden hidden [&.active]:flex">
+            <div class="flex items-center justify-between gap-2 mb-2 shrink-0">
+              <h2 class="text-sm font-bold m-0 flex items-center gap-2">
+                  Bookmarks
+                  <span id="bookmarks-count" class="text-xs font-normal text-[var(--color-muted)]">0 bookmarks</span>
+              </h2>
+              <button id="sync-bookmarks-now" type="button" class="text-xs font-semibold px-2.5 py-1 bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded hover:bg-[var(--color-border)] transition-colors">Sync now</button>
+            </div>
+            <input id="bookmarks-query" type="search" placeholder="Search bookmarks..." class="w-full text-xs bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded px-3 py-2 outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] mb-3 shrink-0" />
+            <div id="bookmarks-list" class="flex-1 overflow-y-auto flex flex-col gap-3 pb-2 pr-1"></div>
+            <div class="flex items-center gap-2 mt-2 shrink-0">
+              <button id="bookmarks-more" type="button" class="flex-1 text-xs font-semibold px-3 py-1.5 bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded hover:bg-[var(--color-border)] transition-colors">Show more</button>
+              <button id="bookmarks-less" type="button" class="flex-1 text-xs font-semibold px-3 py-1.5 bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded hover:bg-[var(--color-border)] transition-colors hidden">Show less</button>
+            </div>
+          </section>
 
-      <section id="settings-panel" class="panel tab-panel" hidden>
-        <h2 style="font-size: 14px; margin-bottom: 12px;">Sync settings</h2>
+          <section id="history-panel" class="tab-panel absolute inset-0 flex flex-col overflow-hidden hidden [&.active]:flex">
+            <div class="flex items-center justify-between gap-2 mb-2 shrink-0">
+              <h2 class="text-sm font-bold m-0 flex items-center gap-2">
+                  History
+                  <span id="history-count" class="text-xs font-normal text-[var(--color-muted)]">0 items</span>
+              </h2>
+              <button id="delete-history" type="button" class="text-xs font-semibold px-2.5 py-1 bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] border border-[var(--color-danger-border)] rounded hover:opacity-80 transition-opacity">Delete</button>
+            </div>
+            <input id="history-query" type="search" placeholder="Search history..." class="w-full text-xs bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded px-3 py-2 outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] mb-3 shrink-0" />
+            <div id="history-list" class="flex-1 overflow-y-auto flex flex-col gap-3 pb-2 pr-1"></div>
+            <div class="flex items-center gap-2 mt-2 shrink-0">
+              <button id="history-more" type="button" class="flex-1 text-xs font-semibold px-3 py-1.5 bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded hover:bg-[var(--color-border)] transition-colors">Show more</button>
+              <button id="history-less" type="button" class="flex-1 text-xs font-semibold px-3 py-1.5 bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded hover:bg-[var(--color-border)] transition-colors hidden">Show less</button>
+            </div>
+          </section>
 
-        <div class="stack">
-            <label class="row">
-            <span>Sync Safari bookmarks when available</span>
-            <input id="toggle-bookmarks" type="checkbox" />
-            </label>
-            <label class="row">
-            <span>Save Safari history or BrowserBridge Activity</span>
-            <input id="toggle-history" type="checkbox" />
-            </label>
-        </div>
+          <section id="settings-panel" class="tab-panel absolute inset-0 flex flex-col overflow-y-auto pb-4 hidden [&.active]:flex">
+            <h2 class="text-sm font-bold m-0 mb-3">Sync settings</h2>
+            
+            <div class="flex flex-col gap-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] p-3 shadow-sm mb-4">
+                <label class="flex items-center justify-between gap-2 cursor-pointer text-sm">
+                <span>Sync bookmarks</span>
+                <input id="toggle-bookmarks" type="checkbox" class="w-4 h-4 rounded border-[var(--color-border-strong)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
+                </label>
+                <div class="h-px bg-[var(--color-border)] my-1"></div>
+                <label class="flex items-center justify-between gap-2 cursor-pointer text-sm">
+                <span>Sync open tabs</span>
+                <input id="toggle-tabs" type="checkbox" class="w-4 h-4 rounded border-[var(--color-border-strong)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
+                </label>
+                <div class="h-px bg-[var(--color-border)] my-1"></div>
+                <label class="flex items-center justify-between gap-2 cursor-pointer text-sm">
+                <span>Sync browsing history</span>
+                <input id="toggle-history" type="checkbox" class="w-4 h-4 rounded border-[var(--color-border-strong)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
+                </label>
+            </div>
 
-        <div id="history-settings-container" hidden style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--bb-border);">
-          <label class="row">
-            <span>History range</span>
-            <select id="history-sync-range" style="width: auto;">
-              <option value="24h">Last 24 hours</option>
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-              <option value="all">All available history</option>
-            </select>
-          </label>
-          <div id="history-range-warning" class="warning" hidden style="margin-top: 8px;">
-            This may sync thousands of Safari history entries if native history access is available.
-          </div>
-        </div>
+            <div id="history-settings-container" hidden class="flex flex-col gap-3 p-3 bg-[var(--color-surface-muted)] border border-[var(--color-border)] rounded-[var(--radius-md)] mb-4">
+              <label class="flex items-center justify-between gap-2 text-sm">
+                <span>History range</span>
+                <select id="history-sync-range" class="text-xs bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]">
+                  <option value="24h">Last 24 hours</option>
+                  <option value="7d">Last 7 days</option>
+                  <option value="30d">Last 30 days</option>
+                  <option value="all">All available</option>
+                </select>
+              </label>
+              <div id="history-range-warning" class="text-xs text-[var(--color-warning-text)] bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] p-2 rounded" hidden>
+                This may sync thousands of entries.
+              </div>
+              <button id="resync-history" type="button" class="w-full text-xs font-semibold px-3 py-1.5 bg-[var(--color-surface)] border border-[var(--color-border-strong)] rounded shadow-sm hover:bg-[var(--color-surface-muted)] transition-colors mt-1">Resync selected range</button>
+            </div>
 
-        <p id="sync-source-status" class="privacy-note" style="margin-top: 12px;">Safari displays BrowserBridge data from your server. Sync checks Safari source capabilities first, then refreshes remote BrowserBridge data.</p>
-        
-        <details style="margin-top: 12px;">
-            <summary style="cursor:pointer; color:var(--bb-muted); font-size:12px; font-weight:600;">Advanced diagnostics</summary>
-            <div style="margin-top: 12px;" class="stack">
-                <h3 style="font-size: 12px; color:var(--bb-muted);">Connected devices</h3>
-                <div id="devices-list" class="list" style="margin-bottom: 12px;"></div>
-                
-                <h3 style="font-size: 12px; color:var(--bb-muted);">Quick stats</h3>
-                <div class="stats-grid">
-                    <div class="stat">
-                        <strong id="bookmarks-stat">0</strong>
-                        <span class="muted">Bookmarks</span>
+            <details class="group bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-sm mb-4">
+                <summary class="cursor-pointer text-xs font-semibold text-[var(--color-muted)] p-3 select-none hover:text-[var(--color-text)] transition-colors list-none [&::-webkit-details-marker]:hidden border-b border-transparent group-open:border-[var(--color-border)] flex items-center justify-between">
+                    Advanced diagnostics
+                    <svg class="w-4 h-4 opacity-50 transform transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <div class="p-3 flex flex-col gap-4 text-sm bg-[var(--color-surface-muted)] rounded-b-[var(--radius-md)]">
+                    <div>
+                        <h3 class="text-xs font-bold text-[var(--color-muted)] uppercase tracking-wider mb-2">Connected devices</h3>
+                        <div id="devices-list" class="flex flex-col gap-2"></div>
                     </div>
-                    <div class="stat">
-                        <strong id="history-stat">0</strong>
-                        <span class="muted">History</span>
-                    </div>
-                    <div class="stat">
-                        <strong id="tabs-stat">0</strong>
-                        <span class="muted">Latest tabs</span>
+                    
+                    <div>
+                        <h3 class="text-xs font-bold text-[var(--color-muted)] uppercase tracking-wider mb-2">Quick stats</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded p-2 text-center flex flex-col">
+                                <strong id="bookmarks-stat" class="text-lg font-bold text-[var(--color-text)]">0</strong>
+                                <span class="text-[10px] text-[var(--color-muted)]">Bookmarks</span>
+                            </div>
+                            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded p-2 text-center flex flex-col">
+                                <strong id="history-stat" class="text-lg font-bold text-[var(--color-text)]">0</strong>
+                                <span class="text-[10px] text-[var(--color-muted)]">History</span>
+                            </div>
+                            <div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded p-2 text-center flex flex-col">
+                                <strong id="tabs-stat" class="text-lg font-bold text-[var(--color-text)]">0</strong>
+                                <span class="text-[10px] text-[var(--color-muted)]">Tabs</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </details>
 
-                <p id="safari-bookmarks-upload-status" class="muted" style="margin-top: 8px; font-size: 11px;">Native Safari bookmark capability has not been checked yet.</p>
-                <p id="safari-history-upload-status" class="muted" style="margin-top: 4px; font-size: 11px;">Native Safari history capability has not been checked yet.</p>
-
-                <h3 style="font-size: 12px; color:var(--bb-muted); margin-top: 12px;">Safari capabilities</h3>
-                <div class="stack" style="font-size: 11px;">
-                    <p id="capability-current-tab" class="muted">Read current tab: Checking...</p>
-                    <p id="capability-all-tabs" class="muted">Read open tabs: Checking...</p>
-                    <p class="muted">Send current tab: Available</p>
-                    <p class="muted">Receive tabs: Available</p>
-                    <p class="muted">Display BrowserBridge Bookmarks: Available</p>
-                    <p class="muted">Display BrowserBridge History: Available</p>
-                    <p id="capability-bookmarks" class="muted">Native Safari bookmark reading: Checking...</p>
-                    <p id="capability-history" class="muted">Native Safari history reading: Checking...</p>
-                    <p id="capability-background" class="muted">Background polling: Checking...</p>
-                </div>
-
-                <h3 style="font-size: 12px; color:var(--bb-muted); margin-top: 12px;">Refresh status</h3>
-                <p id="refresh-summary" class="muted" style="font-size: 11px;">Refresh BrowserBridge data from your server.</p>
-
-                <h3 style="font-size: 12px; color:var(--bb-muted); margin-top: 12px;">Capability debug</h3>
-                <div id="capability-debug-list" class="list"></div>
-            </div>
-        </details>
-
-        <button id="open-options" type="button" class="secondary" style="margin-top: 16px; width: 100%;">Full Extension Options</button>
-      </section>
+            <button id="open-options" type="button" class="w-full text-xs font-semibold px-3 py-2 mt-auto bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded shadow-sm hover:bg-[var(--color-border)] transition-colors">Full Extension Options</button>
+          </section>
+      </div>
     </main>
 
-    <div id="history-confirmation-modal" class="modal" hidden>
-      <section class="modal-content" role="dialog" aria-modal="true" aria-labelledby="history-confirmation-title">
-        <h2 id="history-confirmation-title">Enable Safari history or Activity sync?</h2>
-        <p class="muted">
-          If Safari allows native history access, BrowserBridge will store visited URLs and page titles on your server.
-          If Safari does not allow full history access, BrowserBridge Activity saves Safari pages you send/open through the extension.
-          BrowserBridge Activity is not the same as full Safari history.
-        </p>
-        <div class="actions">
-          <button id="cancel-history-enable" type="button" class="secondary">Cancel</button>
-          <button id="confirm-history-enable" type="button">Enable sync</button>
+    <div id="history-confirmation-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" hidden>
+      <section class="bg-[var(--color-surface)] rounded-[var(--radius-lg)] shadow-2xl p-5 w-full max-w-[320px] border border-[var(--color-border)]" role="dialog" aria-modal="true" aria-labelledby="history-confirmation-title">
+        <h2 id="history-confirmation-title" class="text-base font-bold m-0 mb-2">Enable history sync?</h2>
+        <p class="text-xs text-[var(--color-muted)] mb-5">This will sync visited URLs and page titles to your BrowserBridge server. Do not enable this if you do not want browsing history synced.</p>
+        <div class="flex justify-end gap-2">
+          <button id="cancel-history-enable" type="button" class="text-xs font-semibold px-3 py-1.5 bg-[var(--color-surface-muted)] border border-[var(--color-border-strong)] rounded hover:bg-[var(--color-border)] transition-colors">Cancel</button>
+          <button id="confirm-history-enable" type="button" class="text-xs font-bold px-3 py-1.5 bg-[var(--color-primary)] text-white border border-[var(--color-primary-strong)] rounded hover:bg-[var(--color-primary-strong)] transition-colors shadow-sm">Enable</button>
         </div>
       </section>
     </div>

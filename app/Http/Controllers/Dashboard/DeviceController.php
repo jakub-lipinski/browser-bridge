@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\TabCommandStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\RedirectResponse;
@@ -17,8 +18,8 @@ class DeviceController extends Controller
             'removal_reason' => 'disconnected_from_dashboard',
         ]);
 
-        $device->sentTabCommands()->where('status', \App\Enums\TabCommandStatus::Pending)->update(['status' => \App\Enums\TabCommandStatus::Dismissed]);
-        $device->incomingTabCommands()->where('status', \App\Enums\TabCommandStatus::Pending)->update(['status' => \App\Enums\TabCommandStatus::Dismissed]);
+        $device->sentTabCommands()->where('status', TabCommandStatus::Pending)->update(['status' => TabCommandStatus::Dismissed]);
+        $device->incomingTabCommands()->where('status', TabCommandStatus::Pending)->update(['status' => TabCommandStatus::Dismissed]);
 
         $device->bookmarkSyncProfilesAsSource()->update(['is_active' => false]);
         $device->bookmarkSyncProfilesAsTarget()->update(['is_active' => false]);
@@ -40,15 +41,15 @@ class DeviceController extends Controller
         $device->normalizedBookmarks()->delete();
         $device->tabSnapshots()->delete();
         $device->historyItems()->delete();
-        
+
         $device->sentTabCommands()->delete();
         $device->incomingTabCommands()->delete();
-        
+
         $device->bookmarkSyncProfilesAsSource()->each(function ($profile) {
             $profile->runs()->delete();
             $profile->delete();
         });
-        
+
         $device->bookmarkSyncProfilesAsTarget()->each(function ($profile) {
             $profile->runs()->delete();
             $profile->delete();
