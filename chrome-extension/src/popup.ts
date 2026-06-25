@@ -180,20 +180,23 @@ function activateTab(tab: string): void {
     button.classList.toggle('active', button.dataset.tab === tab);
   });
 
-  ['bookmarks', 'history', 'settings'].forEach((name) => {
-    const panel = document.querySelector<HTMLElement>(`#${name}-panel`);
-
-    if (panel) {
-      panel.hidden = panel.id !== `${tab}-panel`;
-    }
+  document.querySelectorAll<HTMLElement>('.tab-panel').forEach((panel) => {
+    const isActive = panel.id === `${tab}-panel`;
+    panel.hidden = !isActive;
+    panel.classList.toggle('active', isActive);
   });
 
   if (tab === 'send') {
-    document.querySelector('#send-card')?.scrollIntoView({ block: 'nearest' });
+    document.querySelector('#send-panel')?.scrollIntoView({ block: 'nearest' });
   }
 
   if (tab === 'incoming') {
-    document.querySelector('#incoming-panel')?.scrollIntoView({ block: 'nearest' });
+    const sendPanel = document.querySelector<HTMLElement>('#send-panel');
+    if (sendPanel) {
+      sendPanel.hidden = false;
+      sendPanel.classList.add('active');
+    }
+    document.querySelector('#commands-list')?.scrollIntoView({ block: 'nearest' });
   }
 }
 
@@ -252,6 +255,39 @@ function renderDevices(status: PopupStatus): void {
   });
 }
 
+function createFavicon(urlStr: string, sizeClass = 'w-6 h-6'): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = `${sizeClass} shrink-0 relative flex items-center justify-center`;
+
+  try {
+    const domain = new URL(urlStr).hostname;
+    if (domain) {
+      const firstLetter = domain.replace(/^www\./, '')[0]?.toUpperCase() || '?';
+      
+      const fallback = document.createElement('div');
+      fallback.className = `absolute inset-0 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[10px] font-bold text-[var(--color-muted)] uppercase`;
+      fallback.textContent = firstLetter;
+      
+      const img = document.createElement('img');
+      img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      img.className = `absolute inset-0 w-full h-full object-contain rounded-[var(--radius-sm)] bg-[var(--color-surface)] shadow-sm border border-[var(--color-border)] p-0.5 z-10`;
+      img.loading = 'lazy';
+      img.onerror = () => img.remove();
+      
+      wrapper.append(fallback, img);
+      return wrapper;
+    }
+  } catch {
+    // ignore
+  }
+  
+  const fallback = document.createElement('div');
+  fallback.className = `absolute inset-0 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[10px] font-bold text-[var(--color-muted)] uppercase`;
+  fallback.textContent = '?';
+  wrapper.append(fallback);
+  return wrapper;
+}
+
 function renderCommands(status: PopupStatus): void {
   const commandsList = requireElement(elements.commandsList);
   commandsList.textContent = '';
@@ -267,7 +303,7 @@ function renderCommands(status: PopupStatus): void {
 
   status.incomingCommands.slice(0, 5).forEach((command) => {
     const item = document.createElement('div');
-    item.className = 'flex flex-col gap-1 p-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-sm)]';
+    item.className = 'flex items-center gap-3 p-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-sm)] min-w-0';
 
     const title = document.createElement('div');
     title.className = 'text-[13px] font-semibold text-[var(--color-text)] truncate';
@@ -300,8 +336,11 @@ function renderCommands(status: PopupStatus): void {
         .catch((error: unknown) => setError(error instanceof Error ? error.message : 'Unable to dismiss command.'));
     });
 
-    actions.append(openButton, dismissButton);
-    item.append(title, url, actions);
+    const content = document.createElement('div');
+    content.className = 'flex flex-col gap-1 min-w-0';
+    content.append(title, url, actions);
+
+    item.append(createFavicon(command.url || '', 'w-8 h-8'), content);
     commandsList.append(item);
   });
 }
@@ -373,7 +412,6 @@ function renderBookmarks(): void {
 
     items.forEach((bookmark) => {
       const item = document.createElement('div');
-      item.className = 'flex flex-col gap-0.5 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[var(--color-primary)]';
       item.tabIndex = 0;
 
       const title = document.createElement('div');
@@ -403,7 +441,12 @@ function renderBookmarks(): void {
         }
       });
 
-      item.append(title, url, path);
+      const content = document.createElement('div');
+      content.className = 'flex flex-col gap-0.5 min-w-0';
+      content.append(title, url, path);
+
+      item.className = 'flex items-center gap-2.5 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[var(--color-primary)]';
+      item.append(createFavicon(bookmark.url || ''), content);
       list.append(item);
     });
   });
@@ -457,7 +500,6 @@ function renderHistoryItems(): void {
 
     items.forEach((historyItem) => {
       const item = document.createElement('div');
-      item.className = 'flex flex-col gap-0.5 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[var(--color-primary)]';
       item.tabIndex = 0;
 
       const title = document.createElement('div');
@@ -487,7 +529,12 @@ function renderHistoryItems(): void {
         }
       });
 
-      item.append(title, url, visitedAt);
+      const content = document.createElement('div');
+      content.className = 'flex flex-col gap-0.5 min-w-0';
+      content.append(title, url, visitedAt);
+
+      item.className = 'flex items-center gap-2.5 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-[var(--color-primary)]';
+      item.append(createFavicon(historyItem.url || ''), content);
       list.append(item);
     });
   });
@@ -867,6 +914,8 @@ requireElement(elements.resyncHistory).addEventListener('click', () => {
 document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((button) => {
   button.addEventListener('click', () => activateTab(button.dataset.tab || 'send'));
 });
+
+activateTab('send');
 
 void refresh().catch((error: unknown) => {
   setError(error instanceof Error ? error.message : 'Unable to load BrowserBridge status.');

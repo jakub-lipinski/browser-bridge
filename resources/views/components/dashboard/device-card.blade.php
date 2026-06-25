@@ -3,8 +3,11 @@
 <x-dashboard.card class="p-5 flex flex-col gap-4">
     <div class="flex justify-between items-start">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-xs font-bold uppercase text-[var(--color-text)]">
-                {{ substr($device->name, 0, 1) }}
+            <div class="w-10 h-10 shrink-0 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text)] relative">
+                <x-dashboard.browser-icon :browser="$device->browser" class="w-5 h-5 opacity-80" />
+                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-[var(--color-surface)] rounded-full flex items-center justify-center shadow-sm border border-[var(--color-border)]">
+                    <x-dashboard.platform-icon :platform="$device->platform" class="w-2.5 h-2.5 text-[var(--color-muted)]" />
+                </div>
             </div>
             <div>
                 <h3 class="text-base font-bold text-[var(--color-text)] leading-tight m-0">{{ $device->name }}</h3>

@@ -16,9 +16,6 @@
                     <x-dashboard.badge variant="accent" class="mr-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-primary-strong)]"></span> Local server running
                     </x-dashboard.badge>
-                    <x-dashboard.button href="#tabs" variant="secondary">
-                        <svg class="w-4 h-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send a tab
-                    </x-dashboard.button>
                     <x-dashboard.button onclick="openModal('setup-sync-modal')">Set up bookmark sync</x-dashboard.button>
                 </x-slot:actions>
             </x-dashboard.header>
@@ -143,13 +140,9 @@
                 @else
                     <div class="flex flex-col gap-3">
                         @foreach ($tabCommands->take(5) as $tabCommand)
-                            @php
-                                $domain = parse_url($tabCommand->url, PHP_URL_HOST) ?? '';
-                                $firstLetter = $domain ? strtoupper(substr(str_replace('www.', '', $domain), 0, 1)) : '?';
-                            @endphp
                             <div class="flex items-center justify-between gap-4 p-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] hover:border-[var(--color-border-strong)] transition-colors">
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-8 h-8 shrink-0 rounded bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-xs font-bold text-[var(--color-text)] uppercase">{{ $firstLetter }}</div>
+                                    <x-dashboard.favicon :url="$tabCommand->url" class="w-8 h-8" />
                                     <div class="min-w-0">
                                         <a href="{{ $tabCommand->url }}" target="_blank" rel="noreferrer" class="block text-sm font-semibold text-[var(--color-text)] truncate hover:text-[var(--color-primary)] transition-colors">{{ $tabCommand->title ?: $tabCommand->url }}</a>
                                         <div class="text-xs text-[var(--color-muted)] truncate mt-0.5">
@@ -182,16 +175,14 @@
                                 <h4 class="font-bold text-sm text-[var(--color-text)] truncate">{{ $tabSnapshot->device?->name ?? 'Target unavailable' }}</h4>
                                 <span class="text-xs text-[var(--color-muted)] shrink-0">{{ $tabSnapshot->created_at->diffForHumans() }}</span>
                             </div>
-                            @foreach ($visibleTabs as $tab)
-                                @php
-                                    $domain = parse_url($tab['url'] ?? '', PHP_URL_HOST) ?? '';
-                                    $firstLetter = $domain ? strtoupper(substr(str_replace('www.', '', $domain), 0, 1)) : '?';
-                                @endphp
-                                <div class="flex items-center gap-2.5 min-w-0">
-                                    <div class="w-6 h-6 shrink-0 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[10px] font-bold text-[var(--color-muted)] uppercase">{{ $firstLetter }}</div>
-                                    <a href="{{ $tab['url'] ?? '#' }}" target="_blank" rel="noreferrer" class="text-sm text-[var(--color-text)] hover:text-[var(--color-primary)] truncate transition-colors">{{ $tab['title'] ?? $tab['url'] ?? 'Untitled Tab' }}</a>
-                                </div>
-                            @endforeach
+                            <div class="flex flex-col gap-0.5">
+                                @foreach ($visibleTabs as $tab)
+                                    <a href="{{ $tab['url'] ?? '#' }}" target="_blank" rel="noreferrer" class="flex items-center gap-3 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors min-w-0">
+                                        <x-dashboard.favicon :url="$tab['url'] ?? ''" class="w-6 h-6" />
+                                        <div class="text-sm text-[var(--color-text)] truncate transition-colors flex-1">{{ $tab['title'] ?? $tab['url'] ?? 'Untitled Tab' }}</div>
+                                    </a>
+                                @endforeach
+                            </div>
                             @if ($hiddenTabs->isNotEmpty())
                                 <div class="text-xs text-[var(--color-muted)] italic mt-1">And {{ $hiddenTabs->count() }} more tabs...</div>
                             @endif
@@ -228,12 +219,8 @@
                                     <h5 class="text-xs font-bold text-[var(--color-muted)] uppercase tracking-wider mb-2">{{ $deviceName }}</h5>
                                     <div class="flex flex-col gap-1.5">
                                         @foreach ($bookmarks as $bookmark)
-                                            @php
-                                                $domain = parse_url($bookmark->url, PHP_URL_HOST) ?? '';
-                                                $firstLetter = $domain ? strtoupper(substr(str_replace('www.', '', $domain), 0, 1)) : '?';
-                                            @endphp
                                             <a href="{{ $bookmark->url }}" target="_blank" rel="noreferrer" class="flex items-center gap-3 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors">
-                                                <div class="w-6 h-6 shrink-0 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[10px] font-bold text-[var(--color-muted)] uppercase">{{ $firstLetter }}</div>
+                                                <x-dashboard.favicon :url="$bookmark->url" class="w-6 h-6" />
                                                 <div class="min-w-0 flex-1">
                                                     <div class="text-sm font-semibold text-[var(--color-text)] truncate">{{ $bookmark->title ?: $bookmark->url }}</div>
                                                     <div class="text-xs text-[var(--color-muted)] truncate">
@@ -278,12 +265,8 @@
                         <div data-empty class="{{ $latestHistoryItems->isEmpty() ? '' : 'hidden' }} text-sm text-[var(--color-muted)] p-4 text-center">No history found.</div>
                         <div data-results class="flex flex-col gap-1.5">
                             @foreach ($latestHistoryItems as $historyItem)
-                                @php
-                                    $domain = parse_url($historyItem->url, PHP_URL_HOST) ?? '';
-                                    $firstLetter = $domain ? strtoupper(substr(str_replace('www.', '', $domain), 0, 1)) : '?';
-                                @endphp
                                 <a href="{{ $historyItem->url }}" target="_blank" rel="noreferrer" class="flex items-center gap-3 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-muted)] border border-transparent hover:border-[var(--color-border)] transition-colors">
-                                    <div class="w-6 h-6 shrink-0 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border)] flex items-center justify-center text-[10px] font-bold text-[var(--color-muted)] uppercase">{{ $firstLetter }}</div>
+                                    <x-dashboard.favicon :url="$historyItem->url" class="w-6 h-6" />
                                     <div class="min-w-0 flex-1">
                                         <div class="text-sm font-semibold text-[var(--color-text)] truncate">{{ $historyItem->title ?: $historyItem->url }}</div>
                                         <div class="text-xs text-[var(--color-muted)] truncate">
@@ -312,8 +295,8 @@
 
     <!-- Bookmark Sync Setup Modal -->
     <x-dashboard.modal id="setup-sync-modal" title="Set up Bookmark Sync" description="Synchronize bookmarks between your connected devices.">
-        <div class="flex flex-col gap-4">
-            <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-4 min-w-0">
+            <div class="flex flex-col gap-1.5 min-w-0">
                 <label class="text-sm font-semibold text-[var(--color-text)]">Source device</label>
                 <select class="w-full bg-[var(--color-surface)] border border-[var(--color-border-strong)] text-[var(--color-text)] text-sm rounded-[var(--radius-md)] px-3 py-2 min-h-[38px] outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                     <option value="">Select a source device...</option>
@@ -322,7 +305,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-1.5 min-w-0">
                 <label class="text-sm font-semibold text-[var(--color-text)]">Target device</label>
                 <select class="w-full bg-[var(--color-surface)] border border-[var(--color-border-strong)] text-[var(--color-text)] text-sm rounded-[var(--radius-md)] px-3 py-2 min-h-[38px] outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                     <option value="">Select a target device...</option>
@@ -331,7 +314,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-1.5 min-w-0">
                 <label class="text-sm font-semibold text-[var(--color-text)]">Sync mode</label>
                 <select class="w-full bg-[var(--color-surface)] border border-[var(--color-border-strong)] text-[var(--color-text)] text-sm rounded-[var(--radius-md)] px-3 py-2 min-h-[38px] outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                     <option value="safe_folder" selected>Safe folder (Recommended)</option>
@@ -339,7 +322,7 @@
                     <option value="mirror" disabled>Mirror (Dangerous - coming soon)</option>
                 </select>
             </div>
-            <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-1.5 min-w-0">
                 <label class="text-sm font-semibold text-[var(--color-text)]">Automation</label>
                 <select class="w-full bg-[var(--color-surface)] border border-[var(--color-border-strong)] text-[var(--color-text)] text-sm rounded-[var(--radius-md)] px-3 py-2 min-h-[38px] outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
                     <option value="manual">Manual only</option>
@@ -348,7 +331,7 @@
                     <option value="1440">Daily</option>
                 </select>
             </div>
-            <x-dashboard.badge variant="warning" class="mt-2 block p-3 w-full text-sm font-medium whitespace-normal">
+            <x-dashboard.badge variant="warning" class="mt-2 block p-3 w-full text-sm font-medium whitespace-normal break-words">
                 Full profile management and merging will be fully enabled in a future update. For now, configure profiles directly from the Chrome extension.
             </x-dashboard.badge>
         </div>
@@ -357,4 +340,32 @@
             <x-dashboard.button disabled class="opacity-50 cursor-not-allowed">Save profile</x-dashboard.button>
         </x-slot:footer>
     </x-dashboard.modal>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                let activeId = null;
+                // Find the first intersecting entry from the top
+                const intersecting = entries.filter(e => e.isIntersecting);
+                if (intersecting.length > 0) {
+                    activeId = intersecting[0].target.id;
+                }
+
+                if (activeId) {
+                    document.querySelectorAll('[data-sidebar-item]').forEach(el => {
+                        const isActive = el.getAttribute('href') === `#${activeId}`;
+                        if (isActive) {
+                            el.classList.add('active', 'bg-[var(--color-surface)]', 'text-[var(--color-text)]', 'shadow-[var(--shadow-sm)]');
+                            el.classList.remove('text-[var(--color-muted)]', 'hover:bg-[var(--color-surface)]', 'hover:text-[var(--color-text)]', 'hover:shadow-[var(--shadow-sm)]');
+                        } else {
+                            el.classList.remove('active', 'bg-[var(--color-surface)]', 'text-[var(--color-text)]', 'shadow-[var(--shadow-sm)]');
+                            el.classList.add('text-[var(--color-muted)]', 'hover:bg-[var(--color-surface)]', 'hover:text-[var(--color-text)]', 'hover:shadow-[var(--shadow-sm)]');
+                        }
+                    });
+                }
+            }, { rootMargin: '-10% 0px -70% 0px' });
+
+            document.querySelectorAll('div[id="overview"], section[id]').forEach(el => observer.observe(el));
+        });
+    </script>
 </x-dashboard.layout>
