@@ -9,26 +9,26 @@
 }
 
 :root {
-    --bb-bg: #f7f7f4;
+    --bb-bg: #f9f9f8;
     --bb-surface: #ffffff;
-    --bb-surface-muted: #fbfbf8;
+    --bb-surface-muted: #fcfcfc;
     --bb-text: #171717;
-    --bb-muted: #6b6b76;
-    --bb-border: #e5e5e0;
-    --bb-border-strong: #d6d6cf;
+    --bb-muted: #71717a;
+    --bb-border: #eaeaea;
+    --bb-border-strong: #d4d4d4;
     --bb-accent: #0f766e;
-    --bb-accent-strong: #0b5f58;
+    --bb-accent-strong: #0f5f58;
     --bb-accent-subtle: #ccfbf1;
     --bb-warning-bg: #fff7ed;
-    --bb-warning-border: #fed7aa;
-    --bb-warning-text: #7c2d12;
-    --bb-danger: #b91c1c;
+    --bb-warning-border: #ffedd5;
+    --bb-warning-text: #9a3412;
+    --bb-danger: #ef4444;
     --bb-danger-bg: #fef2f2;
-    --bb-danger-border: #fecaca;
-    --bb-radius-sm: 6px;
-    --bb-radius-md: 8px;
-    --bb-radius-lg: 12px;
-    --bb-shadow-sm: 0 1px 2px rgb(23 23 23 / 0.04);
+    --bb-danger-border: #fee2e2;
+    --bb-radius-sm: 8px;
+    --bb-radius-md: 14px;
+    --bb-radius-lg: 20px;
+    --bb-shadow-sm: 0 4px 12px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.02);
 }
 
 body {
@@ -41,10 +41,55 @@ body {
     outline-offset: 2px;
 }
 
-.bb-shell {
+.bb-dashboard-layout {
+    display: flex;
+    max-width: 1200px;
     margin: 0 auto;
-    max-width: 1180px;
-    padding: 32px 20px 44px;
+    padding: 32px 20px;
+    gap: 40px;
+}
+
+.bb-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 32px;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.bb-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bb-nav-item {
+    color: var(--bb-muted);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: var(--bb-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 150ms ease, color 150ms ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bb-nav-item:hover, .bb-nav-item.active {
+    background: var(--bb-surface);
+    color: var(--bb-text);
+    box-shadow: var(--bb-shadow-sm);
+}
+
+.bb-content {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    gap: 24px;
 }
 
 .bb-stack {
@@ -412,7 +457,111 @@ a.bb-item-title:hover,
     display: none !important;
 }
 
+.bb-details {
+    background: var(--bb-surface-muted);
+    border: 1px solid var(--bb-border);
+    border-radius: var(--bb-radius-md);
+    margin-top: 14px;
+    overflow: hidden;
+}
+
+.bb-details[open] {
+    padding-bottom: 12px;
+}
+
+.bb-details-summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--bb-muted);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.bb-details-summary:hover {
+    background: var(--bb-border);
+    color: var(--bb-text);
+}
+
+.bb-details-summary::-webkit-details-marker {
+    display: none;
+}
+
+.bb-details-content {
+    padding: 0 14px;
+}
+
+.bb-device-card {
+    background: var(--bb-surface);
+    border: 1px solid var(--bb-border);
+    border-radius: var(--bb-radius-lg);
+    box-shadow: var(--bb-shadow-sm);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bb-device-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.bb-device-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.bb-favicon {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.bb-favicon-fallback {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    background: var(--bb-border-strong);
+    color: var(--bb-text);
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.bb-hero-card {
+    background: linear-gradient(135deg, var(--bb-surface), var(--bb-accent-subtle));
+    border: 1px solid var(--bb-border);
+    border-radius: var(--bb-radius-lg);
+    box-shadow: var(--bb-shadow-sm);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
 @media (max-width: 900px) {
+    .bb-dashboard-layout {
+        flex-direction: column;
+    }
+    
+    .bb-sidebar {
+        width: 100%;
+        position: static;
+    }
+
     .bb-header,
     .bb-section-head,
     .bb-row {

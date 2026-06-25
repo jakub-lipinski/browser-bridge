@@ -7,177 +7,143 @@
     <script type="module" src="/popup.ts"></script>
   </head>
   <body>
-    <main class="shell">
-      <header class="header">
-        <div>
-          <div class="brand-row">
-            <span class="brand-mark" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-            </span>
-            <div>
-              <p class="eyebrow">BrowserBridge</p>
-              <h1>Tab handoff <span id="activity-dot" class="activity-dot" hidden></span></h1>
-            </div>
+    <main class="shell" style="padding: 16px; min-width: 380px;">
+      <header class="header" style="margin-bottom: 16px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="brand-mark" style="height:32px; width:32px;" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
           </div>
-          <p id="device-summary" class="muted"></p>
-          <p class="muted">Last sync: <span id="last-sync">Never</span></p>
+          <div>
+            <h1 style="font-size: 16px;">BrowserBridge <span id="activity-dot" class="activity-dot" hidden></span></h1>
+            <p id="device-summary" class="muted" style="font-size: 12px; margin-top:2px;">Connecting...</p>
+          </div>
         </div>
-        <span id="connection-status" class="status bad">Disconnected</span>
+        <div style="text-align: right;">
+          <span id="connection-status" class="status bad">Disconnected</span>
+          <p class="muted" style="font-size: 10px; margin-top:4px;">Last sync: <span id="last-sync">Never</span></p>
+        </div>
       </header>
 
-      <section id="send-card" class="panel primary-panel">
-        <div class="row">
-          <h2>
-            <span class="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-            </span>
-            Send current tab
-          </h2>
-          <button id="sync-now" type="button" class="secondary">Sync</button>
-        </div>
-        <p id="current-tab-title" class="truncate">No syncable current tab.</p>
-        <p id="current-tab-url" class="muted truncate"></p>
-        <div class="row wrap">
-          <select id="send-target" aria-label="Target device"></select>
-          <button id="send-current-tab" type="button">Send to Safari</button>
-        </div>
-        <p id="send-status" class="send-status"></p>
-        <p id="send-toast" class="toast" hidden></p>
-        <p id="error-message" class="muted"></p>
-      </section>
-
-      <section id="incoming-panel" class="panel tab-panel">
-        <div class="row">
-          <h2>
-            <span class="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-            </span>
-            Incoming tabs
-          </h2>
-          <span id="incoming-count" class="badge">0</span>
-        </div>
-        <div id="commands-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <h2>
-          <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M10 8h4M10 16h4"/></svg>
-          </span>
-          Connected devices
-        </h2>
-        <div id="devices-list" class="list"></div>
-      </section>
-
-      <section class="panel">
-        <h2>
-          <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5"/><path d="M8 17V9"/><path d="M12 19V7"/><path d="M16 15v-4"/><path d="M20 19V5"/></svg>
-          </span>
-          Quick stats
-        </h2>
-        <div class="stats-grid">
-          <div class="stat">
-            <strong id="bookmarks-stat">0</strong>
-            <span class="muted">Bookmarks</span>
-          </div>
-          <div class="stat">
-            <strong id="history-stat">0</strong>
-            <span class="muted">History</span>
-          </div>
-          <div class="stat">
-            <strong id="tabs-stat">0</strong>
-            <span class="muted">Latest tabs</span>
-          </div>
-        </div>
-      </section>
-
-      <nav class="tabs" aria-label="Popup sections">
+      <nav class="tabs" aria-label="Popup sections" style="margin-bottom: 16px;">
         <button type="button" class="tab-button active" data-tab="send">Send</button>
         <button type="button" class="tab-button" data-tab="bookmarks">Bookmarks</button>
         <button type="button" class="tab-button" data-tab="history">History</button>
         <button type="button" class="tab-button" data-tab="settings">Settings</button>
       </nav>
 
-      <section id="bookmarks-panel" class="panel tab-panel" hidden>
+      <section id="send-card" class="panel tab-panel primary-panel">
         <div class="row">
-          <h2>
-            <span class="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            </span>
-            Bookmarks
-          </h2>
-          <button id="sync-bookmarks-now" type="button" class="secondary">Sync now</button>
+          <h2 style="font-size: 14px;">Send current tab</h2>
+          <button id="sync-now" type="button" class="secondary" style="min-height: 28px; padding: 4px 8px;">Sync</button>
         </div>
-        <input id="bookmarks-query" type="text" placeholder="Search bookmarks" />
-        <p id="bookmarks-count" class="muted">0 bookmarks</p>
-        <div id="bookmarks-list" class="list"></div>
-        <div class="actions">
-          <button id="bookmarks-more" type="button" class="secondary">Show more</button>
-          <button id="bookmarks-less" type="button" class="secondary">Show less</button>
+        <div style="margin: 8px 0;">
+            <p id="current-tab-title" class="truncate" style="font-weight: 600; font-size: 13px;">No syncable current tab.</p>
+            <p id="current-tab-url" class="muted truncate" style="font-size: 11px; margin-top: 2px;"></p>
+        </div>
+        <div class="row wrap" style="gap: 8px;">
+          <select id="send-target" aria-label="Target device" style="flex:1; min-height: 32px; padding: 4px 8px;"></select>
+          <button id="send-current-tab" type="button" style="min-height: 32px;">Send to Safari</button>
+        </div>
+        <p id="send-status" class="send-status" style="margin-top: 8px;"></p>
+        <p id="send-toast" class="toast" hidden></p>
+        <p id="error-message" class="muted"></p>
+
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bb-border);">
+            <div class="row">
+                <h2 style="font-size: 14px;">Received tabs</h2>
+                <span id="incoming-count" class="badge">0</span>
+            </div>
+            <div id="commands-list" class="list" style="margin-top: 12px; max-height: 200px; overflow-y: auto;"></div>
+        </div>
+      </section>
+
+      <section id="bookmarks-panel" class="panel tab-panel" hidden>
+        <div class="row" style="margin-bottom: 8px;">
+          <h2 style="font-size: 14px;">Bookmarks</h2>
+          <button id="sync-bookmarks-now" type="button" class="secondary" style="min-height: 28px; padding: 4px 8px;">Sync now</button>
+        </div>
+        <input id="bookmarks-query" type="text" placeholder="Search bookmarks..." style="margin-bottom: 8px;" />
+        <p id="bookmarks-count" class="muted" style="margin-bottom: 8px;">0 bookmarks</p>
+        <div id="bookmarks-list" class="list" style="max-height: 280px; overflow-y: auto;"></div>
+        <div class="actions" style="margin-top: 8px;">
+          <button id="bookmarks-more" type="button" class="secondary" style="width: 100%;">Show more</button>
+          <button id="bookmarks-less" type="button" class="secondary" style="width: 100%;">Show less</button>
         </div>
       </section>
 
       <section id="history-panel" class="panel tab-panel" hidden>
-        <div class="row">
-          <h2>
-            <span class="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/><path d="M12 7v5l3 2"/></svg>
-            </span>
-            History
-          </h2>
-          <button id="delete-history" type="button" class="danger">Delete</button>
+        <div class="row" style="margin-bottom: 8px;">
+          <h2 style="font-size: 14px;">History</h2>
+          <button id="delete-history" type="button" class="danger" style="min-height: 28px; padding: 4px 8px;">Delete</button>
         </div>
-        <input id="history-query" type="text" placeholder="Search history" />
-        <p id="history-count" class="muted">0 history items</p>
-        <div id="history-list" class="list"></div>
-        <div class="actions">
-          <button id="history-more" type="button" class="secondary">Show more</button>
-          <button id="history-less" type="button" class="secondary">Show less</button>
+        <input id="history-query" type="text" placeholder="Search history..." style="margin-bottom: 8px;" />
+        <p id="history-count" class="muted" style="margin-bottom: 8px;">0 history items</p>
+        <div id="history-list" class="list" style="max-height: 280px; overflow-y: auto;"></div>
+        <div class="actions" style="margin-top: 8px;">
+          <button id="history-more" type="button" class="secondary" style="width: 100%;">Show more</button>
+          <button id="history-less" type="button" class="secondary" style="width: 100%;">Show less</button>
         </div>
       </section>
 
       <section id="settings-panel" class="panel tab-panel" hidden>
-        <h2>
-          <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-          </span>
-          Settings
-        </h2>
-        <label class="row">
-          <span>Sync bookmarks</span>
-          <input id="toggle-bookmarks" type="checkbox" />
-        </label>
-        <label class="row">
-          <span>Sync open tabs</span>
-          <input id="toggle-tabs" type="checkbox" />
-        </label>
-        <label class="row">
-          <span>Sync browsing history</span>
-          <input id="toggle-history" type="checkbox" />
-        </label>
+        <h2 style="font-size: 14px; margin-bottom: 12px;">Sync settings</h2>
+        
+        <div class="stack">
+            <label class="row">
+            <span>Sync bookmarks</span>
+            <input id="toggle-bookmarks" type="checkbox" />
+            </label>
+            <label class="row">
+            <span>Sync open tabs</span>
+            <input id="toggle-tabs" type="checkbox" />
+            </label>
+            <label class="row">
+            <span>Sync browsing history</span>
+            <input id="toggle-history" type="checkbox" />
+            </label>
+        </div>
 
-        <div id="history-settings-container" hidden>
+        <div id="history-settings-container" hidden style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--bb-border);">
           <label class="row">
             <span>History range</span>
-            <select id="history-sync-range">
+            <select id="history-sync-range" style="width: auto;">
               <option value="24h">Last 24 hours</option>
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
               <option value="all">All available history</option>
             </select>
           </label>
-          <div id="history-range-warning" class="warning" hidden>
-            This may sync thousands of browsing history entries and may include sensitive private data.
+          <div id="history-range-warning" class="warning" hidden style="margin-top: 8px;">
+            This may sync thousands of entries.
           </div>
-          <button id="resync-history" type="button" class="secondary">Resync selected range</button>
+          <button id="resync-history" type="button" class="secondary" style="margin-top: 8px; width: 100%;">Resync selected range</button>
         </div>
 
-        <div class="warning">
-          History sync is off by default. If enabled, BrowserBridge stores a shared searchable history view on your server.
-          BrowserBridge never syncs passwords, cookies, login sessions or form data.
-        </div>
-        <button id="open-options" type="button" class="secondary">Options</button>
+        <details style="margin-top: 12px;">
+            <summary style="cursor:pointer; color:var(--bb-muted); font-size:12px; font-weight:600;">Advanced diagnostics</summary>
+            <div style="margin-top: 12px;" class="stack">
+                <h3 style="font-size: 12px; color:var(--bb-muted);">Connected devices</h3>
+                <div id="devices-list" class="list" style="margin-bottom: 12px;"></div>
+                
+                <h3 style="font-size: 12px; color:var(--bb-muted);">Quick stats</h3>
+                <div class="stats-grid">
+                    <div class="stat">
+                        <strong id="bookmarks-stat">0</strong>
+                        <span class="muted">Bookmarks</span>
+                    </div>
+                    <div class="stat">
+                        <strong id="history-stat">0</strong>
+                        <span class="muted">History</span>
+                    </div>
+                    <div class="stat">
+                        <strong id="tabs-stat">0</strong>
+                        <span class="muted">Latest tabs</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <button id="open-options" type="button" class="secondary" style="margin-top: 16px; width: 100%;">Full Extension Options</button>
       </section>
     </main>
 
