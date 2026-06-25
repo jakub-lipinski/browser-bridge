@@ -8,12 +8,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['uuid', 'name', 'browser', 'platform', 'capabilities_json', 'last_seen_at'])]
+#[Fillable([
+    'uuid', 'name', 'browser', 'platform', 'capabilities_json', 'last_seen_at',
+    'is_active', 'disconnected_at', 'removal_reason',
+])]
 class Device extends Model
 {
     /** @use HasFactory<DeviceFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public function bookmarkSnapshots(): HasMany
     {
@@ -129,6 +133,8 @@ class Device extends Model
         return [
             'capabilities_json' => 'array',
             'last_seen_at' => 'datetime',
+            'is_active' => 'boolean',
+            'disconnected_at' => 'datetime',
         ];
     }
 }

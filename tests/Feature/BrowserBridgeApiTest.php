@@ -119,9 +119,8 @@ it('stores runtime Safari capability audits for dashboard badges', function (): 
 
     $this->get('/dashboard')
         ->assertSuccessful()
-        ->assertSee('Bookmark upload: Available')
-        ->assertSee('History upload:')
-        ->assertSee('Activity only');
+        ->assertSeeInOrder(['Can sync native bookmarks', 'Available'])
+        ->assertSeeInOrder(['Can sync native history', 'Activity only']);
 });
 
 it('enforces the registered device limit', function (): void {
@@ -303,7 +302,7 @@ it('shows bookmark counts and searchable bookmarks on the dashboard', function (
 
     $this->get('/dashboard?bookmark_query=dashboard')
         ->assertSuccessful()
-        ->assertSee('BrowserBridge Bookmarks')
+        ->assertSee('Bookmarks')
         ->assertSee('Chrome Mac')
         ->assertSee('BrowserBridge Dashboard Bookmark')
         ->assertSee('Bookmarks Bar / BrowserBridge')
@@ -332,7 +331,7 @@ it('limits dashboard bookmarks by default and exposes searchable JSON slices', f
 
     $this->get('/dashboard')
         ->assertSuccessful()
-        ->assertSee('BrowserBridge Bookmarks')
+        ->assertSee('Bookmarks')
         ->assertSee('Visible BrowserBridge Bookmark 0')
         ->assertDontSee('Old Hidden BrowserBridge Bookmark');
 

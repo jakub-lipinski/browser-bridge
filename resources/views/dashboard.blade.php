@@ -136,13 +136,20 @@
             </section>
 
             <section id="devices">
-                <div style="margin-bottom: 16px;">
-                    <h2 class="bb-section-title" style="font-size: 20px;">Connected devices</h2>
-                    <p class="bb-section-copy">Browsers connected to this BrowserBridge server.</p>
+                <div class="bb-section-head" style="margin-bottom: 16px;">
+                    <div>
+                        <h2 class="bb-section-title" style="font-size: 20px;">Connected devices</h2>
+                        <p class="bb-section-copy">Browsers connected to this BrowserBridge server.</p>
+                    </div>
+                    <div class="bb-row" style="gap: 8px;">
+                        <a href="{{ route('dashboard', ['status' => 'active']) }}#devices" class="bb-button {{ $deviceStatus === 'active' ? 'bb-button-accent' : 'bb-button-secondary' }}">Active</a>
+                        <a href="{{ route('dashboard', ['status' => 'disconnected']) }}#devices" class="bb-button {{ $deviceStatus === 'disconnected' ? 'bb-button-accent' : 'bb-button-secondary' }}">Disconnected</a>
+                        <a href="{{ route('dashboard', ['status' => 'all']) }}#devices" class="bb-button {{ $deviceStatus === 'all' ? 'bb-button-accent' : 'bb-button-secondary' }}">All</a>
+                    </div>
                 </div>
 
                 @if ($devices->isEmpty())
-                    <div class="bb-card bb-empty">No devices have registered yet.</div>
+                    <div class="bb-card bb-empty">No devices found.</div>
                 @else
                     <div class="bb-grid bb-grid-2">
                         @foreach ($devices as $device)
@@ -224,10 +231,34 @@
                                             </div>
                                         </div>
                                         <div class="bb-row" style="margin-top:8px;">
-                                            <form method="POST" action="{{ route('dashboard.device.destroy', $device) }}" onsubmit="return confirm('Disconnect this device?');">
+                                            @if($device->trashed())
+                                                <span class="bb-badge bb-badge-warning">Disconnected on {{ $device->disconnected_at?->format('M d, Y') }}</span>
+                                            @else
+                                                <form method="POST" action="{{ route('dashboard.device.destroy', $device) }}" onsubmit="return confirm('Disconnect this device? It will disappear from active devices and pending tab commands will be cancelled. Existing synced data will be kept.');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="bb-button bb-button-danger" style="min-height:30px;font-size:12px;padding:4px 8px;">Disconnect</button>
+                                                </form>
+                                            @endif
+                                        </div>
+
+                                        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bb-border);">
+                                            <h4 class="bb-item-title" style="color:var(--bb-warning-text)">Purge device data</h4>
+                                            <p class="bb-item-meta" style="margin-top:4px;">This permanently deletes this device and its related BrowserBridge data. This cannot be undone.</p>
+                                            
+                                            <div class="bb-list" style="margin-top:8px; padding:8px 0; gap:4px; font-size:11px;">
+                                                <div>• {{ $device->normalized_bookmarks_count }} bookmarks</div>
+                                                <div>• {{ $device->history_items_count }} history items</div>
+                                                <div>• {{ $device->tab_snapshots_count }} tab snapshots</div>
+                                                <div>• {{ $device->sent_tab_commands_count + $device->incoming_tab_commands_count }} tab commands</div>
+                                                <div>• {{ $device->bookmark_sync_profiles_as_source_count + $device->bookmark_sync_profiles_as_target_count }} sync profiles</div>
+                                            </div>
+
+                                            <form method="POST" action="{{ route('dashboard.device.purge', $device) }}" style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="bb-button bb-button-danger" style="min-height:30px;font-size:12px;padding:4px 8px;">Disconnect</button>
+                                                <input type="text" name="confirmation_text" placeholder="Type DELETE DEVICE DATA" required style="font-size:12px; padding:6px 8px; border:1px solid var(--bb-border); border-radius:6px; background:var(--bb-surface); color:var(--bb-text);">
+                                                <button type="submit" class="bb-button" style="background:var(--bb-warning-text); color:white; min-height:30px; font-size:12px; padding:4px 8px; justify-content:center;">Purge Permanently</button>
                                             </form>
                                         </div>
                                     </div>

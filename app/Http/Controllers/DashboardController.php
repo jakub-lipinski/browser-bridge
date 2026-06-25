@@ -28,11 +28,22 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $bookmarkQuery = $request->string('bookmark_query')->trim()->toString();
-        $devices = Device::query()
+        $deviceStatus = $request->string('status')->trim()->toString() ?: 'active';
+        
+        $devicesQuery = Device::query()
+            ->when($deviceStatus === 'all', fn (Builder $query) => $query->withTrashed())
+            ->when($deviceStatus === 'disconnected', fn (Builder $query) => $query->onlyTrashed());
+
+        $devices = $devicesQuery
             ->with(['latestBookmarkSnapshot', 'latestTabSnapshot'])
             ->withCount([
                 'historyItems',
                 'normalizedBookmarks',
+                'tabSnapshots',
+                'sentTabCommands',
+                'incomingTabCommands',
+                'bookmarkSyncProfilesAsSource',
+                'bookmarkSyncProfilesAsTarget',
                 'incomingTabCommands as pending_tab_commands_count' => fn ($query) => $query->where('status', TabCommandStatus::Pending),
             ])
             ->latest('last_seen_at')
@@ -41,8 +52,9 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'devices' => $devices,
+            'deviceStatus' => $deviceStatus,
             'storageCounts' => [
-                'devices' => Device::query()->count(),
+                'devices' => Device::query()->withTrashed()->count(),
                 'bookmarkSnapshots' => BookmarkSnapshot::query()->count(),
                 'normalizedBookmarks' => NormalizedBookmark::query()->count(),
                 'tabSnapshots' => TabSnapshot::query()->count(),

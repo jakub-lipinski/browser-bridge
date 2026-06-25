@@ -29,6 +29,7 @@ class DeviceController extends Controller
 
         return DeviceResource::collection(
             Device::query()
+                ->when($request->boolean('include_disconnected'), fn ($query) => $query->withTrashed())
                 ->latest('last_seen_at')
                 ->latest()
                 ->get(),
