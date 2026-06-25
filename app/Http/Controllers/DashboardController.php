@@ -28,13 +28,7 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $bookmarkQuery = $request->string('bookmark_query')->trim()->toString();
-        $deviceStatus = $request->string('status')->trim()->toString() ?: 'active';
-
-        $devicesQuery = Device::query()
-            ->when($deviceStatus === 'all', fn (Builder $query) => $query->withTrashed())
-            ->when($deviceStatus === 'disconnected', fn (Builder $query) => $query->onlyTrashed());
-
-        $devices = $devicesQuery
+        $devices = Device::query()->withTrashed()
             ->with(['latestBookmarkSnapshot', 'latestTabSnapshot'])
             ->withCount([
                 'historyItems',
@@ -52,7 +46,6 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'devices' => $devices,
-            'deviceStatus' => $deviceStatus,
             'storageCounts' => [
                 'devices' => Device::query()->withTrashed()->count(),
                 'bookmarkSnapshots' => BookmarkSnapshot::query()->count(),

@@ -2,11 +2,12 @@
     <x-dashboard.sidebar>
         <x-dashboard.sidebar-item href="#overview" :active="true" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'>Overview</x-dashboard.sidebar-item>
         <x-dashboard.sidebar-item href="#devices" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg>'>Devices</x-dashboard.sidebar-item>
-        <x-dashboard.sidebar-item href="#tabs" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8"/></svg>'>Tabs</x-dashboard.sidebar-item>
+        <x-dashboard.sidebar-item href="#tab-handoff" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8"/></svg>'>Tab handoff</x-dashboard.sidebar-item>
+        <x-dashboard.sidebar-item href="#bookmark-sync" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>'>Bookmark sync</x-dashboard.sidebar-item>
+        <x-dashboard.sidebar-item href="#activity" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'>Activity</x-dashboard.sidebar-item>
         <x-dashboard.sidebar-item href="#bookmarks" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>'>Bookmarks</x-dashboard.sidebar-item>
         <x-dashboard.sidebar-item href="#history" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/><path d="M12 7v5l3 2"/></svg>'>History</x-dashboard.sidebar-item>
-        <x-dashboard.sidebar-item href="#activity" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>'>Activity</x-dashboard.sidebar-item>
-        <x-dashboard.sidebar-item href="#settings" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>'>Settings</x-dashboard.sidebar-item>
+        <x-dashboard.sidebar-item href="#privacy-data" icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>'>Privacy & Data</x-dashboard.sidebar-item>
     </x-dashboard.sidebar>
 
     <div class="flex-1 min-w-0 flex flex-col gap-10">
@@ -35,10 +36,10 @@
 
         <x-dashboard.section id="devices" title="Connected devices" description="Browsers connected to this BrowserBridge server." class="scroll-mt-8">
             <x-slot:badge>
-                <div class="flex gap-2">
-                    <x-dashboard.button href="{{ route('dashboard', ['status' => 'active']) }}#devices" variant="{{ $deviceStatus === 'active' ? 'primary' : 'secondary' }}">Active</x-dashboard.button>
-                    <x-dashboard.button href="{{ route('dashboard', ['status' => 'disconnected']) }}#devices" variant="{{ $deviceStatus === 'disconnected' ? 'primary' : 'secondary' }}">Disconnected</x-dashboard.button>
-                    <x-dashboard.button href="{{ route('dashboard', ['status' => 'all']) }}#devices" variant="{{ $deviceStatus === 'all' ? 'primary' : 'secondary' }}">All</x-dashboard.button>
+                <div class="flex gap-2" id="device-filters">
+                    <x-dashboard.button data-filter="active" onclick="filterDevices('active')" variant="primary">Active</x-dashboard.button>
+                    <x-dashboard.button data-filter="disconnected" onclick="filterDevices('disconnected')" variant="secondary">Disconnected</x-dashboard.button>
+                    <x-dashboard.button data-filter="all" onclick="filterDevices('all')" variant="secondary">All</x-dashboard.button>
                 </div>
             </x-slot:badge>
             
@@ -47,92 +48,20 @@
             @else
                 <div class="grid md:grid-cols-2 gap-4">
                     @foreach ($devices as $device)
-                        <x-dashboard.device-card 
-                            :device="$device" 
-                            :is-active="!$device->trashed()"
-                            disconnectRoute="{{ route('dashboard.device.destroy', $device) }}"
-                            purgeRoute="{{ route('dashboard.device.purge', $device) }}"
-                        />
+                        <div data-device-card data-status="{{ $device->trashed() ? 'disconnected' : 'active' }}">
+                            <x-dashboard.device-card 
+                                :device="$device" 
+                                :is-active="!$device->trashed()"
+                                disconnectRoute="{{ route('dashboard.device.destroy', $device) }}"
+                                purgeRoute="{{ route('dashboard.device.purge', $device) }}"
+                            />
+                        </div>
                     @endforeach
                 </div>
             @endif
         </x-dashboard.section>
 
-        <x-dashboard.section id="activity" title="Bookmark Sync" description="Profiles for Safe Folder Import, Merge, and guarded Mirror runs." class="scroll-mt-8">
-            <x-slot:badge>
-                <x-dashboard.badge variant="accent">{{ $storageCounts['bookmarkSyncProfiles'] }} profiles</x-dashboard.badge>
-            </x-slot:badge>
-
-            @if ($bookmarkSyncProfiles->isEmpty())
-                <x-dashboard.empty-state title="No sync profiles yet." description="Create one from the Chrome extension options to preview and run imports." />
-            @else
-                <div class="grid grid-cols-1 gap-3">
-                    @foreach ($bookmarkSyncProfiles as $profile)
-                        <x-dashboard.card class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div class="flex flex-col gap-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-[var(--color-text)]">{{ $profile->name }}</span>
-                                    <x-dashboard.badge variant="{{ $profile->is_active ? 'accent' : 'neutral' }}">{{ $profile->is_active ? 'Active' : 'Paused' }}</x-dashboard.badge>
-                                    @if($profile->mode === \App\Enums\BookmarkSyncMode::Mirror)
-                                        <x-dashboard.badge variant="warning">Mirror</x-dashboard.badge>
-                                    @else
-                                        <x-dashboard.badge variant="neutral">{{ str($profile->mode->value)->replace('_', ' ')->title() }}</x-dashboard.badge>
-                                    @endif
-                                </div>
-                                <div class="text-sm text-[var(--color-muted)] flex items-center gap-2">
-                                    <span>{{ $profile->sourceDevice?->name ?? 'Target unavailable' }}</span>
-                                    <svg class="w-3 h-3 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                    <span>{{ $profile->targetDevice?->name ?? 'Target unavailable' }}</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:items-end gap-1 text-sm text-[var(--color-muted)]">
-                                <div>{{ $profile->auto_sync_enabled ? 'Every ' . $profile->auto_sync_interval_minutes . ' min' : 'Manual only' }}</div>
-                                <div class="text-xs">Last run: {{ $profile->last_run_at?->diffForHumans() ?? 'Never' }}</div>
-                            </div>
-                        </x-dashboard.card>
-                    @endforeach
-                </div>
-            @endif
-
-            <h3 class="text-lg font-bold text-[var(--color-text)] mt-6">Recent runs</h3>
-            @if ($bookmarkSyncRuns->isEmpty())
-                <x-dashboard.empty-state title="No sync runs recorded yet." />
-            @else
-                <x-dashboard.card class="overflow-hidden">
-                    <div class="divide-y divide-[var(--color-border)]">
-                        @foreach ($bookmarkSyncRuns as $run)
-                            <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[var(--color-surface-muted)] transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 {{ $run->status->value === 'success' ? 'bg-[var(--color-primary-subtle)] text-[var(--color-primary-text)]' : 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]' }}">
-                                        @if($run->status->value === 'success')
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
-                                        @else
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                        @endif
-                                    </div>
-                                    <div class="flex flex-col gap-0.5">
-                                        <div class="font-semibold text-sm text-[var(--color-text)]">{{ $run->profile?->name ?? 'Deleted profile' }}</div>
-                                        <div class="text-xs text-[var(--color-muted)] flex items-center gap-1.5">
-                                            <span>{{ $run->sourceDevice?->name ?? 'Target unavailable' }}</span>
-                                            <svg class="w-2.5 h-2.5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                            <span>{{ $run->targetDevice?->name ?? 'Target unavailable' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col sm:items-end gap-1">
-                                    <div class="text-sm font-mono text-[var(--color-text)]">
-                                        +{{ $run->added_count }} ~{{ $run->updated_count }} -{{ $run->deleted_count }}
-                                    </div>
-                                    <div class="text-xs text-[var(--color-muted)]">{{ $run->created_at?->diffForHumans() }}</div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </x-dashboard.card>
-            @endif
-        </x-dashboard.section>
-
-        <x-dashboard.section id="tabs" title="Tabs" description="Continue anywhere with your recent open and sent tabs." class="scroll-mt-8">
+        <x-dashboard.section id="tab-handoff" title="Tab handoff" description="Continue anywhere with your recent open and sent tabs." class="scroll-mt-8">
             <x-dashboard.card class="p-5 flex flex-col gap-4 border-[var(--color-primary-border)]">
                 <h3 class="text-base font-bold text-[var(--color-primary-text)] m-0">Recent tab handoffs</h3>
                 @if ($tabCommands->isEmpty())
@@ -192,7 +121,83 @@
             @endif
         </x-dashboard.section>
 
-        <div class="grid lg:grid-cols-2 gap-6">
+        <x-dashboard.section id="bookmark-sync" title="Bookmark Sync" description="Profiles for Safe Folder Import, Merge, and guarded Mirror runs." class="scroll-mt-8">
+            <x-slot:badge>
+                <x-dashboard.badge variant="accent">{{ $storageCounts['bookmarkSyncProfiles'] }} profiles</x-dashboard.badge>
+            </x-slot:badge>
+
+            @if ($bookmarkSyncProfiles->isEmpty())
+                <x-dashboard.empty-state title="No sync profiles yet." description="Create one from the Chrome extension options to preview and run imports." />
+            @else
+                <div class="grid grid-cols-1 gap-3">
+                    @foreach ($bookmarkSyncProfiles as $profile)
+                        <x-dashboard.card class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-[var(--color-text)]">{{ $profile->name }}</span>
+                                    <x-dashboard.badge variant="{{ $profile->is_active ? 'accent' : 'neutral' }}">{{ $profile->is_active ? 'Active' : 'Paused' }}</x-dashboard.badge>
+                                    @if($profile->mode === \App\Enums\BookmarkSyncMode::Mirror)
+                                        <x-dashboard.badge variant="warning">Mirror</x-dashboard.badge>
+                                    @else
+                                        <x-dashboard.badge variant="neutral">{{ str($profile->mode->value)->replace('_', ' ')->title() }}</x-dashboard.badge>
+                                    @endif
+                                </div>
+                                <div class="text-sm text-[var(--color-muted)] flex items-center gap-2">
+                                    <span>{{ $profile->sourceDevice?->name ?? 'Target unavailable' }}</span>
+                                    <svg class="w-3 h-3 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                    <span>{{ $profile->targetDevice?->name ?? 'Target unavailable' }}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:items-end gap-1 text-sm text-[var(--color-muted)]">
+                                <div>{{ $profile->auto_sync_enabled ? 'Every ' . $profile->auto_sync_interval_minutes . ' min' : 'Manual only' }}</div>
+                                <div class="text-xs">Last run: {{ $profile->last_run_at?->diffForHumans() ?? 'Never' }}</div>
+                            </div>
+                        </x-dashboard.card>
+                    @endforeach
+                </div>
+            @endif
+
+        </x-dashboard.section>
+
+        <x-dashboard.section id="activity" title="Activity" description="Recent logs of Bookmark Sync runs." class="scroll-mt-8">
+            @if ($bookmarkSyncRuns->isEmpty())
+                <x-dashboard.empty-state title="No sync runs recorded yet." />
+            @else
+                <x-dashboard.card class="overflow-hidden">
+                    <div class="divide-y divide-[var(--color-border)]">
+                        @foreach ($bookmarkSyncRuns as $run)
+                            <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[var(--color-surface-muted)] transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 {{ $run->status->value === 'success' ? 'bg-[var(--color-primary-subtle)] text-[var(--color-primary-text)]' : 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]' }}">
+                                        @if($run->status->value === 'success')
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                                        @else
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                        @endif
+                                    </div>
+                                    <div class="flex flex-col gap-0.5">
+                                        <div class="font-semibold text-sm text-[var(--color-text)]">{{ $run->profile?->name ?? 'Deleted profile' }}</div>
+                                        <div class="text-xs text-[var(--color-muted)] flex items-center gap-1.5">
+                                            <span>{{ $run->sourceDevice?->name ?? 'Target unavailable' }}</span>
+                                            <svg class="w-2.5 h-2.5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                            <span>{{ $run->targetDevice?->name ?? 'Target unavailable' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col sm:items-end gap-1">
+                                    <div class="text-sm font-mono text-[var(--color-text)]">
+                                        +{{ $run->added_count }} ~{{ $run->updated_count }} -{{ $run->deleted_count }}
+                                    </div>
+                                    <div class="text-xs text-[var(--color-muted)]">{{ $run->created_at?->diffForHumans() }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </x-dashboard.card>
+            @endif
+        </x-dashboard.section>
+
+        <div class="flex flex-col gap-10">
             <x-dashboard.section 
                 id="bookmarks" 
                 title="Bookmarks" 
@@ -284,7 +289,7 @@
             </x-dashboard.section>
         </div>
 
-        <x-dashboard.danger-zone id="settings" class="scroll-mt-8" title="Privacy controls & Settings" description="Synced history is retained for {{ config('browserbridge.history_retention_days') }} days by default and is only a BrowserBridge shared view.">
+        <x-dashboard.danger-zone id="privacy-data" class="scroll-mt-8" title="Privacy controls & Data" description="Synced history is retained for {{ config('browserbridge.history_retention_days') }} days by default and is only a BrowserBridge shared view.">
             <form method="POST" action="{{ route('dashboard.history.destroy') }}" onsubmit="return confirm('Delete all synced BrowserBridge history?');">
                 @csrf
                 @method('DELETE')
@@ -342,7 +347,34 @@
     </x-dashboard.modal>
 
     <script>
+        window.filterDevices = function(status) {
+            // Update button styles
+            document.querySelectorAll('#device-filters [data-filter]').forEach(btn => {
+                if (btn.dataset.filter === status) {
+                    btn.classList.add('bg-[var(--color-primary)]', 'text-[var(--color-primary-text)]');
+                    btn.classList.remove('bg-[var(--color-surface)]', 'text-[var(--color-text)]', 'hover:bg-[var(--color-surface-muted)]');
+                } else {
+                    btn.classList.remove('bg-[var(--color-primary)]', 'text-[var(--color-primary-text)]');
+                    btn.classList.add('bg-[var(--color-surface)]', 'text-[var(--color-text)]', 'hover:bg-[var(--color-surface-muted)]');
+                }
+            });
+
+            // Update card visibility
+            document.querySelectorAll('[data-device-card]').forEach(card => {
+                if (status === 'all' || card.dataset.status === status) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Initial filter state based on URL or default to 'active'
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialStatus = urlParams.get('device_status') || 'active';
+            window.filterDevices(initialStatus);
+
             const observer = new IntersectionObserver((entries) => {
                 let activeId = null;
                 // Find the first intersecting entry from the top

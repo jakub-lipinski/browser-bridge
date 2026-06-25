@@ -47,20 +47,13 @@ test('disconnected device hidden from active list but visible in disconnected', 
     $active = Device::factory()->create();
     $disconnected = Device::factory()->create(['deleted_at' => now(), 'is_active' => false]);
 
-    // Active
+    // All devices are returned to the DOM now for JS filtering.
+    // We just verify they are rendered and have the correct data-status.
     $this->get(route('dashboard'))
         ->assertSee($active->name)
-        ->assertDontSee($disconnected->name);
-
-    // Disconnected
-    $this->get(route('dashboard', ['status' => 'disconnected']))
         ->assertSee($disconnected->name)
-        ->assertDontSee($active->name);
-
-    // All
-    $this->get(route('dashboard', ['status' => 'all']))
-        ->assertSee($active->name)
-        ->assertSee($disconnected->name);
+        ->assertSee('data-status="active"', false)
+        ->assertSee('data-status="disconnected"', false);
 });
 
 test('purge requires exact confirmation', function () {
